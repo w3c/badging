@@ -45,6 +45,8 @@ Examples of sites that may use this API:
 * Chat, email and social apps, to signal that new messages have arrived.
 * Productivity apps, to signal that a long-running background task (such as
   rendering an image or video) has completed.
+* Apps that want to render a small status indicator (e.g., a music app shows ▶️
+  or ⏸️; a weather app shows ⛈️ or ⛅).
 * Games, to signal that a player action is required (e.g., in Chess, when it is
   the player's turn).
 
