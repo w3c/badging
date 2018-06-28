@@ -141,3 +141,53 @@ self.addEventListener('sync', () => {
   * Saturating a number; e.g., 351 -> "99+".
   * Representing a character as a number; e.g., "?" -> "1".
   * Truncating a grapheme cluster; e.g., "நி" -> "ந".
+
+## FAQ
+
+### What data types are supported in different operating systems?
+
+To be detailed in this doc at a later time.
+
+### Could the API take a fallback type?
+
+The proposal is: what if instead of just taking *one of* the string or integer,
+we allow sites to pass both, with an order of preference. This way, you could
+supply a string, but if strings aren't supported, fall back to a given number,
+or vice versa.
+
+This is something we're considering. My concern is that it makes the API too
+complex, where practically it isn't required (e.g., I believe all major
+platforms support at least one character strings).
+
+### Why limit the support to a single grapheme cluster? Is there a technical limitation?
+
+It isn't a technical limitation. It's an attempt to keep the behaviour as
+consistent as possible between different host platforms.
+
+We could say "provide an arbitrarily long string, and we'll truncate it", but
+having some platforms truncate to just 1 or 2 characters, and others showing a
+bit more text, makes it too unpredictable. Limiting to precisely one character
+levels the playing field.
+
+### Is there an upper limit on the size of the integer? And if so, what's the behavior if that limit is reached?
+
+There is no upper limit (besides 2<sup>31</sup>). However, each user agent is
+free to impose a limit and silently saturate the value (e.g., display all values
+above 99 as "99+").
+
+This is different to the string, since truncating a string may change or destroy
+its meaning, whereas the integer always has the semantics of counting, and thus
+saturating the integer still preserves most of its meaning (i.e., "lots").
+
+### Are you concerned about apps perpetually showing a large unread count?
+
+Yes. If users habitually leave mail or chats unread, and mail or chat apps
+simply call `set(getUnreadCount())`, it could result in several apps simply
+showing a large number, presenting several issues:
+
+* Leaving "clutter" on the user's shelf, and
+* Making the user unable to tell when new messages arrive.
+
+However, the only solution to this is a much more limited API which only lets
+you show the count of notifications (or similar). We wanted to give apps the
+full power of showing a native badge.
