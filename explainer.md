@@ -46,7 +46,7 @@ Examples of sites that may use this API:
 * Productivity apps, to signal that a long-running background task (such as
   rendering an image or video) has completed.
 * Apps that want to render a small status indicator (e.g., a music app shows ▶️
-  or ⏸️; a weather app shows ⛈️ or ⛅).
+  or ⏸️; a weather app shows ⛈️ or ⛅️).
 * Games, to signal that a player action is required (e.g., in Chess, when it is
   the player's turn).
 
@@ -86,7 +86,7 @@ character. Examples of grapheme clusters include:
 
 * "a" (a single character, Latin "a")
 * "நி" (a base character + combining character, Tamil "ni")
-* 👩🏾‍🔬 (emoji combination with skin tone modifier, Woman Scientist with
+* 👩🏾‍🔬️ (emoji combination with skin tone modifier, Woman Scientist with
   Medium-Dark Skin Tone)
 
 User agents are encouraged to use integers instead of digit characters, because
