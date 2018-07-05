@@ -170,8 +170,9 @@ Requires macOS 10.5 or higher.
 ### Universal Windows Platform
 
 Requires Windows 10 or higher, and requires that the user agent be a "UWP" app.
-Note that Google Chrome and Mozilla Firefox do not fall into this category, and
-likely don't have access to the necessary APIs.
+(TODO: Unless this is one of those UWP APIs that can be called from Win32 code?
+Need to investigate.) Note that Google Chrome and Mozilla Firefox do not fall
+into this category, and likely don't have access to the necessary APIs.
 
 * The host API is
   [`BadgeNotification`](https://docs.microsoft.com/en-us/uwp/api/windows.ui.notifications.badgenotification),
