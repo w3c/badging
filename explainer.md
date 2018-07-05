@@ -32,13 +32,17 @@ The purpose of this API is:
 
 Non-goals are:
 
-* To provide badging for sites in a normal web browsing context. While it will
-  be available to normal websites, user agents will generally not surface the
-  badge unless the app is installed or has some presence in the operating system
-  shelf area.
-* To provide per-window badging information. The API is a global badge for the
-  application, not per-window or per-tab.
 * To provide an arbitrary image badge.
+
+Possible areas for expansion:
+
+* Providing badging for sites in a normal web browsing context. The current
+  proposal is just for installed apps (designed to show up in the operating
+  system shelf area). We could also explore icon badging on the drive-by web.
+  This naturally leads into...
+* Provide per-window badging information. The current proposal is for a global
+  badge for the application, not per-window or per-tab. See
+  [#1](https://github.com/mgiuca/badging/issues/1).
 
 Examples of sites that may use this API:
 
