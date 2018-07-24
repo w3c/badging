@@ -219,6 +219,13 @@ Requires Android 8.0 (Oreo) or higher.
 * Tricky: The API is tied to notifications. You can't show a badge unless there
   are pending notifications.
 
+### Chrome OS
+
+Not currently supported, but will [soon be available](https://crbug.com/801014)
+for Android apps using the above `NotificationChannel` API. The Chrome browser
+itself will be able to re-use this mechanism for showing a coloured dot on web
+application icons.
+
 ### iOS
 
 * The host API is
