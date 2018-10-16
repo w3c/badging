@@ -219,6 +219,13 @@
           <li>Else, set the application's badge to <var>contents</var>.
           </li>
         </ol>
+        <div class="issue">
+          It is a bit weird that <code>set(0)</code> clears the badge, while
+          <code>set()</code> sets it to <b>flag</b>. This is designed so that
+          the above example code for setting the unread count will
+          automatically clear the badge when the unread count is 0. But it
+          could be a bit unintuitive.
+        </div>
       </section>
       <section>
         <h3>
