@@ -55,6 +55,34 @@
       <h2>
         Usage examples
       </h2>
+      <p>
+        The following example shows how an email application might set a badge
+        showing the unread count, which is updated whenever the client polls
+        for mail from the server.
+      </p>
+      <pre class="example javascript" title="Showing unread count">
+        async function pollForMail() {
+          // ... Fetch unread mail from server. ...
+
+          // Set the app icon badge. If getUnreadCount() returns 0, this is
+          // equivalent to Badge.clear().
+          Badge.set(getUnreadCount());
+        }
+      </pre>
+      <p>
+        The next example shows how a media player might show whether music is
+        playing or paused.
+      </p>
+      <pre class="example javascript" title="Showing media status">
+        function changeMediaState(newState) {
+          if (newState === "play")
+            Badge.set("▶");
+          else if (newState === "pause")
+            Badge.set("⏸");
+          else
+            Badge.clear();
+        }
+      </pre>
     </section>
     <section data-dfn-for="Badge">
       <h2>
