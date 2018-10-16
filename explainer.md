@@ -93,8 +93,8 @@ character. Examples of grapheme clusters include:
 * 👩🏾‍🔬️ (emoji combination with skin tone modifier, Woman Scientist with
   Medium-Dark Skin Tone)
 
-User agents are encouraged to use integers instead of digit characters, because
-some operating systems may *only* support integer badges, so using the digit
+Clients are encouraged to use integers instead of digit characters, because some
+operating systems may *only* support integer badges, so using the digit
 character would not display correctly. Also integers can be localized better for
 the user.
 
