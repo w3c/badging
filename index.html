@@ -152,10 +152,16 @@
       </h2>
       <p>
         When the application is <a data-cite=
-        "appmanifest#dfn-installing">installed</a>, the user agent SHOULD
-        display the application's badge alongside the symbolic representation
-        of the application in the user's operating system (for example, as a
-        small overlay on top of the application's icon).
+        "appmanifest#dfn-installing">installed</a> and the application's flag
+        is <a>set</a>, the user agent SHOULD display the application's badge
+        alongside the symbolic representation of the application in the user's
+        operating system (for example, as a small overlay on top of the
+        application's icon).
+      </p>
+      <p>
+        The special value <b>flag</b> indicates that the badge is set, but
+        contains no specific data. In this case, the user agent SHOULD show an
+        indicator with a non-specific symbol (such as a coloured circle).
       </p>
       <p>
         The user agent MAY simplify or degrade the data in any way. For
