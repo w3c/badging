@@ -85,6 +85,87 @@
         }
       </pre>
     </section>
+    <section>
+      <h2>
+        Badge model
+      </h2>
+      <p>
+        There is a single global badge associated with each <a data-cite=
+        "appmanifest">web application</a>. At any time, the application's badge
+        is set to one of the following values:
+      </p>
+      <ul>
+        <li>The special value <b>nothing</b>.
+        </li>
+        <li>The special value <b>flag</b>.
+        </li>
+        <li>A <code><a data-cite="WEBIDL#idl-USVString">USVString</a></code>
+        value, which must be non-empty, containing a single <a data-cite=
+        "UAX29#Grapheme_Cluster_Boundaries">grapheme cluster</a>.
+        </li>
+        <li>A <code><a data-cite="WEBIDL#idl-long">long</a></code> value, which
+        must be positive.
+        </li>
+      </ul>
+      <p>
+        The user agent MUST initialize each application's badge to
+        <b>nothing</b>. The user agent MAY reset an application's badge to
+        <b>nothing</b> at its discretion (for example, when the system is
+        restarted).
+      </p>
+      <p>
+        If the application's badge is <b>nothing</b>, the badge is said to be
+        "<dfn>cleared</dfn>". Otherwise, it is said to be "<dfn>set</dfn>".
+      </p>
+      <p>
+        The application's badge MUST NOT contain the empty string, a negative
+        integer, or the integer value 0.
+      </p>
+      <div class="note">
+        <p>
+          A <a data-cite="UAX29#Grapheme_Cluster_Boundaries">grapheme
+          cluster</a> is usually a single Unicode character. However, it can
+          also contain multiple characters that are combined into what the user
+          thinks of as a single character. Examples of grapheme clusters
+          include:
+        </p>
+        <ul>
+          <li>"a" (a single character, Latin "a")
+          </li>
+          <li>"நி" (a base character + combining character, Tamil "ni")
+          </li>
+          <li>👩🏾‍🔬️ (emoji combination with skin tone modifier, Woman Scientist
+          with Medium-Dark Skin Tone)
+          </li>
+        </ul>
+      </div>
+      <p class="note">
+        Clients are encouraged to use integers instead of digit characters,
+        because some user agents may <em>only</em> support integer badges, so
+        using the digit character would not display correctly. Also integers
+        can be localized better for the user.
+      </p>
+    </section>
+    <section>
+      <h2>
+        Badge display
+      </h2>
+      <p>
+        When the application is <a data-cite=
+        "appmanifest#dfn-installing">installed</a>, the user agent SHOULD
+        display the application's badge alongside the symbolic representation
+        of the application in the user's operating system (for example, as a
+        small overlay on top of the application's icon).
+      </p>
+      <p>
+        The user agent MAY simplify or degrade the data in any way. For
+        example, a multi-character grapheme cluster may be truncated. A large
+        integer may be saturated (for example, as "99+"). The font and
+        formatting are entirely at the user agent's discretion. The user agent
+        MAY ignore the data, and merely show a marker when the status is
+        <a>set</a>.
+      </p>
+    </section>
     <section data-dfn-for="Badge">
       <h2>
         <code>Badge</code> interface
@@ -100,16 +181,58 @@
         The <dfn>Badge</dfn> interface provides methods for setting and
         clearing the application badge indicator.
       </p>
+      <div class="issue">
+        This section is not clear about which web application is associated
+        with a particular context. In particular, when called from a
+        <a data-cite="service-workers-1">service worker</a> whose scope is
+        outside of the <a data-cite="appmanifest">app manifest</a> scope, the
+        web application may be ambiguous.
+      </div>
       <section>
         <h3>
           <dfn>set()</dfn> method
         </h3>
+        <p>
+          When the <code>set()</code> method is called with argument
+          <var>contents</var>, run the following steps:
+        </p>
+        <ol>
+          <li>If <var>contents</var> is omitted, set the application's badge to
+          <b>flag</b>.
+          </li>
+          <li>If <var>contents</var> is 0 or the empty string, set the
+          application's badge to <b>nothing</b>.
+          </li>
+          <li>Else, if <var>contents</var> is an integer that is less than 0,
+          throw a <a>TypeError</a>.
+          </li>
+          <li>Else, if <var>contents</var> is a string containing more than one
+          <a data-cite="UAX29#Grapheme_Cluster_Boundaries">grapheme
+          cluster</a>, throw a <a>TypeError</a>.
+          </li>
+          <li>Else, set the application's badge to <var>contents</var>.
+          </li>
+        </ol>
       </section>
       <section>
         <h3>
           <dfn>clear()</dfn> method
         </h3>
+        <p>
+          When the <code>clear()</code> method is called, set the application's
+          badge to <b>nothing</b>.
+        </p>
       </section>
+    </section>
+    <section>
+      <h2>
+        Dependencies
+      </h2>
+      <p>
+        <code><dfn data-cite=
+        "!ECMASCRIPT#sec-native-error-types-used-in-this-standard-typeerror">TypeError</dfn></code>
+        is defined by [[!ECMASCRIPT]].
+      </p>
     </section>
   </body>
 </html>
