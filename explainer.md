@@ -42,7 +42,7 @@ Possible areas for expansion:
   This naturally leads into...
 * Provide per-window badging information. The current proposal is for a global
   badge for the application, not per-window or per-tab. See
-  [#1](https://github.com/mgiuca/badging/issues/1).
+  [#1](https://github.com/WICG/badging/issues/1).
 
 Examples of sites that may use this API:
 
