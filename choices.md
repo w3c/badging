@@ -19,7 +19,7 @@ Options:
 
 ## Function arrangement / argument types
 
-Discussion: In [PR #16](https://github.com/WICG/badging/pull/16#discussion_r239075969)
+Issue: [#19](https://github.com/WICG/badging/issues/19)
 
 Options:
 
@@ -34,7 +34,7 @@ Options:
 
 ## Should there be a function to read the badge back out?
 
-Discussion: In [PR #16](https://github.com/WICG/badging/pull/16#discussion_r239075969)
+Issue: [#18](https://github.com/WICG/badging/issues/18)
 
 Options:
 
