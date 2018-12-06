@@ -39,8 +39,8 @@ Possible areas for expansion:
   proposal is just for installed apps (designed to show up in the operating
   system shelf area). We could also explore icon badging on the drive-by web.
   This naturally leads into...
-* Providing per-tab badging information. The current proposal is for an
-  application badge See	[#1](https://github.com/WICG/badging/issues/1).
+* Providing per-tab and per-window badging. The current proposal
+  is for an application badge See [#1](https://github.com/WICG/badging/issues/1).
 * Support apps that want to render a small status indicator (e.g., a music app shows ▶️	
   or ⏸️; a weather app shows ⛈️ or ⛅️).
 * Setting the badge from a service worker (e.g. an email app updating an unread count).
@@ -76,7 +76,8 @@ manifest](https://www.w3.org/TR/appmanifest/)). At any time, the badge is set wi
 * A "flag" indicating the presence of a badge with no contents, or
 * A positive integer.
 
-The model does not allow a badge that is a negative integer.
+The model does not allow a badge that is a negative integer, or the integer value 0
+(setting the badge to 0 is equivalent to clearing the badge).
 
 ### The API
 
@@ -233,12 +234,12 @@ Thus, a fallback option for platforms that do not support arbitrary characters
 
 ### What data types are supported in different operating systems?	
 
-See above
+See above.
 
 ### Why limit support to just an integer? What about other characters?
 
 It isn't a technical limitation, it's an attempt to keep behavior as consistent as possible
-on different host platforms (UWP only supports a subset of characters, while iOS, Android
+on different host platforms (UWP only supports a set of symbols, while iOS, Android
 and Ubuntu don't support them at all).
 
 Limiting support to integers makes behavior more predictable, though we are considering
