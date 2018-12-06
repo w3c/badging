@@ -58,8 +58,8 @@ Options for further content values:
 
 ## Scope of a badge (origin vs app vs window vs tab)
 
-Issue: [#1](https://github.com/WICG/badging/issues/1)
-Issue: [#12](https://github.com/WICG/badging/issues/12)
+Issues: [#1](https://github.com/WICG/badging/issues/1),
+[#12](https://github.com/WICG/badging/issues/12)
 
 - Badge must be set from an installed app scope (foreground or service worker).
   Badge state is global for that app, and appears on all windows of that app.
