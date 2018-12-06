@@ -38,6 +38,12 @@ Possible areas for expansion:
 * Providing badging for sites in a normal web browsing context. The current
   proposal is just for installed apps (designed to show up in the operating
   system shelf area). We could also explore icon badging on the drive-by web.
+  This naturally leads into...
+* Providing per-tab badging information. The current proposal is for an
+  application badge See	[#1](https://github.com/WICG/badging/issues/1).
+* Support apps that want to render a small status indicator (e.g., a music app shows ▶️	
+  or ⏸️; a weather app shows ⛈️ or ⛅️).
+* Setting the badge from a service worker (e.g. an email app updating an unread count).
 
 Examples of sites that may use this API:
 
@@ -66,21 +72,23 @@ There is a single global badge associated with each Web
 application (as defined in [Web app
 manifest](https://www.w3.org/TR/appmanifest/)). At any time, the badge is set with:
 
-* Nothing (we display a notification "flag"), or
+* Nothing (the badge is "cleared"), or
+* A "flag" indicating the presence of a badge with no contents, or
 * A positive integer.
 
-The model does not allow a badge that is a negative integer or the integer value 0.
+The model does not allow a badge that is a negative integer.
 
 ### The API
 
 The `Badge` interface is a member object on
-[`Window`](https://html.spec.whatwg.org/#the-window-object)
+[`Window`](https://html.spec.whatwg.org/#the-window-object). It contains two methods:
 
 * `void set(optional long)`: Sets the associated app's badge to the
   given data, or just "flag" if the argument is not given.
 * `void clear()`: Sets the associated app's badge to nothing.
 
-These can be called from a foreground page 
+These can be called from a foreground page only (calling from a service worker is being
+considered for the future).
 
 TODO: An issue is that if the methods are called from a service worker whose
 scope is a parent of the web app manifest scope, it would be ambiguous which web
@@ -88,8 +96,17 @@ app is being identified. We need to take an optional scope parameter.
 
 Example code (from the main window):
 
+Setting an integer badge (as in an email app):
 ```js
-  window.Badge.set(getUnreadCount());
+Badge.set(getUnreadCount());
+```
+
+Setting and clearing a boolean flag (as in a game of chess):
+```js
+if (myTurn())
+  Badge.set();
+else
+  Badge.clear();
 ```
 
 ## UX treatment
@@ -214,7 +231,25 @@ Requires Ubuntu (no general API for Linux).
 Thus, a fallback option for platforms that do not support arbitrary characters
 (e.g., choose whether to show a number, or nothing) may be necessary.
 
-## FAQ
+### What data types are supported in different operating systems?	
+
+See above
+
+### Why limit support to just an integer? What about other characters?
+
+It isn't a technical limitation, it's an attempt to keep behavior as consistent as possible
+on different host platforms (UWP only supports a subset of characters, while iOS, Android
+and Ubuntu don't support them at all).
+
+Limiting support to integers makes behavior more predictable, though we are considering
+whether it might be worth adding support for other characters or symbols in future.
+
+### Why isn't this API available from a Service Worker?
+
+Ideally, it would be, and we're considering this for a future version of this API. 
+However, the API will require some more thought, as there can be multiple apps installed
+for a single service worker, so we would need some way of specifying which one should
+be badged.
 
 ### Is there an upper limit on the size of the integer? And if so, what's the behavior if that limit is reached?
 
