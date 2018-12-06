@@ -27,9 +27,9 @@ Options:
   clears. (incumbent)
 - `set(number)` to set a number (0 clears), `set(bool)` to set a flag (false
   clears). No "clear" method.
-- `setNumber(number) to set a number (0 clears), `setFlag(bool)` to set a flag
+- `setNumber(number)` to set a number (0 clears), `setFlag(bool)` to set a flag
   (false clears). No "clear" method.
-- `setNumber(number) to set a number (0 clears), `show()` to set a flag,
+- `setNumber(number)` to set a number (0 clears), `show()` to set a flag,
   `hide()` clears.
 
 ## Should there be a function to read the badge back out?
