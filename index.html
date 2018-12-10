@@ -71,15 +71,13 @@
         }
       </pre>
       <p>
-        The next example shows how a media player might show whether music is
-        playing or paused.
+        The next example shows how a game might show when it is the player's
+        turn.
       </p>
-      <pre class="example javascript" title="Showing media status">
-        function changeMediaState(newState) {
-          if (newState === "play")
-            Badge.set("▶");
-          else if (newState === "pause")
-            Badge.set("⏸");
+      <pre class="example javascript" title="Showing ready status">
+        function showPlayerTurn(playerTurnId) {
+          if (playerTurnId == localPlayerId)
+            Badge.set();
           else
             Badge.clear();
         }
@@ -99,10 +97,6 @@
         </li>
         <li>The special value <b>flag</b>.
         </li>
-        <li>A <code><a data-cite="WEBIDL#idl-USVString">USVString</a></code>
-        value, which must be non-empty, containing a single <a data-cite=
-        "UAX29#Grapheme_Cluster_Boundaries">grapheme cluster</a>.
-        </li>
         <li>A <code><a data-cite="WEBIDL#idl-long">long</a></code> value, which
         must be positive.
         </li>
@@ -118,32 +112,8 @@
         "<dfn>cleared</dfn>". Otherwise, it is said to be "<dfn>set</dfn>".
       </p>
       <p>
-        The application's badge MUST NOT contain the empty string, a negative
-        integer, or the integer value 0.
-      </p>
-      <div class="note">
-        <p>
-          A <a data-cite="UAX29#Grapheme_Cluster_Boundaries">grapheme
-          cluster</a> is usually a single Unicode character. However, it can
-          also contain multiple characters that are combined into what the user
-          thinks of as a single character. Examples of grapheme clusters
-          include:
-        </p>
-        <ul>
-          <li>"a" (a single character, Latin "a")
-          </li>
-          <li>"நி" (a base character + combining character, Tamil "ni")
-          </li>
-          <li>👩🏾‍🔬️ (emoji combination with skin tone modifier, Woman Scientist
-          with Medium-Dark Skin Tone)
-          </li>
-        </ul>
-      </div>
-      <p class="note">
-        Clients are encouraged to use integers instead of digit characters,
-        because some user agents may <em>only</em> support integer badges, so
-        using the digit character would not display correctly. Also integers
-        can be localized better for the user.
+        The application's badge MUST NOT contain a negative integer, or the
+        integer value 0.
       </p>
     </section>
     <section>
@@ -165,11 +135,10 @@
       </p>
       <p>
         The user agent MAY simplify or degrade the data in any way. For
-        example, a multi-character grapheme cluster may be truncated. A large
-        integer may be saturated (for example, as "99+"). The font and
-        formatting are entirely at the user agent's discretion. The user agent
-        MAY ignore the data, and merely show a marker when the status is
-        <a>set</a>.
+        example, a large integer may be saturated (for example, as "99+"). The
+        font and formatting are entirely at the user agent's discretion. The
+        user agent MAY ignore the data, and merely show a marker when the
+        status is <a>set</a>.
       </p>
     </section>
     <section data-dfn-for="Badge">
@@ -179,7 +148,7 @@
       <pre class="idl">
         [Exposed=(Window, Worker)]
         interface Badge {
-          static void set(optional (USVString or long) contents);
+          static void set(optional long contents);
           static void clear();
         };
       </pre>
@@ -206,15 +175,11 @@
           <li>If <var>contents</var> is omitted, set the application's badge to
           <b>flag</b>.
           </li>
-          <li>If <var>contents</var> is 0 or the empty string, set the
-          application's badge to <b>nothing</b>.
+          <li>If <var>contents</var> is 0, set the application's badge to
+          <b>nothing</b>.
           </li>
           <li>Else, if <var>contents</var> is an integer that is less than 0,
           throw a <a>TypeError</a>.
-          </li>
-          <li>Else, if <var>contents</var> is a string containing more than one
-          <a data-cite="UAX29#Grapheme_Cluster_Boundaries">grapheme
-          cluster</a>, throw a <a>TypeError</a>.
           </li>
           <li>Else, set the application's badge to <var>contents</var>.
           </li>
