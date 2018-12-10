@@ -148,7 +148,7 @@
       <pre class="idl">
         [Exposed=(Window, Worker)]
         interface Badge {
-          static void set(optional long contents);
+          static void set(optional [EnforceRange] long contents);
           static void clear();
         };
       </pre>
