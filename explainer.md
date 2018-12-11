@@ -39,8 +39,8 @@ Possible areas for expansion:
   proposal is just for installed apps (designed to show up in the operating
   system shelf area). We could also explore icon badging on the drive-by web.
   This naturally leads into...
-* Providing per-tab and per-window badging. The current proposal
-  is for an application badge See [#1](https://github.com/WICG/badging/issues/1).
+* Providing per-tab and per-window badging. The current proposal is for a global badge
+  for the application. See [#1](https://github.com/WICG/badging/issues/1).
 * Support apps that want to render a small status indicator (e.g., a music app shows ▶️	
   or ⏸️; a weather app shows ⛈️ or ⛅️).
 * Setting the badge from a service worker (e.g. an email app updating an unread count).
