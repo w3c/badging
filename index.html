@@ -97,7 +97,7 @@
         </li>
         <li>The special value <b>flag</b>.
         </li>
-        <li>An <code><a data-cite="WEBIDL#idl-unsigned-long">unsigned
+        <li>An <code><a data-cite="WEBIDL#idl-unsigned-long-long">unsigned long
         long</a></code> value, which MUST NOT be 0.
         </li>
       </ul>
@@ -144,7 +144,7 @@
       <pre class="idl">
         [Exposed=(Window, Worker)]
         interface Badge {
-          static void set(optional [EnforceRange] unsigned long contents);
+          static void set(optional [EnforceRange] unsigned long long contents);
           static void clear();
         };
       </pre>
