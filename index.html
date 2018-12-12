@@ -97,8 +97,8 @@
         </li>
         <li>The special value <b>flag</b>.
         </li>
-        <li>A <code><a data-cite="WEBIDL#idl-long">long</a></code> value, which
-        must be positive.
+        <li>An <code><a data-cite="WEBIDL#idl-unsigned-long-long">unsigned long
+        long</a></code> value, which MUST NOT be 0.
         </li>
       </ul>
       <p>
@@ -110,10 +110,6 @@
       <p>
         If the application's badge is <b>nothing</b>, the badge is said to be
         "<dfn>cleared</dfn>". Otherwise, it is said to be "<dfn>set</dfn>".
-      </p>
-      <p>
-        The application's badge MUST NOT contain a negative integer, or the
-        integer value 0.
       </p>
     </section>
     <section>
@@ -148,7 +144,7 @@
       <pre class="idl">
         [Exposed=(Window, Worker)]
         interface Badge {
-          static void set(optional long contents);
+          static void set(optional [EnforceRange] unsigned long long contents);
           static void clear();
         };
       </pre>
@@ -177,9 +173,6 @@
           </li>
           <li>If <var>contents</var> is 0, set the application's badge to
           <b>nothing</b>.
-          </li>
-          <li>Else, if <var>contents</var> is an integer that is less than 0,
-          throw a <a>TypeError</a>.
           </li>
           <li>Else, set the application's badge to <var>contents</var>.
           </li>

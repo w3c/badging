@@ -84,8 +84,8 @@ The model does not allow a badge that is a negative integer, or the integer valu
 The `Badge` interface is a member object on
 [`Window`](https://html.spec.whatwg.org/#the-window-object). It contains two methods:
 
-* `void set(optional long)`: Sets the associated app's badge to the
-  given data, or just "flag" if the argument is not given.
+* `void set(optional unsigned long long)`: Sets the associated app's badge to
+  the given data, or just "flag" if the argument is not given.
 * `void clear()`: Sets the associated app's badge to nothing.
 
 These can be called from a foreground page only (calling from a service worker is being
