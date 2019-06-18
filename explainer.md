@@ -275,4 +275,3 @@ full power of showing a native badge.
 The API is set only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
 
 A potential concern is that a web application could trick users into unnecessarily opening the application by showing a badge. By opening the application, the user could unintentionally expose private information. This is similar to the risk posed by notifications.
-
