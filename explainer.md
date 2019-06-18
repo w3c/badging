@@ -270,3 +270,7 @@ showing a large number, presenting several issues:
 However, the only solution to this is a much more limited API which only lets
 you show the count of notifications (or similar). We wanted to give apps the
 full power of showing a native badge.
+
+### Security and Privacy Considerations
+The API is set only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
+
