@@ -271,6 +271,9 @@ However, the only solution to this is a much more limited API which only lets
 you show the count of notifications (or similar). We wanted to give apps the
 full power of showing a native badge.
 
+### Internationalization
+The API allows `set()`ing an `unsigned long long`. When presenting this value, it should be formatted according to the user's locale settings.
+
 ### Security and Privacy Considerations
 The API is set only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
 
