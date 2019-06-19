@@ -8,7 +8,6 @@ Have the API work on tabs.
 - This would not change the API design.
 - We would like to add this in future.
 
-
 Make it possible to change the Badge colour.
 - Platform support would be limited (possibly only Windows).
 - Could be explored as a future extension.
