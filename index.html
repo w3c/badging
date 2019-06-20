@@ -23,6 +23,10 @@
           name: "Matt Giuca",
           company: "Google Inc.",
           companyURL: "https://google.com"
+        }, {
+          name: "Jay Harris",
+          company: "Google Inc.",
+          companyURL: "https://google.com"
         }],
         otherLinks: [{
           key: "Implementation status",
@@ -138,7 +142,10 @@
       </p>
       <p>
         When presenting a badge, it SHOULD be formatted according to the user's
-        locale settings.
+        <a data-cite="ltli/#locale">locale</a> settings.
+
+        For example, the badge content '7' should be displayed as '7' in the
+        <a data-cite="ltli/#locale">locale</a> 'en-NZ' but as '٧' in 'ar-EG'.
       </p>
     </section>
     <section data-dfn-for="Badge">
