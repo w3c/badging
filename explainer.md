@@ -276,4 +276,3 @@ The API allows `set()`ing an `unsigned long long`. When presenting this value, i
 
 ### Security and Privacy Considerations
 The API is set only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
-
