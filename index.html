@@ -96,9 +96,9 @@
         is set to one of the following values:
       </p>
       <ul>
-        <li>The special value <b>nothing</b>.
+        <li>The special value <a>nothing</a>.
         </li>
-        <li>The special value <b>flag</b>.
+        <li>The special value <a>flag</a>.
         </li>
         <li>An <code><a data-cite="WEBIDL#idl-unsigned-long-long">unsigned long
         long</a></code> value, which MUST NOT be 0.
@@ -106,12 +106,12 @@
       </ul>
       <p>
         The user agent MUST initialize each application's badge to
-        <b>nothing</b>. The user agent MAY reset an application's badge to
-        <b>nothing</b> at its discretion (for example, when the system is
+        <a>nothing</a>. The user agent MAY reset an application's badge to
+        <a>nothing</a> at its discretion (for example, when the system is
         restarted).
       </p>
       <p>
-        If the application's badge is <b>nothing</b>, the badge is said to be
+        If the application's badge is <dfn>nothing</dfn>, the badge is said to be
         "<dfn>cleared</dfn>". Otherwise, it is said to be "<dfn>set</dfn>".
       </p>
       <p>Note: The API is set only, so the badge data cannot be used to identify users.</p>
@@ -127,7 +127,7 @@
         overlay on top of the application's icon).
       </p>
       <p>
-        The special value <b>flag</b> indicates that the badge is set, but
+        The special value <dfn>flag</dfn> indicates that the badge is set, but
         contains no specific data. In this case, the user agent SHOULD show an
         indicator with a non-specific symbol (such as a coloured circle).
       </p>
@@ -175,17 +175,17 @@
         </p>
         <ol>
           <li>If <var>contents</var> is omitted, set the application's badge to
-          <b>flag</b>.
+          <a>flag</a>.
           </li>
           <li>If <var>contents</var> is 0, set the application's badge to
-          <b>nothing</b>.
+          <a>nothing</a>.
           </li>
           <li>Else, set the application's badge to <var>contents</var>.
           </li>
         </ol>
         <div class="issue">
           It is a bit weird that <code>set(0)</code> clears the badge, while
-          <code>set()</code> sets it to <b>flag</b>. This is designed so that
+          <code>set()</code> sets it to <a>flag</a>. This is designed so that
           the above example code for setting the unread count will
           automatically clear the badge when the unread count is 0. But it
           could be a bit unintuitive.
@@ -197,7 +197,7 @@
         </h3>
         <p>
           When the <code>clear()</code> method is called, set the application's
-          badge to <b>nothing</b>.
+          badge to <a>nothing</a>.
         </p>
       </section>
     </section>
