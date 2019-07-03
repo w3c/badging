@@ -152,17 +152,16 @@
     </section>
     <section data-dfn-for="Badge">
       <h2>
-        <code>Badge</code> interface
+        <code>Badge</code> namespace
       </h2>
       <pre class="idl">
-        [Exposed=(Window)]
-        interface Badge {
-          static void set(optional [EnforceRange] unsigned long long contents);
-          static void clear();
+        namespace Badge {
+          void set(optional [EnforceRange] unsigned long long contents);
+          void clear();
         };
       </pre>
       <p>
-        The <dfn>Badge</dfn> interface provides methods for setting and
+        The <dfn>Badge</dfn> namespace provides methods for setting and
         clearing the application badge indicator.
       </p>
       <section>
