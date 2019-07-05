@@ -1,8 +1,45 @@
 # Badging API Explainer
 
-Author: Matt Giuca <mgiuca@chromium.org>
+Author: Matt Giuca <mgiuca@chromium.org><br>
+Author: Jay Harris <harrisjay@chromium.org><br>
+Author: Marcos Cáceres <marcosc@mozilla.org>
 
-Date: 2018-06-26
+Date: 2019-06-05
+
+## Table of Contents
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Overview](#overview)
+- [API proposal](#api-proposal)
+  - [The model](#the-model)
+  - [The API](#the-api)
+- [UX treatment](#ux-treatment)
+- [Specific operating system treatment](#specific-operating-system-treatment)
+  - [macOS](#macos)
+  - [Universal Windows Platform](#universal-windows-platform)
+  - [Legacy Windows (Win32)](#legacy-windows-win32)
+  - [Android](#android)
+  - [Chrome OS](#chrome-os)
+  - [iOS](#ios)
+  - [Ubuntu](#ubuntu)
+  - [Summary](#summary)
+  - [What data types are supported in different operating systems?](#what-data-types-are-supported-in-different-operating-systems)
+  - [Why limit support to just an integer? What about other characters?](#why-limit-support-to-just-an-integer-what-about-other-characters)
+  - [Why haven’t you designed the API to set a separate badge per open app window? This would also let the API work with tab favicons!](#why-havent-you-designed-the-api-to-set-a-separate-badge-per-open-app-window-this-would-also-let-the-api-work-with-tab-favicons)
+  - [Why doesn’t `Badge.set()` apply to the page’s favicon too?](#why-doesnt-badgeset-apply-to-the-pages-favicon-too)
+  - [What about an overload of the `Badge.set(6, { badgeTabsToo: true })` for badging all favicons? Then sites could opt in to Badging their favicons!](#what-about-an-overload-of-the-badgeset6--badgetabstoo-true--for-badging-all-favicons-then-sites-could-opt-in-to-badging-their-favicons)
+  - [Won’t this API (as is) only work in installed apps? (see #1)](#wont-this-api-as-is-only-work-in-installed-apps-see-1)
+  - [Couldn’t this be a declarative API, so it would work without JavaScript?](#couldnt-this-be-a-declarative-api-so-it-would-work-without-javascript)
+  - [Why can’t this be used in the background from the ServiceWorker? (see #28 and #5)](#why-cant-this-be-used-in-the-background-from-the-serviceworker-see-28-and-5)
+  - [Is this API useful for mobile OS’s?](#is-this-api-useful-for-mobile-oss)
+  - [Is there an upper limit on the size of the integer? And if so, what's the behavior if that limit is reached?](#is-there-an-upper-limit-on-the-size-of-the-integer-and-if-so-whats-the-behavior-if-that-limit-is-reached)
+  - [Are you concerned about apps perpetually showing a large unread count?](#are-you-concerned-about-apps-perpetually-showing-a-large-unread-count)
+  - [Internationalization](#internationalization)
+  - [Security and Privacy Considerations](#security-and-privacy-considerations)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Overview
 
