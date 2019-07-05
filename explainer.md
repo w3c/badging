@@ -245,12 +245,92 @@ and Ubuntu don't support them at all).
 Limiting support to integers makes behavior more predictable, though we are considering
 whether it might be worth adding support for other characters or symbols in future.
 
-### Why isn't this API available from a Service Worker?
+### Why haven’t you designed the API to set a separate badge per open app window? This would also let the API work with tab favicons!
 
-Ideally, it would be, and we're considering this for a future version of this API. 
-However, the API will require some more thought, as there can be multiple apps installed
-for a single service worker, so we would need some way of specifying which one should
-be badged.
+Installed PWAs can have multiple windows open at a time. Right now the API is designed to set one badge for the entire app rather than one for each window.
+
+On most operating systems, there is only one application specific place to set a badge, rather than one per open window.
+- On Android: The homescreen
+- On OSX: The dock
+- On Windows: The taskbar (users are able to change settings and get a separate icon open window, but this is non-standard).
+- On iOS: The homescreen.
+  
+So it would mean ignoring OS conventions, and it wouldn’t even be possible on most of them!
+
+### Why doesn’t `Badge.set()` apply to the page’s favicon too?
+While in many cases it *is* desirable to have the same app badge and favicon badge (chat applications, email clients and social networks) it doesn’t cater to all use cases.
+
+For example, consider [Github](https://github.com). It has notifications (when someone comments on a pull request, responds to an issue or asks for a review) and statuses (for issues, pull requests and builds).
+
+![Github in a tab, displaying the status of a ready to merge PR and a notification indicator](images/github-tab-status-and-notifications.png)
+
+These two things are conceptually separate: The pull request status belongs to the page while the number of unread notifications corresponds to the conceptual `App` (which is a group of related pages).
+
+![Github in an app window, displaying the status of a ready to merge PR, a notification indicator and a badge](images/github-app-status-and-notifications.png)
+
+Since developers may want to display different "badges" on each surface, we shouldn’t use the same API to set the badge on both surfaces.
+
+An alternative would be to provide an additional API for setting per-tab/window badges, this is discussed [here](https://github.com/WICG/badging/issues/35) and [here](https://github.com/WICG/badging/issues/1).
+
+### What about an overload of the `Badge.set(6, { badgeTabsToo: true })` for badging all favicons? Then sites could opt in to Badging their favicons!
+(this could even be extended with a regex for matching the path of tabs to change the badge on)
+
+It was considered but the overload has a few problems:
+- It’s unclear what the scope of tabs to badge here is (the origin? Pages with the same url? The manifest scope? What if the manifest isn’t linked from this page?).
+- What can be Badged in the OS is [highly constrained by the OS](#specific-operating-system-treatment) (most only support numeric badges, and some don’t even support those) while the badge displayed with favicon hacks can be any image (browser dependent). It would be a shame if the new API was less useful than what developers already have.
+
+If this approach were to be taken, a better solution might be multiple methods inside the Badge namespace:
+
+```js
+Badge.setApp(/* <number> */); // Will be displayed in an OS specific context.
+Badge.setFavIcon(/* <number> | <string> | <image> */); // Can be anything the browser can fit on the favicon.
+Badge.setAll(/* <number> */); // Will set favicon badges for all pages in the app (unclear what pages these would be) and Badge the OS specific context, if available.
+```
+
+A [declarative approach](#Couldnt-this-be-a-declarative-API-so-it-would-work-without-JavaScript) this be a declarative API, so it would work without JavaScript?) was also considered.
+
+### Won’t this API (as is) only work in [installed apps](https://w3c.github.io/manifest/#installable-web-applications)? (see #1)
+Yes. This API, as it currently stands, allows a web application to show a Badge in an OS specific context. As all considered OS’s only allow installed applications to show a Badge in these contexts, the API only applies to installed applications.
+
+Non-installed apps are free to set the badge, it will just not have any effect. 
+
+### Couldn’t this be a declarative API, so it would work without JavaScript?
+As there is only one OS specific place to show a badge for an installed PWA, but potentially many open `documents` only one document would correctly reflect the current badge value. This would likely be confusing.
+
+We’re considering a separate declarative API for setting a badge on the favicon of the current document, which might look something like this:
+
+```js
+<link rel="shortcut icon badge" href="/favicon.ico" badge="99">
+```
+See [this section](#Why-doesnt-Badgeset-apply-to-the-pages-favicon-too) for the rationale behind keeping the APIs separate.
+
+### Why can’t this be used in the background from the ServiceWorker? (see #28 and #5)
+
+Realistically, using the badge from the background is the most important use case, so ideally, badges could be updated in the background via the service worker.
+
+However there are two non-trivial problems:
+
+1. The scopes of service workers and web applications are related but not dependent. A single service worker may control multiple web applications. Thus, some way of specifying web application to badge is required (see [here](https://github.com/WICG/badging/blame/master/explainer.md#L94) for more context detail on scoping).
+
+We are considering a syntax like this:
+```js
+Badge.set(/* <contents> */, ‘/scope/to/badge’);
+```
+
+2. The second problem is that we need a way to inform the user that the app is running.
+
+With push notifications, browsers enforce that a notification be shown, or the browser will stop the app from processing additional notifications. However, things are not as simple with badging, as a site could always set its badge to the same value, so the user would not get a cue that the site is running in the background.
+
+To solve this, we are considering a separate notification channel especially for badges. The browser would know how to turn the notification into a badge without running any JavaScript.
+
+> Note: I might be pretty far off the mark here, I’m not an expert in things service worker.
+
+### Is this API useful for mobile OS’s?
+iOS has support for badging APIs (see [iOS](#ios). However, PWAs on iOS will not be able to use the badging API until Safari (the only browser engine allowed on iOS) adds support for it.
+
+On Android, badging is blocked at an OS level, as there is [no API for setting a badge without also displaying a notification](#android). However, a badge will already be displayed if a PWA has pending notifications (it just doesn’t allow the fine grained control proposed by this API).
+
+To summarize: This API cannot be used in PWAs on either mobile operating system. Support on iOS is blocked until Safari implements the API and Android does not have an API for controlling badges. Should either situation change, the badging API will become trivially available.
 
 ### Is there an upper limit on the size of the integer? And if so, what's the behavior if that limit is reached?
 
