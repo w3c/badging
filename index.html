@@ -152,25 +152,25 @@
     </section>
     <section data-dfn-for="Badge">
       <h2>
-        <code>Badge</code> interface
+        <code>Badge</code> namespace
       </h2>
       <pre class="idl">
         [Exposed=(Window)]
-        interface Badge {
-          static void set(optional [EnforceRange] unsigned long long contents);
-          static void clear();
+        namespace Badge {
+          void set(optional [EnforceRange] unsigned long long contents);
+          void clear();
         };
       </pre>
       <p>
-        The <dfn>Badge</dfn> interface provides methods for setting and
+        The <dfn>Badge</dfn> namespace provides functions for setting and
         clearing the application badge indicator.
       </p>
       <section>
         <h3>
-          <dfn>set()</dfn> method
+          <dfn>set()</dfn> function
         </h3>
         <p>
-          When the <code>set()</code> method is called with argument
+          When the <code>set()</code> function is called with argument
           <var>contents</var>, run the following steps:
         </p>
         <ol>
@@ -193,10 +193,10 @@
       </section>
       <section>
         <h3>
-          <dfn>clear()</dfn> method
+          <dfn>clear()</dfn> function
         </h3>
         <p>
-          When the <code>clear()</code> method is called, set the application's
+          When the <code>clear()</code> function is called, set the application's
           badge to <a>nothing</a>.
         </p>
       </section>
