@@ -2,7 +2,7 @@
 
 Author: Matt Giuca <mgiuca@chromium.org><br>
 Author: Jay Harris <harrisjay@chromium.org><br>
-Author: Marcos Cáceres <marcosc@mozilla.org>
+Author: Marcos Cáceres <mcaceres@mozilla.org>
 
 Date: 2019-06-05
 
