@@ -46,6 +46,7 @@ Date: 2019-06-05
     - [Are you concerned about apps perpetually showing a large unread count?](#Are-you-concerned-about-apps-perpetually-showing-a-large-unread-count)
     - [Internationalization](#Internationalization)
     - [Security and Privacy Considerations](#Security-and-Privacy-Considerations)
+  - [Considered Alternatives](#Considered-Alternatives)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -504,3 +505,15 @@ The API allows `set()`ing an `unsigned long long`. When presenting this value, i
 
 ### Security and Privacy Considerations
 The API is set only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
+
+## Considered Alternatives
+- A [declarative API](#Couldnt-this-be-a-declarative-API-so-it-would-work-without-JavaScript).
+- Exposing the badging API [elsewhere](#Why-is-this-API-attached-to-window-instead-of-navigator-or-notifications).
+- Supporting [non-integers](#Why-limit-support-to-just-an-integer-What-about-other-characters).
+- Use in the [background](#Why-cant-this-be-used-in-the-background-from-the-ServiceWorker-see-28-and-5).
+- [Separate methods](https://github.com/WICG/badging/issues/19) for setting/clearing boolean flags and numbers.
+- Exposing a [getter](https://github.com/WICG/badging/issues/18) for badge contents.
+- Only [badging](https://github.com/WICG/badging/issues/1) [PWAs](https://github.com/WICG/badging/issues/12).
+- Supporting [query-string scopes](https://github.com/WICG/badging/issues/1#issuecomment-511634128).
+- Adding [fallbacks](https://github.com/WICG/badging/issues/2), when the system can't display a badge.
+- [Promise based](https://github.com/WICG/badging/issues/35#issue-459665145) badging API.
