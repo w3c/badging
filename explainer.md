@@ -119,22 +119,29 @@ The model does not allow a badge to be a negative integer, or the integer value 
 ### The API
 
 The `Badge` interface is a member object on
-[`Window`](https://html.spec.whatwg.org/#the-window-object). It contains two methods:
-
-* `void set(optional unsigned long long, optional BadgeOptions)` 
-    
-    Sets the badge for the specified scope to be the given data, or just "flag" if the argument is not given.
-> Note: Should we have a separate overload for boolean flags now, as discussed in [Issue 19](https://github.com/WICG/badging/issues/19)?
-
-* `void clear(optional BadgeOptions)`:
-  
-  Clears the badge for the specified scope.
+[`Window`](https://html.spec.whatwg.org/#the-window-object). It contains three methods:
 
 ```webidl
 dictionary BadgeOptions {
+  // The scope the badge applies to.
+  // If unspecified this is the origin of the current page.
   USVString scope;
 }
+
+[Exposed=Window]
+interface Badge {
+  // Sets the badge for a scope to be |contents|.
+  void set(unsigned long long contents, optional BadgeOptions options);
+
+  // Sets the badge for a scope to be the special value, 'flag'.
+  void set(optional BadgeOptions options);
+
+  // Clears the badge for a scope.
+  void clear(optional BadgeOptions options);
+}
 ```
+
+> Note: Should we have a separate overload for boolean flags now, as discussed in [Issue 19](https://github.com/WICG/badging/issues/19)?
 
 > Note: This API can only be used from a foreground page. Use from a service worker is being considered for the future. [The FAQ](#Why-cant-this-be-used-in-the-background-from-the-ServiceWorker-see-28-and-5) has more details).
 
