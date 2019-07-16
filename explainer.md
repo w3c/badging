@@ -29,10 +29,6 @@ Date: 2019-06-05
     - [Summary](#Summary)
     - [What data types are supported in different operating systems?](#What-data-types-are-supported-in-different-operating-systems)
     - [Why limit support to just an integer? What about other characters?](#Why-limit-support-to-just-an-integer-What-about-other-characters)
-    - [Why haven’t you designed the API to set a separate badge per open app window? This would also let the API work with tab favicons!](#Why-havent-you-designed-the-API-to-set-a-separate-badge-per-open-app-window-This-would-also-let-the-API-work-with-tab-favicons)
-    - [Why doesn’t `Badge.set()` apply to the page’s favicon too?](#Why-doesnt-Badgeset-apply-to-the-pages-favicon-too)
-    - [What about an overload of the `Badge.set(6, { badgeTabsToo: true })` for badging all favicons? Then sites could opt in to Badging their favicons!](#What-about-an-overload-of-the-Badgeset6--badgeTabsToo-true--for-badging-all-favicons-Then-sites-could-opt-in-to-Badging-their-favicons)
-    - [Won’t this API (as is) only work in installed apps? (see #1)](#Wont-this-API-as-is-only-work-in-installed-apps-see-1)
     - [Couldn’t this be a declarative API, so it would work without JavaScript?](#Couldnt-this-be-a-declarative-API-so-it-would-work-without-JavaScript)
     - [Why can’t this be used in the background from the ServiceWorker? (see #28 and #5)](#Why-cant-this-be-used-in-the-background-from-the-ServiceWorker-see-28-and-5)
     - [Is this API useful for mobile OS’s?](#Is-this-API-useful-for-mobile-OSs)
@@ -291,55 +287,6 @@ and Ubuntu don't support them at all).
 
 Limiting support to integers makes behavior more predictable, though we are considering
 whether it might be worth adding support for other characters or symbols in future.
-
-### Why haven’t you designed the API to set a separate badge per open app window? This would also let the API work with tab favicons!
-
-Installed PWAs can have multiple windows open at a time. Right now the API is designed to set one badge for the entire app rather than one for each window.
-
-On most operating systems, there is only one application specific place to set a badge, rather than one per open window.
-- On Android: The homescreen
-- On OSX: The dock
-- On Windows: The taskbar (users are able to change settings and get a separate icon open window, but this is non-standard).
-- On iOS: The homescreen.
-  
-So it would mean ignoring OS conventions, and it wouldn’t even be possible on most of them!
-
-### Why doesn’t `Badge.set()` apply to the page’s favicon too?
-While in many cases it *is* desirable to have the same app badge and favicon badge (chat applications, email clients and social networks) it doesn’t cater to all use cases.
-
-For example, consider [Github](https://github.com). It has notifications (when someone comments on a pull request, responds to an issue or asks for a review) and statuses (for issues, pull requests and builds).
-
-![Github in a tab, displaying the status of a ready to merge PR and a notification indicator](images/github-tab-status-and-notifications.png)
-
-These two things are conceptually separate: The pull request status belongs to the page while the number of unread notifications corresponds to the conceptual `App` (which is a group of related pages).
-
-![Github in an app window, displaying the status of a ready to merge PR, a notification indicator and a badge](images/github-app-status-and-notifications.png)
-
-Since developers may want to display different "badges" on each surface, we shouldn’t use the same API to set the badge on both surfaces.
-
-An alternative would be to provide an additional API for setting per-tab/window badges, this is discussed [here](https://github.com/WICG/badging/issues/35) and [here](https://github.com/WICG/badging/issues/1).
-
-### What about an overload of the `Badge.set(6, { badgeTabsToo: true })` for badging all favicons? Then sites could opt in to Badging their favicons!
-(this could even be extended with a regex for matching the path of tabs to change the badge on)
-
-It was considered but the overload has a few problems:
-- It’s unclear what the scope of tabs to badge here is (the origin? Pages with the same url? The manifest scope? What if the manifest isn’t linked from this page?).
-- What can be Badged in the OS is [highly constrained by the OS](#specific-operating-system-treatment) (most only support numeric badges, and some don’t even support those) while the badge displayed with favicon hacks can be any image (browser dependent). It would be a shame if the new API was less useful than what developers already have.
-
-If this approach were to be taken, a better solution might be multiple methods inside the Badge namespace:
-
-```js
-Badge.setApp(/* <number> */); // Will be displayed in an OS specific context.
-Badge.setFavIcon(/* <number> | <string> | <image> */); // Can be anything the browser can fit on the favicon.
-Badge.setAll(/* <number> */); // Will set favicon badges for all pages in the app (unclear what pages these would be) and Badge the OS specific context, if available.
-```
-
-A [declarative approach](#Couldnt-this-be-a-declarative-API-so-it-would-work-without-JavaScript) this be a declarative API, so it would work without JavaScript?) was also considered.
-
-### Won’t this API (as is) only work in [installed apps](https://w3c.github.io/manifest/#installable-web-applications)? (see #1)
-Yes. This API, as it currently stands, allows a web application to show a Badge in an OS specific context. As all considered OS’s only allow installed applications to show a Badge in these contexts, the API only applies to installed applications.
-
-Non-installed apps are free to set the badge, it will just not have any effect. 
 
 ### Couldn’t this be a declarative API, so it would work without JavaScript?
 As there is only one OS specific place to show a badge for an installed PWA, but potentially many open `documents` only one document would correctly reflect the current badge value. This would likely be confusing.
