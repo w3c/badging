@@ -21,6 +21,8 @@ Date: 2019-06-05
       - [Basic Examples](#Basic-Examples)
         - [Setting an integer badge (as in an email app):](#Setting-an-integer-badge-as-in-an-email-app)
         - [Setting and clearing a boolean flag (as in a game of chess):](#Setting-and-clearing-a-boolean-flag-as-in-a-game-of-chess)
+      - [Advanced Examples](#Advanced-Examples)
+        - [Updating a Badge on a message from a WebSocket (as in a messaging app, receiving new messages):](#Updating-a-Badge-on-a-message-from-a-WebSocket-as-in-a-messaging-app-receiving-new-messages)
   - [UX treatment](#UX-treatment)
   - [Specific operating system treatment](#Specific-operating-system-treatment)
     - [macOS](#macOS)
@@ -152,7 +154,7 @@ interface Badge {
 ### Examples
 
 #### Basic Examples
-These examples provided limited context and don't specify a scope. They are intended to illustrate the most common use case for this API.
+These examples provided limited context. They are intended to show how the API will look.
 
 ##### Setting an integer badge (as in an email app):
 ```js
@@ -165,6 +167,44 @@ if (myTurn())
   Badge.set();
 else
   Badge.clear();
+```
+
+#### Advanced Examples
+These examples generally provide more context around what is going on, and may specify scopes. They are intended to show how real world applications may use the API.
+
+##### Updating a Badge on a message from a WebSocket (as in a messaging app, receiving new messages):
+
+```ts
+interface ChatMessage {
+  content: string;
+  unread: boolean;
+}
+
+// A list of all messages received by the application.
+const messages: ChatMessage[] = [];
+
+// Sets the badge count to the number of unread messages.
+const updateBadgeCount = () => {
+  // Count the number of unread messages.
+  const badgeCount = messages
+    .filter(m => m.unread)
+    .length;
+  Badge.set(badgeCount);
+}
+
+// Adds a new message and updates the badge count.
+const addMessage = (message: Message) => {
+  messages.push(message);
+  updateBadgeCount();
+}
+
+// Create a new socket, connected to our messages endpoint.
+const socket = new WebSocket('ws://example.com/messages');
+socket.onmessage = (event) => {
+  // Parse the message and add it to our list.
+  const chatMessage = JSON.parse(event.data);
+  addMessage(chatMessage);
+};
 ```
 
 ## UX treatment
