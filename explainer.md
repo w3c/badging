@@ -17,6 +17,10 @@ Date: 2019-06-05
   - [API proposal](#API-proposal)
     - [The model](#The-model)
     - [The API](#The-API)
+    - [Examples](#Examples)
+      - [Basic Examples](#Basic-Examples)
+        - [Setting an integer badge (as in an email app):](#Setting-an-integer-badge-as-in-an-email-app)
+        - [Setting and clearing a boolean flag (as in a game of chess):](#Setting-and-clearing-a-boolean-flag-as-in-a-game-of-chess)
   - [UX treatment](#UX-treatment)
   - [Specific operating system treatment](#Specific-operating-system-treatment)
     - [macOS](#macOS)
@@ -145,14 +149,17 @@ interface Badge {
 
 > Note: This API can only be used from a foreground page. Use from a service worker is being considered for the future. [The FAQ](#Why-cant-this-be-used-in-the-background-from-the-ServiceWorker-see-28-and-5) has more details).
 
-**Example code:**
+### Examples
 
-Setting an integer badge (as in an email app):
+#### Basic Examples
+These examples provided limited context and don't specify a scope. They are intended to illustrate the most common use case for this API.
+
+##### Setting an integer badge (as in an email app):
 ```js
 Badge.set(getUnreadCount());
 ```
 
-Setting and clearing a boolean flag (as in a game of chess):
+##### Setting and clearing a boolean flag (as in a game of chess):
 ```js
 if (myTurn())
   Badge.set();
