@@ -35,6 +35,7 @@ Date: 2019-06-05
     - [iOS](#iOS)
     - [Ubuntu](#Ubuntu)
     - [Summary](#Summary)
+  - [FAQ](#FAQ)
     - [What data types are supported in different operating systems?](#What-data-types-are-supported-in-different-operating-systems)
     - [Why limit support to just an integer? What about other characters?](#Why-limit-support-to-just-an-integer-What-about-other-characters)
     - [Couldn’t this be a declarative API, so it would work without JavaScript?](#Couldnt-this-be-a-declarative-API-so-it-would-work-without-JavaScript)
@@ -431,9 +432,11 @@ Requires Ubuntu (no general API for Linux).
 Thus, a fallback option for platforms that do not support arbitrary characters
 (e.g., choose whether to show a number, or nothing) may be necessary.
 
+## FAQ
+
 ### What data types are supported in different operating systems?	
 
-See above.
+See [above](#Summary).
 
 ### Why limit support to just an integer? What about other characters?
 
