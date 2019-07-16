@@ -107,34 +107,42 @@ for all new messages including group chats not directly addressed to the user.)
 
 ### The model
 
-There is a single global badge associated with each Web
-application (as defined in [Web app
-manifest](https://www.w3.org/TR/appmanifest/)). At any time, the badge is set with:
+1. A Badge is associated with a [scope](https://www.w3.org/TR/appmanifest/#navigation-scope).
+2. Pages are badged with the most specific badge for their url (i.e. prefer a badge for `/page/1` to a badge for `/page/` when on the url `/page/1?foo=7`).
+3. If no scope is specified for a badge then its scope will default to the current origin.
+4. For [installed applications](https://www.w3.org/TR/appmanifest/#installable-web-applications), a user agent **MAY** display the badge with the most specific scope still encompassing the [navigation scope](https://www.w3.org/TR/appmanifest/#navigation-scope) of the web application in an OS specific context, such as the launcher, homescreen, dock or taskbar.
 
-* Nothing (the badge is "cleared"), or
+At any time, the badge for a specific scope may be:
+
+* Nothing. Apply the badge for a less specific scope, or, if there is no matching badge, display nothing.
 * A "flag" indicating the presence of a badge with no contents, or
 * A positive integer.
 
-The model does not allow a badge that is a negative integer, or the integer value 0
-(setting the badge to 0 is equivalent to clearing the badge).
+The model does not allow a badge to be a negative integer, or the integer value 0 (setting the badge to 0 is equivalent to clearing the badge).
 
 ### The API
 
 The `Badge` interface is a member object on
 [`Window`](https://html.spec.whatwg.org/#the-window-object). It contains two methods:
 
-* `void set(optional unsigned long long)`: Sets the associated app's badge to
-  the given data, or just "flag" if the argument is not given.
-* `void clear()`: Sets the associated app's badge to nothing.
+* `void set(optional unsigned long long, optional BadgeOptions)` 
+    
+    Sets the badge for the specified scope to be the given data, or just "flag" if the argument is not given.
+> Note: Should we have a separate overload for boolean flags now, as discussed in [Issue 19](https://github.com/WICG/badging/issues/19)?
 
-These can be called from a foreground page only (calling from a service worker is being
-considered for the future).
+* `void clear(optional BadgeOptions)`:
+  
+  Clears the badge for the specified scope.
 
-TODO: An issue is that if the methods are called from a service worker whose
-scope is a parent of the web app manifest scope, it would be ambiguous which web
-app is being identified. We need to take an optional scope parameter.
+```webidl
+dictionary BadgeOptions {
+  USVString scope;
+}
+```
 
-Example code (from the main window):
+> Note: This API can only be used from a foreground page. Use from a service worker is being considered for the future. [The FAQ](#Why-cant-this-be-used-in-the-background-from-the-ServiceWorker-see-28-and-5) has more details).
+
+**Example code:**
 
 Setting an integer badge (as in an email app):
 ```js
