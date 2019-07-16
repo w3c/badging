@@ -40,6 +40,7 @@ Date: 2019-06-05
     - [Couldn’t this be a declarative API, so it would work without JavaScript?](#Couldnt-this-be-a-declarative-API-so-it-would-work-without-JavaScript)
     - [Why can’t this be used in the background from the ServiceWorker? (see #28 and #5)](#Why-cant-this-be-used-in-the-background-from-the-ServiceWorker-see-28-and-5)
     - [Is this API useful for mobile OS’s?](#Is-this-API-useful-for-mobile-OSs)
+    - [Why is this API attached to `window` instead of `navigator` or `notifications`?](#Why-is-this-API-attached-to-window-instead-of-navigator-or-notifications)
     - [Is there an upper limit on the size of the integer? And if so, what's the behavior if that limit is reached?](#Is-there-an-upper-limit-on-the-size-of-the-integer-And-if-so-whats-the-behavior-if-that-limit-is-reached)
     - [Are you concerned about apps perpetually showing a large unread count?](#Are-you-concerned-about-apps-perpetually-showing-a-large-unread-count)
     - [Internationalization](#Internationalization)
@@ -471,6 +472,10 @@ iOS has support for badging APIs (see [iOS](#ios). However, PWAs on iOS will not
 On Android, badging is blocked at an OS level, as there is [no API for setting a badge without also displaying a notification](#android). However, a badge will already be displayed if a PWA has pending notifications (it just doesn’t allow the fine grained control proposed by this API).
 
 To summarize: This API cannot be used in PWAs on either mobile operating system. Support on iOS is blocked until Safari implements the API and Android does not have an API for controlling badges. Should either situation change, the badging API will become trivially available.
+
+### Why is this API attached to `window` instead of `navigator` or `notifications`?
+
+There was a [poll](https://github.com/WICG/badging/issues/14#issuecomment-445548190), and the current style seemed most popular. There is more detail and discussion in [Issue 14](https://github.com/WICG/badging/issues/14).
 
 ### Is there an upper limit on the size of the integer? And if so, what's the behavior if that limit is reached?
 
