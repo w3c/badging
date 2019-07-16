@@ -23,6 +23,7 @@ Date: 2019-06-05
         - [Setting and clearing a boolean flag (as in a game of chess):](#Setting-and-clearing-a-boolean-flag-as-in-a-game-of-chess)
       - [Advanced Examples](#Advanced-Examples)
         - [Updating a Badge on a message from a WebSocket (as in a messaging app, receiving new messages):](#Updating-a-Badge-on-a-message-from-a-WebSocket-as-in-a-messaging-app-receiving-new-messages)
+        - [Setting a separate badge for the app and a specific page (as in the case of github notifications an PR statuses).](#Setting-a-separate-badge-for-the-app-and-a-specific-page-as-in-the-case-of-github-notifications-an-PR-statuses)
   - [UX treatment](#UX-treatment)
   - [Specific operating system treatment](#Specific-operating-system-treatment)
     - [macOS](#macOS)
@@ -205,6 +206,56 @@ socket.onmessage = (event) => {
   const chatMessage = JSON.parse(event.data);
   addMessage(chatMessage);
 };
+```
+
+##### Setting a separate badge for the app and a specific page (as in the case of github notifications an PR statuses).
+
+The main page of our site https://example.com/
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Main Page</title>
+  </head>
+  <body>
+    <script>
+      // There are ten unread notifications.
+      // This was injected by the server.
+      Badge.set(10);
+    </script>
+  </body>
+</html>
+```
+
+On https://example.com/do-i-have-https
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Main Page</title>
+  </head>
+  <body>
+    <script>
+      const badgeOptions = {
+        scope: `/do-i-have-https`
+      };
+
+      const hasHttps = window
+        .location
+        .href
+        .startsWith('https');
+
+      // Note: This is not supported.
+      Badge.set(hasHttps ? '✓' : '☠', badgeOptions);
+
+      // But we could do this instead:
+      if (hasHttps)
+        Badge.set(badgeOptions);
+      else Badge.clear(badgeOptions);
+      
+    </script>
+  </body>
+</html>
 ```
 
 ## UX treatment
