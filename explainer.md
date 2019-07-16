@@ -24,6 +24,7 @@ Date: 2019-06-05
       - [Advanced Examples](#Advanced-Examples)
         - [Updating a Badge on a message from a WebSocket (as in a messaging app, receiving new messages):](#Updating-a-Badge-on-a-message-from-a-WebSocket-as-in-a-messaging-app-receiving-new-messages)
         - [Setting a separate badge for the app and a specific page (as in the case of github notifications an PR statuses).](#Setting-a-separate-badge-for-the-app-and-a-specific-page-as-in-the-case-of-github-notifications-an-PR-statuses)
+        - [Badging For Multiple Apps on the Same Origin (as in the case of multiple Github Pages PWAs)](#Badging-For-Multiple-Apps-on-the-Same-Origin-as-in-the-case-of-multiple-Github-Pages-PWAs)
   - [UX treatment](#UX-treatment)
   - [Specific operating system treatment](#Specific-operating-system-treatment)
     - [macOS](#macOS)
@@ -252,10 +253,59 @@ On https://example.com/do-i-have-https
       if (hasHttps)
         Badge.set(badgeOptions);
       else Badge.clear(badgeOptions);
-      
+
     </script>
   </body>
 </html>
+```
+
+##### Badging For Multiple Apps on the Same Origin (as in the case of multiple Github Pages PWAs)
+```js
+// Scope of Frobnicate is /frobnicate
+// Scope of Bazify is /baz
+// Both apps are hosted on https://origin.example/${scope}
+
+// By default, setting a flag effects the origin.
+Badge.set();
+// Badge for Frobnicate and Bazify is 'flag'.
+// Badge for /index.html is 'flag'.
+
+// Installed applications use the badge with the most
+// specific scope which encompasses their own scope.
+Badge.set(7, { scope: `/baz` });
+// Badge for Frobnicate is 'flag'.
+// Badge for Bazify is '7'.
+// Badge for /index.html is 'flag'.
+
+// Pages inside an installed application do not effect
+// the badge displayed in an OS specific context for
+// that app.
+Badge.set(55, { scope: `/frobnicate/page` });
+// Badge for Frobnicate is 'flag'.
+// Badge for Bazify is '7'.
+// Badge for /index.html is 'flag'.
+// Badge for /frobnicate/page is '55'.
+
+// Setting the badge for '/' is equivalent to omitting
+// the options dictionary.
+Badge.set(88, { scope: `/` });
+// Badge for Frobnicate is '88'.
+// Badge for Bazify is '7'.
+// Badge for /index.html is '88'.
+// Badge for /frobnicate/page is '55'.
+
+// Clearing the badge for a scope will cause the next
+// most specific badge to be applied.
+Badge.clear({ scope: '/baz' });
+// Badge for Frobnicate is '88'.
+// Badge for Bazify is '88'.
+// Badge for /index.html is '88'.
+// Badge for /frobnicate/page is '55'.
+
+// Clears the badge for the origin.
+Badge.clear();
+// Badge for Frobnicate, Bazify, /index.html is nothing.
+// Badge for /frobnicate/page is '55'.
 ```
 
 ## UX treatment
