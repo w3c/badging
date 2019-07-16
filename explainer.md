@@ -302,22 +302,13 @@ See [this section](#Why-doesnt-Badgeset-apply-to-the-pages-favicon-too) for the 
 
 Realistically, using the badge from the background is the most important use case, so ideally, badges could be updated in the background via the service worker.
 
-However there are two non-trivial problems:
+However there is a non-trivial problem: We need a way to inform the user that the app is running.
 
-1. The scopes of service workers and web applications are related but not dependent. A single service worker may control multiple web applications. Thus, some way of specifying web application to badge is required (see [here](https://github.com/WICG/badging/blame/master/explainer.md#L94) for more context detail on scoping).
-
-We are considering a syntax like this:
-```js
-Badge.set(/* <contents> */, ‘/scope/to/badge’);
-```
-
-2. The second problem is that we need a way to inform the user that the app is running.
-
-With push notifications, browsers enforce that a notification be shown, or the browser will stop the app from processing additional notifications. However, things are not as simple with badging, as a site could always set its badge to the same value, so the user would not get a cue that the site is running in the background.
+With push notifications, browsers enforce that a notification be shown, or the browser will stop the app from processing additional notifications. Things are not as simple with badging, as a site could always set its badge to the same value, which would give the user would no cue that a site is running (or has run) in the background.
 
 To solve this, we are considering a separate notification channel especially for badges. The browser would know how to turn the notification into a badge without running any JavaScript.
 
-> Note: I might be pretty far off the mark here, I’m not an expert in things service worker.
+> Note: I might be pretty far off the mark here, I’m not that familiar in things service worker, background, or notifications.
 
 ### Is this API useful for mobile OS’s?
 iOS has support for badging APIs (see [iOS](#ios). However, PWAs on iOS will not be able to use the badging API until Safari (the only browser engine allowed on iOS) adds support for it.
