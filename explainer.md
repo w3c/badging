@@ -293,7 +293,7 @@ As there is only one OS specific place to show a badge for an installed PWA, but
 
 We’re considering a separate declarative API for setting a badge on the favicon of the current document, which might look something like this:
 
-```js
+```html
 <link rel="shortcut icon badge" href="/favicon.ico" badge="99">
 ```
 See [this section](#Why-doesnt-Badgeset-apply-to-the-pages-favicon-too) for the rationale behind keeping the APIs separate.
