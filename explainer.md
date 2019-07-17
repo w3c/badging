@@ -67,12 +67,9 @@ If the set of pages being badged corresponds to a [Installed Web Application](ht
 
 The purpose of this API is:
 
-* To give the application a small but visible place to subtly notify the user
-  that there is new activity that might require their attention, without showing
-  a full [notification](https://notifications.spec.whatwg.org/).
+* To give documents a small but visible place to subtly notify the user that there is new activity that might require their attention without showing a full [notification](https://notifications.spec.whatwg.org/).
 * To indicate a small amount of additional information, such as an unread count.
-* To allow the application to convey this information regardless of whether any
-  of the application's windows are open.
+* To allow the [Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications) to convey this information regardless of whether any of the application's windows are open.
 
 Non-goals are:
 
@@ -80,34 +77,22 @@ Non-goals are:
 
 Possible areas for expansion:
 
-* Providing badging for sites in a normal web browsing context. The current
-  proposal is just for installed apps (designed to show up in the operating
-  system shelf area). We could also explore icon badging on the drive-by web.
-  This naturally leads into...
-* Providing per-tab and per-window badging. The current proposal is for a global badge
-  for the application. See [#1](https://github.com/WICG/badging/issues/1).
-* Support apps that want to render a small status indicator (e.g., a music app shows ▶️	
-  or ⏸️; a weather app shows ⛈️ or ⛅️).
-* Setting the badge from a service worker (e.g. an email app updating an unread count).
+* Support rendering a small status indicator (e.g., a music app shows ▶️ or ⏸️; a weather app shows ⛈️ or ⛅️).
+* Setting the badge from a service worker (e.g. an email app updating an unread count in the background).
+* Support badges on bookmark icons (this is probably up to user agents to support).
 
 Examples of sites that may use this API:
 
 * Chat, email and social apps, to signal that new messages have arrived.
-* Productivity apps, to signal that a long-running background task (such as
-  rendering an image or video) has completed.
-* Games, to signal that a player action is required (e.g., in Chess, when it is
-  the player's turn).
+* Productivity apps, to signal that a long-running background task (such as rendering an image or video) has completed.
+* Games, to signal that a player action is required (e.g., in Chess, when it is the player's turn).
 
 Advantages of using the badging API over notifications:
 
-* Can be used for much higher frequency events than notifications, because each
-  new event does not disrupt the user.
-* There is no need to request permission to use the badging API, since it is
-  much less invasive than a notification.
+* Can be used for much higher frequency events than notifications, because each new event does not disrupt the user.
+* There is no need to request permission to use the badging API, since it is much less invasive than a notification.
 
-(Typically, sites will want to use both APIs together: notifications for
-high-importance events such as new direct messages or incoming calls, and badges
-for all new messages including group chats not directly addressed to the user.)
+(Typically, sites will want to use both APIs together: notifications for high-importance events such as new direct messages or incoming calls, and badges or all new messages including group chats not directly addressed to the user.)
 
 ## API proposal
 
