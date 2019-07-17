@@ -57,7 +57,7 @@ Date: 2019-07-17
 
 The **Badging API** is a proposed Web Platform API allowing [documents](https://dom.spec.whatwg.org/#document) to apply badges to sets of pages on the same origin as their [document url](https://dom.spec.whatwg.org/#concept-document-url). These badges are displayed in a location related to their documents such as the tab favicons.
 
-If the set of pages being badged corresponds to a [Installed Web Application](https://www.w3.org/TR/appmanifest/#installable-web-applications), the user agent may choose to display a badge in a [operating system specific place](#OS-Specific-Contexts) associated with the application (such as an icon on the shelf, home screen or dock).
+If the set of pages being badged corresponds to an [Installed Web Application](https://www.w3.org/TR/appmanifest/#installable-web-applications), the user agent may choose to display a badge in an [operating system specific place](#OS-Specific-Contexts) associated with the application (such as an icon on the shelf, home screen or dock).
 
 ### OS Specific Contexts
 ![Windows taskbar badge](images/uwp-badge.png)
@@ -73,7 +73,7 @@ The purpose of this API is:
 
 * To give documents a small but visible place to subtly notify the user that there is new activity that might require their attention without showing a full [notification](https://notifications.spec.whatwg.org/).
 * To indicate a small amount of additional information, such as an unread count.
-* To allow certain blessed pages (such as Bookmarks or [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications)) to convey this information, regardless of whether they are currently open.
+* To allow certain user blessed pages (such as Bookmarks or [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications)) to convey this information, regardless of whether they are currently open.
 
 Non-goals are:
 
@@ -82,7 +82,7 @@ Non-goals are:
 Possible areas for expansion:
 
 * Support rendering a small status indicator (e.g., a music app shows ▶️ or ⏸️; a weather app shows ⛈️ or ⛅️).
-* Setting the badge from a service worker (e.g. an email app updating an unread count in the background).
+* Support setting the badge from a service worker (e.g. an email app updating an unread count in the background).
 * Support badges on bookmark icons (this is probably up to user agents to support, and may not need anything new API wise).
 * Support for non-inherited badges (see [Issue 42](https://github.com/WICG/badging/issues/42)).
 * Support for unicode glyph badges.
@@ -106,7 +106,7 @@ Advantages of using the badging API over notifications:
 
 1. A Badge is associated with a [scope](https://www.w3.org/TR/appmanifest/#navigation-scope).
 2. Documents are badged with the most specific badge for their url (i.e. prefer a badge for `/page/1` to a badge for `/page/` when on the url `/page/1?foo=7`).
-3. If no scope is specified the scope is the current origin (equivalent to setting it to `/`).
+3. If no scope is specified the scope is the current origin (equivalent to setting the scope to `/`).
 4. For [installed applications](https://www.w3.org/TR/appmanifest/#installable-web-applications), a user agent **MAY** display the badge with the most specific scope still encompassing the [navigation scope](https://www.w3.org/TR/appmanifest/#navigation-scope) of the application in an [OS specific context](#OS-Specific-Contexts).
 
 At any time, the badge for a specific scope may be:
@@ -303,12 +303,12 @@ Badge.clear();
 ```
 
 ## UX treatment
-Badges should appear as a user agent defined overlay on top of the app's icon, about a quarter of the size of the badge, and in one of the four corners. If the exact representation of a badge is not supported (e.g., a 2-digit number while only single characters are allowed, or a character where only numbers are allowed) the user agent should make a best effort attempt to map the unsupported data onto supported data. This may involve:
+Badges should appear as a user agent defined overlay on top of the app's icon, about a quarter of the size, and in one of the four corners. If the exact representation of a badge is not supported (e.g., a 2-digit number while only single characters are allowed, or a character where only numbers are allowed) the user agent should make a best effort attempt to map the unsupported data onto supported data. This may involve:
 - Saturating a number: 351 -> '99+'
 - Degrading the data: 7 -> 'flag' when only flag badges are supported.
 
 ### Badging Documents
-User agents may choose to apply the badge in other places they display a favicon for the site such as
+User agents may choose to apply the badge in other places they display a favicon for the site. These might include:
 - The favicon displayed on tabs
 - Bookmark Icons
 
