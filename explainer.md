@@ -303,30 +303,26 @@ Badge.clear();
 ```
 
 ## UX treatment
+Badges should appear as a user agent defined overlay on top of the app's icon, about a quarter of the size of the badge, and in one of the four corners. If the exact representation of a badge is not supported (e.g., a 2-digit number while only single characters are allowed, or a character where only numbers are allowed) the user agent should make a best effort attempt to map the unsupported data onto supported data. This may involve:
+- Saturating a number: 351 -> '99+'
+- Degrading the data: 7 -> 'flag' when only flag badges are supported.
 
 ### Badging Documents
+User agents may choose to apply the badge in other places they display a favicon for the site such as
+- The favicon displayed on tabs
+- Bookmark Icons
 
 ### Badging Installed Web Applications
 * Installed Web applications are typically given some presence in an
   operating-system location, such as the shelf, launcher, dock, home screen,
   etc. Usually the application is represented by an icon.
-* The badge would appear as a user-agent-defined overlay on top of the app's
-  icon, about a quarter of the size and in one of the four corners, as shown in
-  the sample images above.
 * Operating systems generally provide a badge system for native applications;
   user agents should re-use existing operating system APIs / UI and conventions
   to achieve a native look-and-feel.
-* The user agent should make a "best effort" attempt to map the badge data
-  structure onto the host operating system's badge format:
-  * Some operating systems (e.g., Android) only provide UI for a Flag badge;
-    just a coloured dot with no content (see the sample image above). In these
-    cases, the user agent should follow this convention, and only show a Flag,
-    even if the website sets richer badge data.
-* If the operating system doesn't allow the exact representation of the badge
-  (e.g., a 2-digit number but the OS only allows a single character, or a
-  character but the OS only allows a number), the user agent should try the best
-  to map into the OS representation. This may involve:
-  * Saturating a number; e.g., 351 -> "99+".
+* Some operating systems (e.g., Android) only provide UI for a Flag badge;
+  only displaying a coloured dot with no content (see the sample image above).
+  In these cases, the user agent should follow this convention, and only show a
+  Flag, even if the website sets richer badge data.
 
 ## Specific operating system treatment for installed web applications
 
