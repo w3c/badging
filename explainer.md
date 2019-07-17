@@ -52,10 +52,9 @@ Date: 2019-07-16
 
 ## Overview
 
-The **Badging API** is a proposed Web Platform API allowing web applications (as
-defined by the [Web App Manifest](https://www.w3.org/TR/appmanifest/) standard)
-to set an **application-wide** badge, shown in an operating-system-specific
-place associated with the application (such as the shelf or home screen).
+The **Badging API** is a proposed Web Platform API allowing [documents](https://dom.spec.whatwg.org/#document) to set badges for sets of pages on the same origin as their [document url](https://dom.spec.whatwg.org/#concept-document-url). These badges are displayed in a a location tied to their related documents, such as on top of each document in the set's tab favicon.
+
+If the set of pages being badged corresponds to a [Installed Web Application](https://www.w3.org/TR/appmanifest/#installable-web-applications), the user agent may choose to display a badge in a operating system specific place associated with the application (such as an icon on the shelf, home screen or dock).
 
 ![Windows taskbar badge](images/uwp-badge.png)
 <br>Windows taskbar badge
