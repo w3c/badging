@@ -14,6 +14,7 @@ Date: 2019-07-16
 - [Badging API Explainer](#Badging-API-Explainer)
   - [Table of Contents](#Table-of-Contents)
   - [Overview](#Overview)
+    - [OS Specific Contexts](#OS-Specific-Contexts)
   - [API proposal](#API-proposal)
     - [The model](#The-model)
     - [The API](#The-API)
@@ -54,8 +55,9 @@ Date: 2019-07-16
 
 The **Badging API** is a proposed Web Platform API allowing [documents](https://dom.spec.whatwg.org/#document) to set badges for sets of pages on the same origin as their [document url](https://dom.spec.whatwg.org/#concept-document-url). These badges are displayed in a a location tied to their related documents, such as on top of each document in the set's tab favicon.
 
-If the set of pages being badged corresponds to a [Installed Web Application](https://www.w3.org/TR/appmanifest/#installable-web-applications), the user agent may choose to display a badge in a operating system specific place associated with the application (such as an icon on the shelf, home screen or dock).
+If the set of pages being badged corresponds to a [Installed Web Application](https://www.w3.org/TR/appmanifest/#installable-web-applications), the user agent may choose to display a badge in a [operating system specific place](#OS-Specific-Contexts) associated with the application (such as an icon on the shelf, home screen or dock).
 
+### OS Specific Contexts
 ![Windows taskbar badge](images/uwp-badge.png)
 <br>Windows taskbar badge
 
@@ -99,9 +101,9 @@ Advantages of using the badging API over notifications:
 ### The model
 
 1. A Badge is associated with a [scope](https://www.w3.org/TR/appmanifest/#navigation-scope).
-2. Pages are badged with the most specific badge for their url (i.e. prefer a badge for `/page/1` to a badge for `/page/` when on the url `/page/1?foo=7`).
+2. Documents are badged with the most specific badge for their url (i.e. prefer a badge for `/page/1` to a badge for `/page/` when on the url `/page/1?foo=7`).
 3. If no scope is specified for a badge then its scope will default to the current origin.
-4. For [installed applications](https://www.w3.org/TR/appmanifest/#installable-web-applications), a user agent **MAY** display the badge with the most specific scope still encompassing the [navigation scope](https://www.w3.org/TR/appmanifest/#navigation-scope) of the web application in an OS specific context, such as the launcher, homescreen, dock or taskbar.
+4. For [installed applications](https://www.w3.org/TR/appmanifest/#installable-web-applications), a user agent **MAY** display the badge with the most specific scope still encompassing the [navigation scope](https://www.w3.org/TR/appmanifest/#navigation-scope) of the application in an [OS specific context](#OS-Specific-Contexts).
 
 At any time, the badge for a specific scope may be:
 
@@ -433,7 +435,7 @@ Limiting support to integers makes behavior more predictable, though we are cons
 whether it might be worth adding support for other characters or symbols in future.
 
 ### Couldn’t this be a declarative API, so it would work without JavaScript?
-As there is only one OS specific place to show a badge for an installed PWA, but potentially many open `documents` only one document would correctly reflect the current badge value. This would likely be confusing.
+As there is only one [OS specific place](#OS-Specific-Contexts) to show a badge for an installed PWA, but potentially many open `documents` only one document would correctly reflect the current badge value. This would likely be confusing.
 
 We’re considering a separate declarative API for setting a badge on the favicon of the current document, which might look something like this:
 
