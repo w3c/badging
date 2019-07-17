@@ -27,6 +27,8 @@ Date: 2019-07-17
         - [Setting a separate badge for the app and a specific page (as in the case of github notifications an PR statuses).](#Setting-a-separate-badge-for-the-app-and-a-specific-page-as-in-the-case-of-github-notifications-an-PR-statuses)
         - [Badging for Multiple Apps on the Same Origin (as in the case of multiple Github Pages PWAs)](#Badging-for-Multiple-Apps-on-the-Same-Origin-as-in-the-case-of-multiple-Github-Pages-PWAs)
   - [UX treatment](#UX-treatment)
+    - [Badging Documents](#Badging-Documents)
+    - [Badging Installed Web Applications](#Badging-Installed-Web-Applications)
   - [Specific operating system treatment for installed web applications](#Specific-operating-system-treatment-for-installed-web-applications)
     - [macOS](#macOS)
     - [Universal Windows Platform](#Universal-Windows-Platform)
@@ -302,6 +304,9 @@ Badge.clear();
 
 ## UX treatment
 
+### Badging Documents
+
+### Badging Installed Web Applications
 * Installed Web applications are typically given some presence in an
   operating-system location, such as the shelf, launcher, dock, home screen,
   etc. Usually the application is represented by an icon.
