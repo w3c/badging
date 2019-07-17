@@ -25,9 +25,9 @@ Date: 2019-07-17
       - [Advanced Examples](#Advanced-Examples)
         - [Updating a Badge on a message from a WebSocket (as in a messaging app, receiving new messages):](#Updating-a-Badge-on-a-message-from-a-WebSocket-as-in-a-messaging-app-receiving-new-messages)
         - [Setting a separate badge for the app and a specific page (as in the case of github notifications an PR statuses).](#Setting-a-separate-badge-for-the-app-and-a-specific-page-as-in-the-case-of-github-notifications-an-PR-statuses)
-        - [Badging For Multiple Apps on the Same Origin (as in the case of multiple Github Pages PWAs)](#Badging-For-Multiple-Apps-on-the-Same-Origin-as-in-the-case-of-multiple-Github-Pages-PWAs)
+        - [Badging for Multiple Apps on the Same Origin (as in the case of multiple Github Pages PWAs)](#Badging-for-Multiple-Apps-on-the-Same-Origin-as-in-the-case-of-multiple-Github-Pages-PWAs)
   - [UX treatment](#UX-treatment)
-  - [Specific operating system treatment](#Specific-operating-system-treatment)
+  - [Specific operating system treatment for installed web applications](#Specific-operating-system-treatment-for-installed-web-applications)
     - [macOS](#macOS)
     - [Universal Windows Platform](#Universal-Windows-Platform)
     - [Legacy Windows (Win32)](#Legacy-Windows-Win32)
@@ -53,7 +53,7 @@ Date: 2019-07-17
 
 ## Overview
 
-The **Badging API** is a proposed Web Platform API allowing [documents](https://dom.spec.whatwg.org/#document) to set badges for sets of pages on the same origin as their [document url](https://dom.spec.whatwg.org/#concept-document-url). These badges are displayed in a a location tied to their related documents, such as on top of each document in the set's tab favicon.
+The **Badging API** is a proposed Web Platform API allowing [documents](https://dom.spec.whatwg.org/#document) to apply badges to sets of pages on the same origin as their [document url](https://dom.spec.whatwg.org/#concept-document-url). These badges are displayed in a location related to their documents such as the tab favicons.
 
 If the set of pages being badged corresponds to a [Installed Web Application](https://www.w3.org/TR/appmanifest/#installable-web-applications), the user agent may choose to display a badge in a [operating system specific place](#OS-Specific-Contexts) associated with the application (such as an icon on the shelf, home screen or dock).
 
@@ -71,7 +71,7 @@ The purpose of this API is:
 
 * To give documents a small but visible place to subtly notify the user that there is new activity that might require their attention without showing a full [notification](https://notifications.spec.whatwg.org/).
 * To indicate a small amount of additional information, such as an unread count.
-* To allow the [Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications) to convey this information regardless of whether any of the application's windows are open.
+* To allow certain blessed pages (such as Bookmarks or [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications)) to convey this information, regardless of whether they are currently open.
 
 Non-goals are:
 
@@ -81,20 +81,22 @@ Possible areas for expansion:
 
 * Support rendering a small status indicator (e.g., a music app shows ▶️ or ⏸️; a weather app shows ⛈️ or ⛅️).
 * Setting the badge from a service worker (e.g. an email app updating an unread count in the background).
-* Support badges on bookmark icons (this is probably up to user agents to support).
+* Support badges on bookmark icons (this is probably up to user agents to support, and may not need anything new API wise).
+* Support for non-inherited badges (see [Issue 42](https://github.com/WICG/badging/issues/42)).
+* Support for unicode glyph badges.
 
 Examples of sites that may use this API:
 
-* Chat, email and social apps, to signal that new messages have arrived.
+* Chat, email and social apps; to signal that new messages have arrived.
 * Productivity apps, to signal that a long-running background task (such as rendering an image or video) has completed.
-* Games, to signal that a player action is required (e.g., in Chess, when it is the player's turn).
+* Games, to signal that player action is required (e.g., in Chess, when it is the player's turn).
 
 Advantages of using the badging API over notifications:
 
 * Can be used for much higher frequency events than notifications, because each new event does not disrupt the user.
 * There is no need to request permission to use the badging API, since it is much less invasive than a notification.
 
-(Typically, sites will want to use both APIs together: notifications for high-importance events such as new direct messages or incoming calls, and badges or all new messages including group chats not directly addressed to the user.)
+(Typically, sites will want to use both APIs together: notifications for high-importance events such as new direct messages or incoming calls, and badges for all new messages including group chats not directly addressed to the user.)
 
 ## API proposal
 
@@ -102,7 +104,7 @@ Advantages of using the badging API over notifications:
 
 1. A Badge is associated with a [scope](https://www.w3.org/TR/appmanifest/#navigation-scope).
 2. Documents are badged with the most specific badge for their url (i.e. prefer a badge for `/page/1` to a badge for `/page/` when on the url `/page/1?foo=7`).
-3. If no scope is specified for a badge then its scope will default to the current origin.
+3. If no scope is specified the scope is the current origin (equivalent to setting it to `/`).
 4. For [installed applications](https://www.w3.org/TR/appmanifest/#installable-web-applications), a user agent **MAY** display the badge with the most specific scope still encompassing the [navigation scope](https://www.w3.org/TR/appmanifest/#navigation-scope) of the application in an [OS specific context](#OS-Specific-Contexts).
 
 At any time, the badge for a specific scope may be:
@@ -138,7 +140,7 @@ interface Badge {
 }
 ```
 
-> Note: Should we have a separate overload for boolean flags now, as discussed in [Issue 19](https://github.com/WICG/badging/issues/19)?
+> Note: Should we have a separate overload for boolean flags now, as discussed in [Issue 19](https://github.com/WICG/badging/issues/19) and [Issue 42](https://github.com/WICG/badging/issues/42)?
 
 > Note: This API can only be used from a foreground page. Use from a service worker is being considered for the future. [The FAQ](#Why-cant-this-be-used-in-the-background-from-the-ServiceWorker-see-28-and-5) has more details).
 
@@ -199,6 +201,7 @@ socket.onmessage = (event) => {
 ```
 
 ##### Setting a separate badge for the app and a specific page (as in the case of github notifications an PR statuses).
+On all pages of this site, we wish to display the notification count, except for `/do-have-https`, where we should instead display `flag` if the page was not served over `https` or nothing, if it was.
 
 The main page of our site https://example.com/
 ```html
@@ -248,13 +251,13 @@ On https://example.com/do-i-have-https
 </html>
 ```
 
-##### Badging For Multiple Apps on the Same Origin (as in the case of multiple Github Pages PWAs)
+##### Badging for Multiple Apps on the Same Origin (as in the case of multiple Github Pages PWAs)
 ```js
 // Scope of Frobnicate is /frobnicate
 // Scope of Bazify is /baz
 // Both apps are hosted on https://origin.example/${scope}
 
-// By default, setting a flag effects the origin.
+// By default, setting a badge affects the origin.
 Badge.set();
 // Badge for Frobnicate and Bazify is 'flag'.
 // Badge for /index.html is 'flag'.
@@ -276,7 +279,7 @@ Badge.set(55, { scope: `/frobnicate/page` });
 // Badge for /frobnicate/page is '55'.
 
 // Setting the badge for '/' is equivalent to omitting
-// the options dictionary.
+// the scope param.
 Badge.set(88, { scope: `/` });
 // Badge for Frobnicate is '88'.
 // Badge for Bazify is '7'.
@@ -305,7 +308,7 @@ Badge.clear();
 * The badge would appear as a user-agent-defined overlay on top of the app's
   icon, about a quarter of the size and in one of the four corners, as shown in
   the sample images above.
-* Operating systems typically provide a badge system for native applications;
+* Operating systems generally provide a badge system for native applications;
   user agents should re-use existing operating system APIs / UI and conventions
   to achieve a native look-and-feel.
 * The user agent should make a "best effort" attempt to map the badge data
@@ -320,7 +323,7 @@ Badge.clear();
   to map into the OS representation. This may involve:
   * Saturating a number; e.g., 351 -> "99+".
 
-## Specific operating system treatment
+## Specific operating system treatment for installed web applications
 
 This section describes a possible treatment on each major OS. User agents are
 free to implement however they like, but this should give an idea of what the
@@ -371,7 +374,7 @@ Requires Windows 7 or higher.
 * Integer badges are rendered as the number, if a single digit, or "+", if
   greater than 9.
 
-Note: This API only allows badging on a currently open window.
+Note: This API only allows badging a currently open window.
 
 ### Android
 
@@ -435,14 +438,7 @@ Limiting support to integers makes behavior more predictable, though we are cons
 whether it might be worth adding support for other characters or symbols in future.
 
 ### Couldn’t this be a declarative API, so it would work without JavaScript?
-As there is only one [OS specific place](#OS-Specific-Contexts) to show a badge for an installed PWA, but potentially many open `documents` only one document would correctly reflect the current badge value. This would likely be confusing.
-
-We’re considering a separate declarative API for setting a badge on the favicon of the current document, which might look something like this:
-
-```html
-<link rel="shortcut icon badge" href="/favicon.ico" badge="99">
-```
-See [this section](#Why-doesnt-Badgeset-apply-to-the-pages-favicon-too) for the rationale behind keeping the APIs separate.
+It could be, yes. However, as badges may be shared across multiple documents, this could be kind of confusing (e.g. there is a <link rel="shortcut icon badge" href="/favicon.ico" badge="99"> in the head of a document, but it is being badged with 7 because another page was loaded afterwards). There is some discussion of this [here](https://github.com/WICG/badging/issues/1#issuecomment-485635068).
 
 ### Why can’t this be used in the background from the ServiceWorker? (see #28 and #5)
 
@@ -450,7 +446,7 @@ Realistically, using the badge from the background is the most important use cas
 
 However there is a non-trivial problem: We need a way to inform the user that the app is running.
 
-With push notifications, browsers enforce that a notification be shown, or the browser will stop the app from processing additional notifications. Things are not as simple with badging, as a site could always set its badge to the same value, which would give the user would no cue that a site is running (or has run) in the background.
+With push notifications, browsers enforce that a notification be shown, or the browser will stop the app from processing additional notifications. Things are not as simple with badging, as a site could always set its badge to the same value, which would give the user would no cue that a site is running (or has run) in the background (and could mine all the cryptocurrencies!).
 
 To solve this, we are considering a separate notification channel especially for badges. The browser would know how to turn the notification into a badge without running any JavaScript.
 
@@ -469,7 +465,7 @@ There was a [poll](https://github.com/WICG/badging/issues/14#issuecomment-445548
 
 ### Is there an upper limit on the size of the integer? And if so, what's the behavior if that limit is reached?
 
-There is no upper limit (besides 2<sup>31</sup>). However, each user agent is
+There is no upper limit (besides 2<sup>64</sup>). However, each user agent is
 free to impose a limit and silently saturate the value (e.g., display all values
 above 99 as "99+").
 
