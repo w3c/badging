@@ -84,13 +84,12 @@ Possible areas for expansion:
 * Support rendering a small status indicator (e.g., a music app shows ▶️ or ⏸️; a weather app shows ⛈️ or ⛅️).
 * Support setting the badge from a service worker (e.g. an email app updating an unread count in the background).
 * Support badges on bookmark icons (this is probably up to user agents to support, and may not need anything new API wise).
-* Support for non-inherited badges (see [Issue 42](https://github.com/WICG/badging/issues/42)).
-* Support for unicode glyph badges.
+* Support for non-inherited badges (see [Issue 42](https://github.com/WICG/badging/issues/42), e.g. a page which normally shows a status might not want to fall back to the notification count badged on the origin when the status is cleared).
+* Support for unicode glyph badges (e.g. 😀, 😍, ❤, to render a more diverse range of statuses).
 
 Examples of sites that may use this API:
 
 * Chat, email, and social apps could signal that new messages have arrived.
-* Productivity apps, to signal that a long-running background task (such as rendering an image or video) has completed.
 * Any application that needs to signal that user action is required (e.g., in a turn-based game, when it is the player's turn).
 
 Advantages of using the badging API over notifications:
@@ -239,9 +238,6 @@ On https://example.com/do-i-have-https
         .location
         .href
         .startsWith('https');
-
-      // Note: This is not supported.
-      Badge.set(hasHttps ? '✓' : '☠', badgeOptions);
 
       // But we could do this instead:
       if (hasHttps)
