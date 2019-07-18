@@ -55,9 +55,9 @@ Date: 2019-07-17
 
 ## Overview
 
-The **Badging API** is a proposed Web Platform API allowing websites to apply badges to sets of pages on their origin. These badges are displayed in a location related to their documents such as the tab favicons.
+The **Badging API** is a proposed Web Platform API allowing websites to apply badges to sets of pages on their origin. These badges can be displayed in a location related to their documents, such as, for example, near the tab's favicons.
 
-If the set of pages being badged corresponds to an [Installed Web Application](https://www.w3.org/TR/appmanifest/#installable-web-applications), the user agent may choose to display a badge in an [operating system specific place](#OS-Specific-Contexts) associated with the application (such as an icon on the shelf, home screen or dock).
+If the set of pages being badged corresponds to an [Installed Web Application](https://www.w3.org/TR/appmanifest/#installable-web-applications), the user agent may choose to display a badge in an [operating system specific place](#OS-Specific-Contexts) associated with the application - such as an icon on the shelf, home screen, or dock.
 
 ### OS Specific Contexts
 ![Windows taskbar badge](images/uwp-badge.png)
@@ -71,13 +71,13 @@ If the set of pages being badged corresponds to an [Installed Web Application](h
 
 The purpose of this API is:
 
-* To give web sites a small but visible place to subtly notify the user that there is new activity that might require their attention without showing a full [notification](https://notifications.spec.whatwg.org/).
+* To subtly notify the user that there is new activity that might require their attention without requiring an OS-level [notification](https://notifications.spec.whatwg.org/).
 * To indicate a small amount of additional information, such as an unread count.
 * To allow certain user blessed pages (such as Bookmarks or [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications)) to convey this information, regardless of whether they are currently open.
 
 Non-goals are:
 
-* To provide an arbitrary image badge.
+* To provide an arbitrary image badge. The  web platform already provides this capability via favicons.
 
 Possible areas for expansion:
 
@@ -89,9 +89,9 @@ Possible areas for expansion:
 
 Examples of sites that may use this API:
 
-* Chat, email and social apps; to signal that new messages have arrived.
+* Chat, email, and social apps could signal that new messages have arrived.
 * Productivity apps, to signal that a long-running background task (such as rendering an image or video) has completed.
-* Games, to signal that player action is required (e.g., in Chess, when it is the player's turn).
+* Any application that needs to signal that user action is required (e.g., in a turn-based game, when it is the player's turn).
 
 Advantages of using the badging API over notifications:
 
@@ -120,7 +120,7 @@ The model does not allow a badge to be a negative integer, or the integer value 
 ### The API
 
 The `Badge` interface is a member object on
-[`Window`](https://html.spec.whatwg.org/#the-window-object). It contains three methods:
+[`Window`](https://html.spec.whatwg.org/#the-window-object). It contains the following methods:
 
 ```webidl
 dictionary BadgeOptions {
