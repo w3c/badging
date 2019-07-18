@@ -38,7 +38,7 @@ Date: 2019-07-17
     - [iOS](#iOS)
     - [Ubuntu](#Ubuntu)
     - [Summary](#Summary)
-  - [FAQ](#FAQ)
+  - [Design Questions](#Design-Questions)
     - [What data types are supported in different operating systems?](#What-data-types-are-supported-in-different-operating-systems)
     - [Why limit support to just an integer? What about other characters?](#Why-limit-support-to-just-an-integer-What-about-other-characters)
     - [Couldn’t this be a declarative API, so it would work without JavaScript?](#Couldnt-this-be-a-declarative-API-so-it-would-work-without-JavaScript)
@@ -49,13 +49,13 @@ Date: 2019-07-17
     - [Are you concerned about apps perpetually showing a large unread count?](#Are-you-concerned-about-apps-perpetually-showing-a-large-unread-count)
     - [Internationalization](#Internationalization)
     - [Security and Privacy Considerations](#Security-and-Privacy-Considerations)
-  - [Considered Alternatives](#Considered-Alternatives)
+    - [Index of Considered Alternatives](#Index-of-Considered-Alternatives)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Overview
 
-The **Badging API** is a proposed Web Platform API allowing [documents](https://dom.spec.whatwg.org/#document) to apply badges to sets of pages on the same origin as their [document url](https://dom.spec.whatwg.org/#concept-document-url). These badges are displayed in a location related to their documents such as the tab favicons.
+The **Badging API** is a proposed Web Platform API allowing websites to apply badges to sets of pages on their origin. These badges are displayed in a location related to their documents such as the tab favicons.
 
 If the set of pages being badged corresponds to an [Installed Web Application](https://www.w3.org/TR/appmanifest/#installable-web-applications), the user agent may choose to display a badge in an [operating system specific place](#OS-Specific-Contexts) associated with the application (such as an icon on the shelf, home screen or dock).
 
@@ -71,7 +71,7 @@ If the set of pages being badged corresponds to an [Installed Web Application](h
 
 The purpose of this API is:
 
-* To give documents a small but visible place to subtly notify the user that there is new activity that might require their attention without showing a full [notification](https://notifications.spec.whatwg.org/).
+* To give web sites a small but visible place to subtly notify the user that there is new activity that might require their attention without showing a full [notification](https://notifications.spec.whatwg.org/).
 * To indicate a small amount of additional information, such as an unread count.
 * To allow certain user blessed pages (such as Bookmarks or [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications)) to convey this information, regardless of whether they are currently open.
 
@@ -423,7 +423,7 @@ Requires Ubuntu (no general API for Linux).
 Thus, a fallback option for platforms that do not support arbitrary characters
 (e.g., choose whether to show a number, or nothing) may be necessary.
 
-## FAQ
+## Design Questions
 
 ### What data types are supported in different operating systems?	
 
@@ -489,7 +489,7 @@ The API allows `set()`ing an `unsigned long long`. When presenting this value, i
 ### Security and Privacy Considerations
 The API is set only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
 
-## Considered Alternatives
+### Index of Considered Alternatives
 - A [declarative API](#Couldnt-this-be-a-declarative-API-so-it-would-work-without-JavaScript).
 - Exposing the badging API [elsewhere](#Why-is-this-API-attached-to-window-instead-of-navigator-or-notifications).
 - Supporting [non-integers](#Why-limit-support-to-just-an-integer-What-about-other-characters).
