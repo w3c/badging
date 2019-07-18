@@ -95,7 +95,7 @@ Examples of sites that may use this API:
 Advantages of using the badging API over notifications:
 
 * Can be used for much higher frequency events than notifications, because each new event does not disrupt the user.
-* There is no need to request permission to use the badging API, since it is much less invasive than a notification.
+* There may be no need to request permission to use the badging API, since it is much less invasive than a notification.
 
 (Typically, sites will want to use both APIs together: notifications for high-importance events such as new direct messages or incoming calls, and badges for all new messages including group chats not directly addressed to the user.)
 
