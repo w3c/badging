@@ -103,10 +103,12 @@ Advantages of using the badging API over notifications:
 
 ### The model
 
-1. A Badge is associated with a [scope](https://www.w3.org/TR/appmanifest/#navigation-scope).
+1. A Badge is associated with a [scope](https://w3c.github.io/ServiceWorker/#service-worker-registration-scope).
 2. Documents are badged with the most specific badge for their url (i.e. prefer a badge for `/page/1` to a badge for `/page/` when on the url `/page/1?foo=7`).
 3. If no scope is specified the scope is the current origin (equivalent to setting the scope to `/`).
 4. For [installed applications](https://www.w3.org/TR/appmanifest/#installable-web-applications), a user agent **MAY** display the badge with the most specific scope still encompassing the [navigation scope](https://www.w3.org/TR/appmanifest/#navigation-scope) of the application in an [OS specific context](#OS-Specific-Contexts).
+
+> Note: [scope](https://w3c.github.io/ServiceWorker/#service-worker-registration-scope) may need to be moved into its own spec, as it is now being referenced by [ServiceWorkers](https://w3c.github.io/ServiceWorker/#service-worker-registration-scope), [AppManifests](https://www.w3.org/TR/appmanifest/#navigation-scope) and [Badging](#The-model).
 
 At any time, the badge for a specific scope may be:
 
