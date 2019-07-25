@@ -24,7 +24,7 @@ Date: 2019-07-17
         - [Setting and clearing a boolean flag (as in a game of chess):](#Setting-and-clearing-a-boolean-flag-as-in-a-game-of-chess)
       - [Advanced Examples](#Advanced-Examples)
         - [Updating a Badge on a message from a WebSocket (as in a messaging app, receiving new messages):](#Updating-a-Badge-on-a-message-from-a-WebSocket-as-in-a-messaging-app-receiving-new-messages)
-        - [Setting a separate badge for the app and a specific page (as in the case of github notifications an PR statuses).](#Setting-a-separate-badge-for-the-app-and-a-specific-page-as-in-the-case-of-github-notifications-an-PR-statuses)
+        - [Setting a separate badge for the app and a specific page (as in the case of Github notifications and PR statuses).](#Setting-a-separate-badge-for-the-app-and-a-specific-page-as-in-the-case-of-Github-notifications-and-PR-statuses)
         - [Badging for Multiple Apps on the Same Origin (as in the case of multiple Github Pages PWAs)](#Badging-for-Multiple-Apps-on-the-Same-Origin-as-in-the-case-of-multiple-Github-Pages-PWAs)
   - [UX treatment](#UX-treatment)
     - [Badging Documents](#Badging-Documents)
@@ -170,17 +170,13 @@ These examples generally provide more context around what is going on, and may s
 
 ##### Updating a Badge on a message from a WebSocket (as in a messaging app, receiving new messages):
 
-```ts
-interface ChatMessage {
-  content: string;
-  unread: boolean;
-}
+```js
 
 // A list of all messages received by the application.
-const messages: ChatMessage[] = [];
+const messages = [];
 
 // Sets the badge count to the number of unread messages.
-const updateBadgeCount = () => {
+function updateBadgeCount() {
   // Count the number of unread messages.
   const badgeCount = messages
     .filter(m => m.unread)
@@ -189,7 +185,7 @@ const updateBadgeCount = () => {
 }
 
 // Adds a new message and updates the badge count.
-const addMessage = (message: Message) => {
+function addMessage(message) {
   messages.push(message);
   updateBadgeCount();
 }
@@ -203,7 +199,7 @@ socket.onmessage = (event) => {
 };
 ```
 
-##### Setting a separate badge for the app and a specific page (as in the case of github notifications an PR statuses).
+##### Setting a separate badge for the app and a specific page (as in the case of Github notifications and PR statuses).
 On all pages of this site, we wish to display the notification count, except for `/do-have-https`, where we should instead display `flag` if the page was not served over `https` or nothing, if it was.
 
 The main page of our site https://example.com/
@@ -445,14 +441,12 @@ Realistically, using the badge from the background is the most important use cas
 
 However there is a non-trivial problem: We need a way to inform the user that the app is running.
 
-With push notifications, browsers enforce that a notification be shown, or the browser will stop the app from processing additional notifications. Things are not as simple with badging, as a site could always set its badge to the same value, which would give the user would no cue that a site is running (or has run) in the background (and could mine all the cryptocurrencies!).
+With push notifications, [some browsers](https://github.com/w3c/push-api/issues/313) enforce that a notification be shown, or the browser will stop the app from processing additional notifications. Things are not as simple with badging, as a site could always set its badge to the same value, which would give the user would no cue that a site is running (or has run) in the background (and could mine all the cryptocurrencies!).
 
 To solve this, we are considering a separate notification channel especially for badges. The browser would know how to turn the notification into a badge without running any JavaScript.
 
-> Note: I might be pretty far off the mark here, I’m not that familiar in things service worker, background, or notifications.
-
 ### Is this API useful for mobile OS’s?
-iOS has support for badging APIs (see [iOS](#ios). However, PWAs on iOS will not be able to use the badging API until Safari (the only browser engine allowed on iOS) adds support for it.
+iOS has support for badging APIs (see [iOS](#ios).
 
 On Android, badging is blocked at an OS level, as there is [no API for setting a badge without also displaying a notification](#android). However, a badge will already be displayed if a PWA has pending notifications (it just doesn’t allow the fine grained control proposed by this API).
 
@@ -464,7 +458,7 @@ There was a [poll](https://github.com/WICG/badging/issues/14#issuecomment-445548
 
 ### Is there an upper limit on the size of the integer? And if so, what's the behavior if that limit is reached?
 
-There is no upper limit (besides 2<sup>64</sup>). However, each user agent is
+There is no upper limit (besides `Number.MAX_SAFE_INTEGER`). However, each user agent is
 free to impose a limit and silently saturate the value (e.g., display all values
 above 99 as "99+").
 
