@@ -53,7 +53,7 @@ Date: 2019-07-17
 
 ## Overview
 
-The **Badging API** is a proposed Web Platform API allowing websites to apply badges to sets of pages on their origin. These badges can be displayed in a location related to their documents, such as, for example, near the tab's favicons.
+The **Badging API** is a proposed Web Platform API allowing websites to apply badges to sets of pages on their origin. These badges can be displayed in a location related to their documents, such as tab favicons.
 
 If the set of pages being badged corresponds to an [Installed Web Application](https://www.w3.org/TR/appmanifest/#installable-web-applications), the user agent may choose to display a badge in an [operating system specific place](#OS-Specific-Contexts) associated with the application - such as an icon on the shelf, home screen, or dock.
 
@@ -95,7 +95,7 @@ Advantages of using the badging API over notifications:
 * Can be used for much higher frequency events than notifications, because each new event does not disrupt the user.
 * There may be no need to request permission to use the badging API, since it is much less invasive than a notification.
 
-(Typically, sites will want to use both APIs together: notifications for high-importance events such as new direct messages or incoming calls, and badges for all new messages including group chats not directly addressed to the user.)
+Typically, sites will want to use both APIs together: notifications for high-importance events such as new direct messages or incoming calls, and badges for all new messages including group chats not directly addressed to the user.
 
 ## API proposal
 
@@ -198,7 +198,7 @@ socket.onmessage = (event) => {
 ```
 
 ##### Setting a separate badge for the app and a specific page (as in the case of Github notifications and PR statuses).
-On all pages of this site, we wish to display the notification count, except for `/status/{number}`, where we should instead display `flag` if the page's status is `ready-to-merge` or nothing.
+On all pages of this site, we wish to display the notification count, except for `/status/{number}`, where we should instead display `flag` if the page's status is `ready` or nothing, if it is not.
 
 The main page of our site https://example.com/
 ```html
@@ -231,12 +231,12 @@ On https://example.com/status/1
       };
 
       const statusInfo = {
-        status: 'ready-to-merge',
+        status: 'ready',
         author: 'me',
         url: 'https://example.com/status/1'
       };
 
-      if (statusInfo.status === 'ready-to-merge')
+      if (statusInfo.status === 'ready')
         Badge.set(badgeOptions);
       else
         Badge.clear(badgeOptions);
@@ -296,10 +296,10 @@ Badge.clear();
 ```
 
 ## UX treatment
-Badges should appear in any place that the user agent deems appropriate. In general, these places should be obviously related to the pages being badged, so users understand what the status is for. Appropriate places could include:
+Badges may appear in any place that the user agent deems appropriate. In general, these places should be obviously related to the pages being badged, so users understand what the status is for. Appropriate places could include:
 - Tab favicons.
 - Bookmark icons.
-- The [OS Specific Icons](#OS-Specific-Contexts) of [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications).
+- The [OS Specific Contexts](#OS-Specific-Contexts) of [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications).
   
 > Note: When showing an badge in an [OS Specific Context](#OS-Specific-Contexts) user agents should attempt reuse existing [operating system APIs and conventions](#Specific-operating-system-treatment-for-installed-web-applications), to achieve a native look-and-feel.
 
