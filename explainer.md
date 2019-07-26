@@ -200,7 +200,7 @@ socket.onmessage = (event) => {
 ```
 
 ##### Setting a separate badge for the app and a specific page (as in the case of Github notifications and PR statuses).
-On all pages of this site, we wish to display the notification count, except for `/do-have-https`, where we should instead display `flag` if the page was not served over `https` or nothing, if it was.
+On all pages of this site, we wish to display the notification count, except for `/status/{number}`, where we should instead display `flag` if the page's status is `ready-to-merge` or nothing.
 
 The main page of our site https://example.com/
 ```html
@@ -219,7 +219,7 @@ The main page of our site https://example.com/
 </html>
 ```
 
-On https://example.com/do-i-have-https
+On https://example.com/status/1
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -229,18 +229,19 @@ On https://example.com/do-i-have-https
   <body>
     <script>
       const badgeOptions = {
-        scope: `/do-i-have-https`
+        scope: '/status/1'
       };
 
-      const hasHttps = window
-        .location
-        .href
-        .startsWith('https');
+      const statusInfo = {
+        status: 'ready-to-merge',
+        author: 'me',
+        url: 'https://example.com/status/1'
+      };
 
-      // But we could do this instead:
-      if (hasHttps)
+      if (statusInfo.status === 'ready-to-merge')
         Badge.set(badgeOptions);
-      else Badge.clear(badgeOptions);
+      else
+        Badge.clear(badgeOptions);
 
     </script>
   </body>
