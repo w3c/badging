@@ -27,8 +27,6 @@ Date: 2019-07-17
         - [Setting a separate badge for the app and a specific page (as in the case of Github notifications and PR statuses).](#Setting-a-separate-badge-for-the-app-and-a-specific-page-as-in-the-case-of-Github-notifications-and-PR-statuses)
         - [Badging for Multiple Apps on the Same Origin (as in the case of multiple Github Pages PWAs)](#Badging-for-Multiple-Apps-on-the-Same-Origin-as-in-the-case-of-multiple-Github-Pages-PWAs)
   - [UX treatment](#UX-treatment)
-    - [Badging Documents](#Badging-Documents)
-    - [Badging Installed Web Applications](#Badging-Installed-Web-Applications)
   - [Specific operating system treatment for installed web applications](#Specific-operating-system-treatment-for-installed-web-applications)
     - [macOS](#macOS)
     - [Universal Windows Platform](#Universal-Windows-Platform)
@@ -298,26 +296,16 @@ Badge.clear();
 ```
 
 ## UX treatment
-Badges should appear as a user agent defined overlay on top of the app's icon, about a quarter of the size, and in one of the four corners. If the exact representation of a badge is not supported (e.g., a 2-digit number while only single characters are allowed, or a character where only numbers are allowed) the user agent should make a best effort attempt to map the unsupported data onto supported data. This may involve:
+Badges should appear in any place that the user agent deems appropriate. In general, these places should be obviously related to the pages being badged, so users understand what the status is for. Appropriate places could include:
+- Tab favicons.
+- Bookmark icons.
+- The [OS Specific Icons](#OS-Specific-Contexts) of [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications).
+  
+> Note: When showing an badge in an [OS Specific Context](#OS-Specific-Contexts) user agents should attempt reuse existing [operating system APIs and conventions](#Specific-operating-system-treatment-for-installed-web-applications), to achieve a native look-and-feel.
+
+If the exact representation of a badge is not supported (e.g., a 2-digit number while only single characters are allowed, or a character where only numbers are allowed) the user agent should make a best effort attempt to map the unsupported data onto supported data. This may involve:
 - Saturating a number: 351 -> '99+'
 - Degrading the data: 7 -> 'flag' when only flag badges are supported.
-
-### Badging Documents
-User agents may choose to apply the badge in other places they display a favicon for the site. These might include:
-- The favicon displayed on tabs
-- Bookmark Icons
-
-### Badging Installed Web Applications
-* Installed Web applications are typically given some presence in an
-  operating-system location, such as the shelf, launcher, dock, home screen,
-  etc. Usually the application is represented by an icon.
-* Operating systems generally provide a badge system for native applications;
-  user agents should re-use existing operating system APIs / UI and conventions
-  to achieve a native look-and-feel.
-* Some operating systems (e.g., Android) only provide UI for a Flag badge;
-  only displaying a coloured dot with no content (see the sample image above).
-  In these cases, the user agent should follow this convention, and only show a
-  Flag, even if the website sets richer badge data.
 
 ## Specific operating system treatment for installed web applications
 
