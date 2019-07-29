@@ -226,14 +226,20 @@ On https://example.com/status/1
   </head>
   <body>
     <script>
+      // `/status/39/` => `39`
+      const statusNumber = location.pathname
+        .split('/') // Get path segments
+        .filter(s => s) // which are non-empty
+        .pop(); // and take the last one.
+
       const badgeOptions = {
-        scope: '/status/1'
+        scope: `/status/${statusNumber}`
       };
 
       const statusInfo = {
         status: 'ready',
         author: 'me',
-        url: 'https://example.com/status/1'
+        url: `https://example.com/status/${statusNumber}`
       };
 
       if (statusInfo.status === 'ready')
