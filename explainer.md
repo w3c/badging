@@ -299,7 +299,7 @@ Badge.clear();
 Badges may appear in any place that the user agent deems appropriate. In general, these places should be obviously related to the pages being badged, so users understand what the status is for. Appropriate places could include:
 - Tab favicons.
 - Bookmark icons.
-- The [OS Specific Contexts](#OS-Specific-Contexts) of [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications).
+- [OS Specific Contexts](#OS-Specific-Contexts) for [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications).
   
 > Note: When showing an badge in an [OS Specific Context](#OS-Specific-Contexts) user agents should attempt reuse existing [operating system APIs and conventions](#Specific-operating-system-treatment-for-installed-web-applications), to achieve a native look-and-feel.
 
