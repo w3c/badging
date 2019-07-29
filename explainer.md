@@ -24,8 +24,8 @@ Date: 2019-07-17
         - [Setting and clearing a boolean flag (as in a game of chess):](#Setting-and-clearing-a-boolean-flag-as-in-a-game-of-chess)
       - [Advanced Examples](#Advanced-Examples)
         - [Updating a Badge on a message from a WebSocket (as in a messaging app, receiving new messages):](#Updating-a-Badge-on-a-message-from-a-WebSocket-as-in-a-messaging-app-receiving-new-messages)
-        - [Setting a separate badge for the app and a specific page (as in the case of Github notifications and PR statuses).](#Setting-a-separate-badge-for-the-app-and-a-specific-page-as-in-the-case-of-Github-notifications-and-PR-statuses)
-        - [Badging for Multiple Apps on the Same Origin (as in the case of multiple Github Pages PWAs)](#Badging-for-Multiple-Apps-on-the-Same-Origin-as-in-the-case-of-multiple-Github-Pages-PWAs)
+        - [Setting a separate badge for the app and a specific page (as in the case of GitHub notifications and PR statuses).](#Setting-a-separate-badge-for-the-app-and-a-specific-page-as-in-the-case-of-GitHub-notifications-and-PR-statuses)
+        - [Badging for Multiple Apps on the Same Origin (as in the case of multiple GitHub Pages PWAs)](#Badging-for-Multiple-Apps-on-the-Same-Origin-as-in-the-case-of-multiple-GitHub-Pages-PWAs)
   - [UX treatment](#UX-treatment)
   - [Specific operating system treatment for installed web applications](#Specific-operating-system-treatment-for-installed-web-applications)
     - [macOS](#macOS)
@@ -197,7 +197,7 @@ socket.onmessage = (event) => {
 };
 ```
 
-##### Setting a separate badge for the app and a specific page (as in the case of Github notifications and PR statuses).
+##### Setting a separate badge for the app and a specific page (as in the case of GitHub notifications and PR statuses).
 On all pages of this site, we wish to display the notification count, except for `/status/{number}`, where we should instead display `flag` if the page's status is `ready` or nothing, if it is not.
 
 The main page of our site https://example.com/
@@ -246,7 +246,7 @@ On https://example.com/status/1
 </html>
 ```
 
-##### Badging for Multiple Apps on the Same Origin (as in the case of multiple Github Pages PWAs)
+##### Badging for Multiple Apps on the Same Origin (as in the case of multiple GitHub Pages PWAs)
 ```js
 // Scope of Frobnicate is /frobnicate
 // Scope of Bazify is /baz
