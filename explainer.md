@@ -479,23 +479,23 @@ The API is set only, so data badged can't be used to track a user. Whether the A
 
 ### What to Badge?
 There are a number of different concepts that we could have chosen to badge. Broadly these are:
-- Origins: A whole origin (such as https://example.com) could be badged. Badges would show up for all pages on that origin. This will be what *most* sites want. However there are some use cases it does not address:
+- Origins: A whole origin (such as https://example.com) is badged. Badges show up for all pages on that origin. This is what *most* sites want. However there are some use cases it does not address:
   - Multiple apps being installed on the same origin.
   - Separate page status and notification indicators (as in [this example](#Setting-a-separate-badge-for-the-app-and-a-specific-page-as-in-the-case-of-GitHub-notifications-and-PR-statuses))
-- Apps: An [Installable Web Application](https://www.w3.org/TR/appmanifest/#installable-web-applications) would be badged. Generally, this would work similarly to badging an origin (badges would show for all pages in an app) but has some not-insignificant downsides in that:
-  - Badges would only work where an application exists containing the current url.
+- Apps: An [Installable Web Application](https://www.w3.org/TR/appmanifest/#installable-web-applications) is badged. Generally, this is similar to badging an origin (badges show for all pages in an app) but has some not-insignificant downsides:
+  - Badges only work where an application exists for the current url.
   - Scopes of web applications can overlap.
 - Scopes: All pages with a certain prefix are badged. If multiple prefixes match the same url, the longest is used. This is similar to the way service worker and app scopes work.
-- URLs: A specific url is badged, and all pages on that exact url share the badge. This could allow the badging of web applications (perhaps by setting the badge for the web applications's [navigation scope](https://www.w3.org/TR/appmanifest/#navigation-scope)). However, it doesn't address the common use case of sharing a notification count for most pages in an origin/app.
+- URLs: A specific url is badged. All pages on that exact url share the badge. This allows the badging of web applications (by setting a badge for the web applications's [navigation scope](https://www.w3.org/TR/appmanifest/#navigation-scope)). However, it does not address the common use case of sharing a notification count for across pages in an origin/app.
 - Documents: A specific instance of a document is badged. This is nearly identical to the current method of badging favicons, except it would provide a more convenient syntax.
   - This would not allow the badging of web applications, which is one of the primary motivations for this explainer.
 
-We decided to badging scopes was the most appropriate option for this API, as:
-1. It allows badging of origins (apply a badge to the scope "`/`"). This could be the default when no scope is provided to solve the most common use case.
-2. It allows badging of multiple apps in the same scopes (apply a badge to "`/app1`" and "`/app2`").
+We decided badging scopes was the most appropriate option for this API, as:
+1. It allows badging of origins (apply a badge to the scope "`/`"). This could be the default when no scope is provided.
+2. It allows badging of multiple apps on the same origin (apply a badge to "`/app1`" and "`/app2`").
 3. It allows setting notification counts and status indicators for individual pages.
 4. It allows badging of individual urls (though may require clearing the badge for a sub path to stop the badge cascading down).
-5. Badging documents doesn't allow the badging of web applications, and is already possible through the favicon.
+5. Badging documents doesn't allow the badging of web applications, and is already possible by modifying the favicon.
 
 In short, it allows the most flexibility while still being ergonomic in the common case (through use of a sensible default for scope).
 
