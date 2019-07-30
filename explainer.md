@@ -489,7 +489,14 @@ There are three main use cases developers might have for the badging API.
 
 3. Badging a specific Document.
 
-   Potentially useful when there is some internal state contained in the page which controls the badge state.
+   Potentially useful when there is some internal state contained in the document which controls the badge.
+
+Initially, `2` and `3` seem very similar. However, in option `2` all pages on the same url would share a badge, while in `3` badges would be tied to a specific, currently open instance of a page (a tab). The API proposed in this explainer will provide a way to do `1` (by badging `/` for the origin or `/app/` for an app), and `2` (by badging the full url for the page) but does not solve `3`.
+
+This is not as much of a problem as it at first seems: Badging specific documents is already supported, through the current favicon API. In addition, developers should generally prefer option `2` to `3`, so as to ensure that content on the web is addressable.
+
+> Note: Not really happy with this section. Essentially we don't want to support it because it doesn't quite fit with the problem we're trying to solve: Namely, applying badges to loosely grouped sets of pages.
+
 ### Index of Considered Alternatives
 - A [declarative API](#Couldnt-this-be-a-declarative-API-so-it-would-work-without-JavaScript).
 - Exposing the badging API [elsewhere](#Why-is-this-API-attached-to-window-instead-of-navigator-or-notifications).
