@@ -501,3 +501,4 @@ There are a number of different concepts that we could have chosen to badge. Bro
 - Supporting [query-string scopes](https://github.com/WICG/badging/issues/1#issuecomment-511634128).
 - Adding [fallbacks](https://github.com/WICG/badging/issues/2), when the system can't display a badge.
 - [Promise based](https://github.com/WICG/badging/issues/35#issue-459665145) badging API.
+- Badging [Different Concepts](#What-to-Badge).
