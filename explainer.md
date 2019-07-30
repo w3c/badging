@@ -490,6 +490,15 @@ There are a number of different concepts that we could have chosen to badge. Bro
 - Documents: A specific instance of a document is badged. This is nearly identical to the current method of badging favicons, except it would provide a more convenient syntax.
   - This would not allow the badging of web applications, which is one of the primary motivations for this explainer.
 
+We decided to badging scopes was the most appropriate option for this API, as:
+1. It allows badging of origins (apply a badge to the scope "`/`"). This could be the default when no scope is provided to solve the most common use case.
+2. It allows badging of multiple apps in the same scopes (apply a badge to "`/app1`" and "`/app2`").
+3. It allows setting notification counts and status indicators for individual pages.
+4. It allows badging of individual urls (though may require clearing the badge for a sub path to stop the badge cascading down).
+5. Badging documents doesn't allow the badging of web applications, and is already possible through the favicon.
+
+In short, it allows the most flexibility while still being ergonomic in the common case (through use of a sensible default for scope).
+
 ### Index of Considered Alternatives
 - A [declarative API](#Couldnt-this-be-a-declarative-API-so-it-would-work-without-JavaScript).
 - Exposing the badging API [elsewhere](#Why-is-this-API-attached-to-window-instead-of-navigator-or-notifications).
