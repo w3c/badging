@@ -47,6 +47,7 @@ Date: 2019-07-17
     - [Are you concerned about apps perpetually showing a large unread count?](#Are-you-concerned-about-apps-perpetually-showing-a-large-unread-count)
     - [Internationalization](#Internationalization)
     - [Security and Privacy Considerations](#Security-and-Privacy-Considerations)
+    - [What to Badge?](#What-to-Badge)
     - [Index of Considered Alternatives](#Index-of-Considered-Alternatives)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -475,6 +476,24 @@ The API allows `set()`ing an `unsigned long long`. When presenting this value, i
 
 ### Security and Privacy Considerations
 The API is set only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
+
+### What to Badge?
+There are three main use cases developers might have for the badging API.
+1. Badging an entire App or Origin
+   
+   Useful for a social network or chat application.
+
+2. Badging a specific URL, or group of URLs.
+
+   Useful when a specific page has a status associated with it, such as reporting whether a build succeeded or failed.
+
+3. Badging a specific Document.
+
+   Potentially useful when there is some internal state contained in the document which controls the badge.
+
+> Note: Initially, `2` and `3` seem very similar. However, in option `2` all pages on the same url would share a badge, while in `3` badges would be tied to a specific, currently open instance of a page (a tab).
+
+The API proposed in this explainer will provide solutions to `1` (by badging `/` for the origin or `/app/` for an app), and `2` (by badging the full url for the page). It does not attempt solve `3`. Conceptually, it would be possible to support `3` by adding a switch to the options passed to `Badge.set(.., { documentOnly: true })`. However, this would be extra work to spec and implement, and we don't have use cases to justify it at this time. In addition, badging individual documents is already possible (though unpleasant), with the `favicon` API.
 
 ### Index of Considered Alternatives
 - A [declarative API](#Couldnt-this-be-a-declarative-API-so-it-would-work-without-JavaScript).
