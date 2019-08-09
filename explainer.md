@@ -54,11 +54,50 @@ Date: 2019-07-17
 
 ## Overview
 
-The **Badging API** is a proposed Web Platform API allowing websites to apply badges to sets of pages on their origin. These badges can be displayed in a location related to their documents, such as tab favicons.
+The **Badging API** is a proposed Web Platform API allowing websites to apply
+badges (small status indicators) to pages or sets of pages on their origin. We
+are deliberately agnostic about which contexts a badge can appear in, but have
+two fairly different contexts in mind:
 
-If the set of pages being badged corresponds to an [Installed Web Application](https://www.w3.org/TR/appmanifest/#installable-web-applications), the user agent may choose to display a badge in an [operating system specific place](#OS-Specific-Contexts) associated with the application - such as an icon on the shelf, home screen, or dock.
+* "Document" contexts, associated with an open document, such as when a badge is
+  shown on or near the page's icon in a browser tab.
+* "Handle" contexts, associated with a handle or link to a site somewhere in the
+  user agent or operating system UI, but not necessarily associated with a
+  running document, such as a bookmark or [installed web
+  app](https://www.w3.org/TR/appmanifest/#installable-web-applications) icon.
 
-### OS Specific Contexts
+Here is a mock of a badge being applied to the page tab:
+
+![Mock of a badge being applied to the page tab](images/tab-badge.png)
+
+This use case is already satisfied today with sites dynamically setting either
+their favicon or title to include some status indicator. The use of an explicit
+badge API has a number of advantages over the "hack" ways:
+
+* The badge can appear outside (completely, or partially overlapping) of the
+  favicon, leaving more room for the site's brand image.
+* The badge is meaningful to the user agent, which can present it to the user in
+  various ways, such as announcing it verbally to a user using a screen reader.
+* Badges can be displayed with a consistent style across websites, chosen by the
+  user agent.
+* User agents can provide a way for users to disable badges on a per-site or
+  global basis.
+
+The "handle" context is more nebulous because it means associating a badge with
+any place the user agent shows an icon representing a site, page or app. For
+example, it could be applied to an icon in the bookmark bar, or a "commonly
+visited sites" index on the new tab page.
+
+![Mock of a badge being applied to the bookmark bar](images/bookmark-badge.png)
+<br>Mock of a badge being applied to the bookmark bar
+
+For [installed web
+applications](https://www.w3.org/TR/appmanifest/#installable-web-applications),
+the badge can be applied in whatever place the OS shows apps, such as the shelf,
+home screen or dock.
+
+Here are some examples of app badging applied at the OS level:
+
 ![Windows taskbar badge](images/uwp-badge.png)
 <br>Windows taskbar badge
 
@@ -68,23 +107,48 @@ If the set of pages being badged corresponds to an [Installed Web Application](h
 ![Android home screen badge](images/android-badge.png)
 <br>Android home screen badge
 
+Unlike document contexts, badges applied in "handle" contexts can be shown and
+updated even when there are no tabs or windows open for the app. So there are
+some special considerations for this use case, such as how to set the badge in
+response to a [Push message](https://www.w3.org/TR/push-api/), and how to scope
+a badge so that it appears on the desired set of pages or apps. The most
+commonly requested use case for "handle" badging is badging an app icon on the
+OS shelf, but it generalizes to non-installed sites as well.
+
+In the common case, developers should simply be able to set a badge for the
+entire site, without worrying about document versus handle contexts, and it
+would show up in whatever context is appropriate (e.g., on all the tabs for this
+site, as well as on the site's app icon, if installed, or in the bookmarks bar,
+if bookmarked); this is why we present a single API for both contexts and not
+two separate APIs. However, due to the different nature of these two contexts,
+it will sometimes be necessary for developers to consider them separately. We
+consider the following concerns specific to each context:
+
+* Document: Sites may wish to apply different badges to certain pages, even two
+  documents at the same URL.
+* Document: Sites may need to feature detect whether the user agent specifically
+  supports tab badging (regardless of whether it supports handle use cases), to
+  know whether to fall back to badging the favicon or title.
+* Handle: Updating the badge while there are no windows open requires extra
+  work, and is only useful for non-document use cases.
+
+## Goals and use cases
+
 The purpose of this API is:
 
 * To subtly notify the user that there is new activity that might require their attention without requiring an OS-level [notification](https://notifications.spec.whatwg.org/).
 * To indicate a small amount of additional information, such as an unread count.
-* To allow certain user blessed pages (such as Bookmarks or [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications)) to convey this information, regardless of whether they are currently open.
+* To allow certain user-blessed pages (such as Bookmarks or [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications)) to convey this information, regardless of whether they are currently open.
+* To allow setting the badge when no documents from the site are running (e.g. an email app updating an unread count in the background).
 
 Non-goals are:
 
-* To provide an arbitrary image badge. The  web platform already provides this capability via favicons.
+* To provide an arbitrary image badge. The web platform already provides this capability via favicons.
 
 Possible areas for expansion:
 
-* Support rendering a small status indicator (e.g., a music app shows ▶️ or ⏸️; a weather app shows ⛈️ or ⛅️).
-* Support setting the badge from a service worker (e.g. an email app updating an unread count in the background).
-* Support badges on bookmark icons (this is probably up to user agents to support, and may not need anything new API wise).
+* Support rendering a small status indicator (e.g., a music app shows ▶️ or ⏸️; a weather app shows ⛈️ or ⛅️): either a pre-defined set of glyphs or simply allowing a Unicode character to be rendered.
 * Support for non-inherited badges (see [Issue 42](https://github.com/WICG/badging/issues/42), e.g. a page which normally shows a status might not want to fall back to the notification count badged on the origin when the status is cleared).
-* Support for unicode glyph badges (e.g. 😀, 😍, ❤, to render a more diverse range of statuses).
 
 Examples of sites that may use this API:
 
