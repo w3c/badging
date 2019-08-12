@@ -191,6 +191,186 @@ Advantages of using the badging API over notifications:
 
 Typically, sites will want to use both APIs together: notifications for high-importance events such as new direct messages or incoming calls, and badges for all new messages including group chats not directly addressed to the user.
 
+## Badge scope
+
+This section explains the difference between badging a *set of URLs* versus
+badging a *document*.
+
+Consider four increasingly narrow sets of pages that a Badge is applied to:
+
+1. An entire origin (e.g., when you just want to set an unread count for the
+   entire site).
+2. All pages whose URL [starts
+   with](https://www.w3.org/TR/appmanifest/#dfn-within-scope) a given path
+   (e.g., if a site is organised into "projects", each with their own status
+   indicator).
+3. All pages with a specific URL path (e.g., if each page has a separate status
+   indicator, but all tabs open at a certain URL should share status).
+4. A specific document (e.g., if many tabs can be open with URLs on the same
+   path, but might have different status, due to either a different query
+   string, or different dynamic context inside the document).
+
+Number 3 and 4 seem very similar, but architecturally are very different. In
+3, the badge is associated with a URL (and any current or future documents open
+at that URL will show that badge), whereas in 4, the badge is associated with a
+particular document — other tabs open to the same URL will not share the badge.
+
+What this boils down to is two different modes:
+
+* Badging a particular URL scope, applied to the set of URLs that start with the
+  same path. This covers 1, 2 and 3 above.
+* Badging a particular document, applied to only the browser tab containing the
+  document.
+
+The API for requesting to badge the current document, as opposed to a URL set,
+is still under consideration. It may simply be a separate option member, e.g.:
+
+```js
+Badge.set(getUnreadCount(), {scopeDocument: true});
+```
+
+## Background updates
+
+For the *handle* context badges, we would like to be able to update the badge
+with a server-side push, while there are no active documents open. This would
+allow, for example, app icon badges to show an up-to-date unread count even when
+no pages are open.
+
+In this section, we explore two APIs that could be useful for this: [Push
+API](https://www.w3.org/TR/push-api/) and [Periodic Background
+Sync](https://github.com/WICG/BackgroundSync/blob/master/explainer.md#periodic-synchronization-in-design).
+
+### The Push problem
+
+The [Push API](https://www.w3.org/TR/push-api/) allows servers to send messages
+to service workers, which can run JavaScript code even when no foreground page
+is running. Thus, a server push could trigger a `Badge.set`.
+
+However, there is a [de facto standard
+requirement](https://github.com/w3c/push-api/issues/313) that whenever a push is
+received, a notification needs to be displayed. This means it's impossible to
+subtly update a badge in the background while no pages are open, without also
+displaying a notification.
+
+This may be fine for some use cases (if you want to always show a notification
+when updating the badge, possibly with an exception of not showing a
+notification if the app is in the foreground). But we specifically designed this
+API as a *subtle* notice mechanism that does not require a more distracting
+notification in order to set a badge. Because of this de facto requirement, the
+Push API currently isn't suitable for this use case.
+
+There is also a requirement that the user grants notification permission to
+subscribe to push messages.
+
+### Periodic Background Sync
+
+[Periodic Background
+Sync](https://github.com/WICG/BackgroundSync/blob/master/explainer.md#periodic-synchronization-in-design)
+is a proposed extension to the [Background
+Sync](https://wicg.github.io/BackgroundSync/spec/) API, that allows a service
+worker to periodically poll the server, which could be used to get an updated
+status and call `Badge.set`. However, this API is unreliable: the period that it
+gets called is at the discretion of the user agent and can be subject to things
+like battery status.
+
+That means when the page isn't open, you could have the badge indicator update
+every once in awhile, but have no guarantee that it would be up to date.
+
+(Also, the Periodic Background Sync API is not yet implemented.)
+
+It's possible that the use of Push API and Periodic Background Sync together is
+"good enough": high-priority notices (that show a notification) come in through
+a Push and are displayed immediately with a notification; low-priority notices
+are displayed as badges immediately if there are pages open, or "eventually" if
+there are no pages open.
+
+However, in our view, there is a need for *immediate* update to low-priority
+notices: this is akin to the [urgency vs importance](https://en.wikipedia.org/wiki/Time_management#The_Eisenhower_Method)
+dichotomy: a badge is for non-important information but that doesn't mean the
+user doesn't want to see the notice in a timely fashion.
+
+### Possible changes to the Push API
+
+Here we discuss ways to potentially allow the Push API to update badges without
+showing notifications.
+
+**Note: This should not be considered blocking.** The Badge API is perfectly
+usable, including from service workers, without these changes, so we consider
+these as add-ons that we could introduce at a later time.
+
+#### Waiving the notification requirement
+
+The purpose of the [de facto
+requirement](https://github.com/w3c/push-api/issues/313) to show a notification
+upon receipt of a push message is to prevent malicious sites from using
+high-frequency pushes to do invisible background work, such as crypto mining
+(use of the user's computing resources) or monitoring the user's IP address,
+giving coarse-grained geographic location (privacy concern). The theory is that
+if the site is required to show a notification on each push, the user is at
+least going to be aware that the site is constantly doing something, and if it's
+unreasonably spammy, the user is likely to revoke the notification permission,
+thus erasing the push subscription.
+
+We could make it so that use of the `Badge` API serves the same function as
+showing a notification (fulfilling the requirement to use the Push API). But
+doing so would probably nullify the reason for this requirement in the first
+place: a malicious site that wants to do crypto mining could just set a badge
+every 30 seconds and the user would probably not notice it.
+
+On the other hand, this may be acceptable if we allow user agents to dictate a
+high bar for waiving this requirement, e.g., "the user must have [installed the
+site](https://www.w3.org/TR/appmanifest/#installable-web-applications) as an
+application, and enabled notifications". It may be an acceptable trade-off to
+allow these "semi-trusted" sites to perform silent background tasks, in order to
+let them keep badges up to date in a timely fashion. This would have to be a
+discussion around privacy trade-offs which we (the Badge API authors) aren't
+equipped to answer by ourselves.
+
+Technically, the way we would do this is by allowing certain sites to set
+`userVisibleOnly` to `false` in the push subscription (which currently has no
+defined meaning, and in Chrome at least, is not allowed to be `false`, so there
+is currently a de facto requirement that it be set to `true`). If a site is
+allowed to set `userVisibleOnly` to `false`, then it can receive badge-only push
+messages. If not, it is bound by the existing rules, and must either show a
+notification, or turn off low-priority messages.
+
+#### A separate channel for Badge payloads
+
+A more comprehensive solution includes some significant additions to the Push
+API (which the authors of the Badge spec are not really equipped to do).
+
+(This has been briefly discussed with Peter Beverloo, an editor of the Push API
+spec, but only at a very high level.)
+
+Instead of allowing the service worker to run JavaScript code and call the
+`Badge` API, we would introduce a new concept to a Push subscription called a
+"channel", which dictates what is done with the payload upon receipt. The
+default channel would be "event" (the payload is delivered to the `"push"`
+event), with a new channel, "badge", which imposes a specific format to the
+payload. The payload would now be interpreted as a JSON dictionary containing
+parameters to the `Badge.set` API. Upon receipt of the push, the user agent
+would automatically call the `Badge` API without running any user code, and with
+no requirement to show a notification.
+
+This solution still has the following two flaws (expressed by Peter Beverloo):
+
+1. The server can still use badge delivery to know whether device is online
+   through [delivery receipts](https://tools.ietf.org/html/rfc8030#section-6.3).
+   This may or may not be a privacy concern.
+2. (On mobile) (at least on Android and iOS) the browser needs to be woken up to
+   decrypt and process the payload; it can't be processed by the host OS's push
+   receipt system due to the encryption. This could be a big resource drain if
+   badges are pushed too frequently (the same concern applies for notifications,
+   but as above, there is a natural tendency for developers to reduce the number
+   of user-visible notifications due to user spam; the same forcing function
+   does not apply for setting a badge).
+
+#### Conclusion
+
+Both of the above changes present huge obstacles and discussions involving
+privacy, resource usage, and utility trade-offs. Due to the increased
+complexity, we are not considering changes to the Push API at this time.
+
 ## API proposal
 
 ### The model
@@ -455,24 +635,6 @@ The API allows `set()`ing an `unsigned long long`. When presenting this value, i
 
 ### Security and Privacy Considerations
 The API is set only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
-
-### What to Badge?
-There are three main use cases developers might have for the badging API.
-1. Badging an entire App or Origin
-   
-   Useful for a social network or chat application.
-
-2. Badging a specific URL, or group of URLs.
-
-   Useful when a specific page has a status associated with it, such as reporting whether a build succeeded or failed.
-
-3. Badging a specific Document.
-
-   Potentially useful when there is some internal state contained in the document which controls the badge.
-
-> Note: Initially, `2` and `3` seem very similar. However, in option `2` all pages on the same url would share a badge, while in `3` badges would be tied to a specific, currently open instance of a page (a tab).
-
-The API proposed in this explainer will provide solutions to `1` (by badging `/` for the origin or `/app/` for an app), and `2` (by badging the full url for the page). It does not attempt solve `3`. Conceptually, it would be possible to support `3` by adding a switch to the options passed to `Badge.set(.., { documentOnly: true })`. However, this would be extra work to spec and implement, and we don't have use cases to justify it at this time. In addition, badging individual documents is already possible (though unpleasant), with the `favicon` API.
 
 ### Index of Considered Alternatives
 - A [declarative API](#Couldnt-this-be-a-declarative-API-so-it-would-work-without-JavaScript).
