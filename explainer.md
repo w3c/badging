@@ -488,25 +488,24 @@ which contains a URL prefix to scope the badge to. If omitted, it defaults to
 
 > Note: Should we have a separate overload for boolean flags now, as discussed in [Issue 19](https://github.com/WICG/badging/issues/19) and [Issue 42](https://github.com/WICG/badging/issues/42)?
 
-## UX treatment
+### UX treatment
 Badges may appear in any place that the user agent deems appropriate. In general, these places should be obviously related to the pages being badged, so users understand what the status is for. Appropriate places could include:
 - Tab favicons.
 - Bookmark icons.
 - [OS Specific Contexts](#OS-Specific-Contexts) for [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications).
-  
+
 > Note: When showing an badge in an [OS Specific Context](#OS-Specific-Contexts) user agents should attempt reuse existing [operating system APIs and conventions](#Specific-operating-system-treatment-for-installed-web-applications), to achieve a native look-and-feel.
 
-If the exact representation of a badge is not supported (e.g., a 2-digit number while only single characters are allowed, or a character where only numbers are allowed) the user agent should make a best effort attempt to map the unsupported data onto supported data. This may involve:
-- Saturating a number: 351 -> '99+'
-- Degrading the data: 7 -> 'flag' when only flag badges are supported.
+## Security and Privacy Considerations
+The API is set only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
 
-See [Badge implementation on host platforms](docs/implementation.md) for details on how user agents might implement the API on various platforms (giving an idea of what the treatment will look like in practice).
+There are additional privacy considerations relating to the proposed extensions to the Push API, noted above. However, this does not apply to the base Badge API.
 
 ## Design Questions
 
-### What data types are supported in different operating systems?	
+### What data types are supported in different operating systems?
 
-See [above](#Summary).
+See [implementation.md](docs/implementation.md).
 
 ### Why limit support to just an integer? What about other characters?
 
@@ -517,18 +516,8 @@ and Ubuntu don't support them at all).
 Limiting support to integers makes behavior more predictable, though we are considering
 whether it might be worth adding support for other characters or symbols in future.
 
-### Couldn’t this be a declarative API, so it would work without JavaScript?
-It could be, yes. However, as badges may be shared across multiple documents, this could be kind of confusing (e.g. there is a <link rel="shortcut icon badge" href="/favicon.ico" badge="99"> in the head of a document, but it is being badged with 7 because another page was loaded afterwards). There is some discussion of this [here](https://github.com/WICG/badging/issues/1#issuecomment-485635068).
-
-### Why can’t this be used in the background from the ServiceWorker? (see #28 and #5)
-
-Realistically, using the badge from the background is the most important use case, so ideally, badges could be updated in the background via the service worker.
-
-However there is a non-trivial problem: We need a way to inform the user that the app is running.
-
-With push notifications, [some browsers](https://github.com/w3c/push-api/issues/313) enforce that a notification be shown, or the browser will stop the app from processing additional notifications. Things are not as simple with badging, as a site could always set its badge to the same value, which would give the user would no cue that a site is running (or has run) in the background (and could mine all the cryptocurrencies!).
-
-To solve this, we are considering a separate notification channel especially for badges. The browser would know how to turn the notification into a badge without running any JavaScript.
+### Couldn’t this be a declarative API (i.e., a DOM element), so it would work without JavaScript?
+It could be, yes. However, as badges may be shared across multiple documents, this could be kind of confusing (e.g. there is a `<link rel="shortcut icon badge" href="/favicon.ico" badge="99">` in the head of a document, but it is being badged with 7 because another page was loaded afterwards). There is some discussion of this [here](https://github.com/WICG/badging/issues/1#issuecomment-485635068).
 
 ### Is this API useful for mobile OS’s?
 iOS has support for badging APIs (see [iOS](#ios).
@@ -562,9 +551,6 @@ full power of showing a native badge.
 
 ### Internationalization
 The API allows `set()`ing an `unsigned long long`. When presenting this value, it should be formatted according to the user's locale settings.
-
-### Security and Privacy Considerations
-The API is set only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
 
 ### Index of Considered Alternatives
 - A [declarative API](#Couldnt-this-be-a-declarative-API-so-it-would-work-without-JavaScript).
