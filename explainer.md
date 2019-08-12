@@ -115,22 +115,44 @@ a badge so that it appears on the desired set of pages or apps. The most
 commonly requested use case for "handle" badging is badging an app icon on the
 OS shelf, but it generalizes to non-installed sites as well.
 
-In the common case, developers should simply be able to set a badge for the
-entire site, without worrying about document versus handle contexts, and it
-would show up in whatever context is appropriate (e.g., on all the tabs for this
-site, as well as on the site's app icon, if installed, or in the bookmarks bar,
-if bookmarked); this is why we present a single API for both contexts and not
-two separate APIs. However, due to the different nature of these two contexts,
-it will sometimes be necessary for developers to consider them separately. We
-consider the following concerns specific to each context:
+## Usage examples
 
-* Document: Sites may wish to apply different badges to certain pages, even two
-  documents at the same URL.
-* Document: Sites may need to feature detect whether the user agent specifically
-  supports tab badging (regardless of whether it supports handle use cases), to
-  know whether to fall back to badging the favicon or title.
-* Handle: Updating the badge while there are no windows open requires extra
-  work, and is only useful for non-document use cases.
+The simplest possible usage of the API is a single call to `Badge.set` from a
+foreground context (which might be used to show an unread count in an email
+app):
+
+```js
+Badge.set(getUnreadCount());
+```
+
+This will set the badge for all pages and apps in the current origin until it is
+changed. If `getUnreadCount()` (the argument to `Badge.set`) is 0, it will
+automatically clear the badge.
+
+If you just want to show a status indicator flag without a number, use the
+Boolean mode of the API by calling `Badge.set` without an argument, and
+`Badge.clear` (which might be done to indicate that it is the player's turn to
+move in a multiplayer game):
+
+```js
+if (myTurn())
+  Badge.set();
+else
+  Badge.clear();
+```
+
+The reason we are considering both the "document" and "handle" contexts in the
+same API, and not two separate badging APIs, is so that in the common case,
+developers can just set a badge for the origin and have it show up in whatever
+places the user agent wants to show it. However, if you just want to badge a
+specific set of URLs, and not the whole site, use the `scope` option (which
+might be done if you have a different "unread count" on each page):
+
+```js
+Badge.set(getUnreadCount(location.pathname), {scope: location});
+```
+
+More advanced examples are given below.
 
 ## Goals and use cases
 
@@ -148,16 +170,16 @@ Non-goals are:
 Possible areas for expansion:
 
 * Support rendering a small status indicator (e.g., a music app shows ▶️ or ⏸️; a weather app shows ⛈️ or ⛅️): either a pre-defined set of glyphs or simply allowing a Unicode character to be rendered.
-* Support for non-inherited badges (see [Issue 42](https://github.com/WICG/badging/issues/42), e.g. a page which normally shows a status might not want to fall back to the notification count badged on the origin when the status is cleared).
 
 Examples of sites that may use this API:
 
 * Chat, email, and social apps could signal that new messages have arrived.
 * Any application that needs to signal that user action is required (e.g., in a turn-based game, when it is the player's turn).
+* As a permanent indicator of a page's status (e.g., on a build page, to show that the build has completed).
 
 Advantages of using the badging API over notifications:
 
-* Can be used for much higher frequency events than notifications, because each new event does not disrupt the user.
+* Can be used for much higher frequency / lower priority events than notifications, because each new event does not disrupt the user.
 * There may be no need to request permission to use the badging API, since it is much less invasive than a notification.
 
 Typically, sites will want to use both APIs together: notifications for high-importance events such as new direct messages or incoming calls, and badges for all new messages including group chats not directly addressed to the user.
@@ -210,28 +232,11 @@ interface Badge {
 
 > Note: This API can only be used from a foreground page. Use from a service worker is being considered for the future. [The FAQ](#Why-cant-this-be-used-in-the-background-from-the-ServiceWorker-see-28-and-5) has more details).
 
-### Examples
+## Advanced Examples
 
-#### Basic Examples
-These examples provided limited context. They are intended to show how the API will look.
-
-##### Setting an integer badge (as in an email app):
-```js
-Badge.set(getUnreadCount());
-```
-
-##### Setting and clearing a boolean flag (as in a game of chess):
-```js
-if (myTurn())
-  Badge.set();
-else
-  Badge.clear();
-```
-
-#### Advanced Examples
 These examples generally provide more context around what is going on, and may specify scopes. They are intended to show how real world applications may use the API.
 
-##### Updating a Badge on a message from a WebSocket (as in a messaging app, receiving new messages):
+### Updating a Badge on a message from a WebSocket (as in a messaging app, receiving new messages):
 
 ```js
 
@@ -262,7 +267,7 @@ socket.onmessage = (event) => {
 };
 ```
 
-##### Setting a separate badge for the app and a specific page (as in the case of GitHub notifications and PR statuses).
+### Setting a separate badge for the app and a specific page (as in the case of GitHub notifications and PR statuses).
 On all pages of this site, we wish to display the notification count, except for `/status/{number}`, where we should instead display `flag` if the page's status is `ready` or nothing, if it is not.
 
 The main page of our site https://example.com/
@@ -317,7 +322,7 @@ On https://example.com/status/1
 </html>
 ```
 
-##### Badging for Multiple Apps on the Same Origin (as in the case of multiple GitHub Pages PWAs)
+### Badging for Multiple Apps on the Same Origin (as in the case of multiple GitHub Pages PWAs)
 ```js
 // Scope of Frobnicate is /frobnicate
 // Scope of Bazify is /baz
