@@ -401,6 +401,57 @@ Both of the above changes present huge obstacles and discussions involving
 privacy, resource usage, and utility trade-offs. Due to the increased
 complexity, we are not considering changes to the Push API at this time.
 
+## Feature detection
+
+Ideally we would not provide any feedback to the site as to how the badge is
+going to be displayed to the user, since it's a user interface concern that
+should be at the discretion of the user agent. For example, the site shouldn't
+need to know whether the badge is displayed on a tab icon or on an app icon.
+
+However, a practical concern overrides this: because the favicon can be (and
+often is) used to display a page badge, sites upgrading to the `Badge` API need
+to know whether they need to fall back to setting the favicon (since,
+presumably, they don't want the badge being displayed twice). So we need to
+provide a way to feature detect — not just "whether the Badge API is supported",
+but "whether a Badge-API badge will show up on or near the favicon". So we
+introduce the `Badge.canBadgeDocument` API:
+
+```js
+if (Badge.canBadgeDocument()) {
+  Badge.set(getUnreadCount(), {scopeDocument: true});
+} else {
+  // Fall back to favicon.
+  showBadgeOnFavicon(getUnreadCount());
+}
+```
+
+## A case for separation
+
+Having enumerated all of the complexity relating to "document" versus "handle"
+contexts, I think we can make a case for separating them into two distinct APIs.
+Under this alternative, there would be an API for setting a badge on URL scopes
+that would *only* be displayed on URL handles such as apps and bookmarks, and
+another API for setting a badge on the current document.
+
+This would mean we no longer have a quick solution for setting the badge
+everywhere on the current origin: to do that, you would need to call both APIs,
+the latter on each page load.
+
+The reason to do this is that the two APIs have very different concerns which
+would be properly separated:
+
+* The URL scoping complexity only applies to the "handle" API.
+* The push messaging complexity only applies to the "handle" API.
+* We wouldn't need `canBadgeDocument`; the presence of the "document" API itself
+  would indicate whether the tab will be badged in the UI.
+
+Other reasons to separate:
+
+* Sites that only want to badge their app icon or only want to badge their tab
+  could just concern themselves with the relevant API.
+* The "document" API could potentially support badges that aren't supported by
+  host operating systems, such as arbitrary Unicode characters.
+
 ## Detailed API proposal
 
 ### The model
