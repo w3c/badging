@@ -152,6 +152,9 @@ might be done if you have a different "unread count" on each page):
 Badge.set(getUnreadCount(location.pathname), {scope: location});
 ```
 
+The scope is a URL prefix; the badge is applied on all pages whose URL [starts
+with](https://www.w3.org/TR/appmanifest/#dfn-within-scope) that prefix.
+
 More advanced examples are given below.
 
 ## Goals and use cases
@@ -228,6 +231,33 @@ is still under consideration. It may simply be a separate option member, e.g.:
 ```js
 Badge.set(getUnreadCount(), {scopeDocument: true});
 ```
+
+When displaying the badge for an app, the user agent should use the badge
+matching the app's [scope URL](https://www.w3.org/TR/appmanifest/#scope-member).
+
+### Nested scopes
+
+Since we allow badges to be scoped to different, potentially nested, URLs, it
+means that a particular page can be subject to more than one badge at a time.
+In this case, the user agent should display only the badge with the most
+specific URL.
+
+Therefore, clearing a badge (either by calling `Badge.clear()` or
+`Badge.set(0)`) does *not necessarily* mean that no badge will be displayed; by
+erasing a badge at one level, a page may inherit a badge from a higher level.
+
+For example, consider a site that has made the following two calls:
+
+* `Badge.set(6, {scope: '/users/'});`
+* `Badge.set(2, {scope: '/users/1'});`
+
+Now all pages in '/users/' show the badge "6", except for `/users/1`, which
+shows the badge "2".
+
+Now if we see `Badge.clear({scope: '/users/1'})`, the pages under `/users/1`
+will start showing the badge "6" since that badge is still in effect. If instead
+we see `Badge.clear({scope: '/users/'})`, the pages under `/users/1` will still
+show the badge "2", *even if `clear` is called from one of those pages*.
 
 ## Background updates
 
@@ -371,7 +401,7 @@ Both of the above changes present huge obstacles and discussions involving
 privacy, resource usage, and utility trade-offs. Due to the increased
 complexity, we are not considering changes to the Push API at this time.
 
-## API proposal
+## Detailed API proposal
 
 ### The model
 
