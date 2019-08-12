@@ -456,16 +456,13 @@ Other reasons to separate:
 
 ### The model
 
-1. A Badge is associated with a [scope](https://w3c.github.io/ServiceWorker/#service-worker-registration-scope).
-2. Documents are badged with the most specific badge for their url (i.e. prefer a badge for `/page/1` to a badge for `/page/` when on the url `/page/1?foo=7`).
-3. If no scope is specified the scope is the current origin (equivalent to setting the scope to `/`).
-4. For [installed applications](https://www.w3.org/TR/appmanifest/#installable-web-applications), a user agent **MAY** display the badge with the most specific scope still encompassing the [navigation scope](https://www.w3.org/TR/appmanifest/#navigation-scope) of the application in an [OS specific context](#OS-Specific-Contexts).
+A badge is associated with a [scope](https://www.w3.org/TR/appmanifest/#navigation-scope).
 
-> Note: [scope](https://w3c.github.io/ServiceWorker/#service-worker-registration-scope) may need to be moved into its own spec, as it is now being referenced by [ServiceWorkers](https://w3c.github.io/ServiceWorker/#service-worker-registration-scope), [AppManifests](https://www.w3.org/TR/appmanifest/#navigation-scope) and [Badging](#The-model).
+* Documents are badged with the most specific badge for their URL (i.e. prefer a badge for `/page/1` to a badge for `/page/` when on the url `/page/1?foo=7`).
+* For [installed applications](https://www.w3.org/TR/appmanifest/#installable-web-applications), a user agent **MAY** display the badge with the most specific scope still encompassing the [navigation scope](https://www.w3.org/TR/appmanifest/#navigation-scope) of the application in an [OS specific context](#OS-Specific-Contexts).
 
-At any time, the badge for a specific scope may be:
+At any time, the badge for a specific scope, if it is set, may be either:
 
-* Nothing. Apply the badge for a less specific scope, or, if there is no matching badge, display nothing.
 * A "flag" indicating the presence of a badge with no contents, or
 * A positive integer.
 
@@ -474,31 +471,22 @@ The model does not allow a badge to be a negative integer, or the integer value 
 ### The API
 
 The `Badge` interface is a member object on
-[`Window`](https://html.spec.whatwg.org/#the-window-object). It contains the following methods:
+[`Window`](https://html.spec.whatwg.org/#the-window-object) and
+[`ServiceWorkerGlobalScope`](https://w3c.github.io/ServiceWorker/#serviceworkerglobalscope-interface).
+It contains the following methods:
 
-```webidl
-dictionary BadgeOptions {
-  // The scope the badge applies to.
-  // If unspecified this is the origin of the current page.
-  USVString scope;
-}
+* `Badge.set([contents], [options])`: Sets the badge for the scope in *options*
+  to *contents* (an integer), or to "flag" if *contents* is omitted. If
+  *contents* is 0, clears the badge for the given scope.
+* `Badge.clear([options])`: Clears the badge for the scope in *options*.
+* `Badge.canBadgeDocument()`: Returns true if the user agent would display a
+  badge applying to a document scope on or near the page's favicon.
 
-[Exposed=Window]
-interface Badge {
-  // Sets the badge for a scope to be |contents|.
-  void set(unsigned long long contents, optional BadgeOptions options);
-
-  // Sets the badge for a scope to be the special value, 'flag'.
-  void set(optional BadgeOptions options);
-
-  // Clears the badge for a scope.
-  void clear(optional BadgeOptions options);
-}
-```
+The *options* parameter is a dictionary containing a single member, `scope`,
+which contains a URL prefix to scope the badge to. If omitted, it defaults to
+`"/"`.
 
 > Note: Should we have a separate overload for boolean flags now, as discussed in [Issue 19](https://github.com/WICG/badging/issues/19) and [Issue 42](https://github.com/WICG/badging/issues/42)?
-
-> Note: This API can only be used from a foreground page. Use from a service worker is being considered for the future. [The FAQ](#Why-cant-this-be-used-in-the-background-from-the-ServiceWorker-see-28-and-5) has more details).
 
 ## UX treatment
 Badges may appear in any place that the user agent deems appropriate. In general, these places should be obviously related to the pages being badged, so users understand what the status is for. Appropriate places could include:
