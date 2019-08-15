@@ -1,8 +1,24 @@
 # Badge implementation on host platforms
 
-This section describes a possible treatment on each major OS. User agents are
+This document describes a possible treatment on each major OS. User agents are
 free to implement however they like, but this should give an idea of what the
 API will look like in practice.
+
+## Table of Contents
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [macOS](#macos)
+- [Universal Windows Platform](#universal-windows-platform)
+- [Legacy Windows (Win32)](#legacy-windows-win32)
+- [Android](#android)
+- [Chrome OS](#chrome-os)
+- [iOS](#ios)
+- [Ubuntu](#ubuntu)
+- [Summary](#summary)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## macOS
 

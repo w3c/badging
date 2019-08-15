@@ -2,6 +2,17 @@
 
 These examples generally provide more context around what is going on, and may specify scopes. They are intended to show how real world applications may use the API.
 
+## Table of Contents
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
+
+- [Updating a Badge on a message from a WebSocket (as in a messaging app, receiving new messages):](#updating-a-badge-on-a-message-from-a-websocket-as-in-a-messaging-app-receiving-new-messages)
+- [Setting a separate badge for the app and a specific page (as in the case of GitHub notifications and PR statuses).](#setting-a-separate-badge-for-the-app-and-a-specific-page-as-in-the-case-of-github-notifications-and-pr-statuses)
+- [Badging for Multiple Apps on the Same Origin (as in the case of multiple GitHub Pages PWAs)](#badging-for-multiple-apps-on-the-same-origin-as-in-the-case-of-multiple-github-pages-pwas)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Updating a Badge on a message from a WebSocket (as in a messaging app, receiving new messages):
 
 ```js
