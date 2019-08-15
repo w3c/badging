@@ -58,7 +58,8 @@ Requires Android 8.0 (Oreo) or higher.
 * The host API is
   [`NotificationChannel`](https://developer.android.com/training/notify-user/badges),
   which lets you set a number only. The badge is usually shown as a coloured
-  dot; the number is only shown on a long-press.
+  dot; the number is only shown on a long-press (at least in the Pixel home
+  screen).
 * Tricky: The API is tied to notifications. You can't show a badge unless there
   are pending notifications.
 
@@ -66,8 +67,8 @@ Requires Android 8.0 (Oreo) or higher.
 
 Not currently supported, but will [soon be available](https://crbug.com/801014)
 for Android apps using the above `NotificationChannel` API. The Chrome browser
-itself will be able to re-use this mechanism for showing a coloured dot on web
-application icons.
+itself will be able to re-use the same UI for showing a coloured dot in response
+to the Badge API.
 
 ## iOS
 
@@ -85,12 +86,12 @@ Requires Ubuntu (no general API for Linux).
 * The host API is
   [`unity_launcher_*`](https://wiki.ubuntu.com/Unity/LauncherAPI), which lets
   you set an integer only.
-* See iOS treatment.
+* Badges have the same restrictions as iOS.
 
 ## Summary
 
 * All known host OSes support some form of badge.
-* Integer badges are always supported (but sometimes translated).
+* Integer badges are always supported (but sometimes reduced to a simple dot).
 * Most platforms support showing at least one arbitrary character. UWP limits to
   a small selection of glyphs. iOS and Ubuntu can only show numbers.
 

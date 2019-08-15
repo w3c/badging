@@ -163,7 +163,7 @@ The purpose of this API is:
 
 * To subtly notify the user that there is new activity that might require their attention without requiring an OS-level [notification](https://notifications.spec.whatwg.org/).
 * To indicate a small amount of additional information, such as an unread count.
-* To allow certain user-blessed pages (such as Bookmarks or [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications)) to convey this information, regardless of whether they are currently open.
+* To allow certain pages that a user agent deems interesting to a user (such as Bookmarks or [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications)) to convey this information, regardless of whether they are currently open.
 * To allow setting the badge when no documents from the site are running (e.g. an email app updating an unread count in the background).
 
 Non-goals are:
@@ -240,7 +240,7 @@ matching the app's [scope URL](https://www.w3.org/TR/appmanifest/#scope-member).
 Since we allow badges to be scoped to different, potentially nested, URLs, it
 means that a particular page can be subject to more than one badge at a time.
 In this case, the user agent should display only the badge with the most
-specific URL.
+specific [scope](https://www.w3.org/TR/appmanifest/#scope-member).
 
 Therefore, clearing a badge (either by calling `Badge.clear()` or
 `Badge.set(0)`) does *not necessarily* mean that no badge will be displayed; by
@@ -258,6 +258,8 @@ Now if we see `Badge.clear({scope: '/users/1'})`, the pages under `/users/1`
 will start showing the badge "6" since that badge is still in effect. If instead
 we see `Badge.clear({scope: '/users/'})`, the pages under `/users/1` will still
 show the badge "2", *even if `clear` is called from one of those pages*.
+See [this
+example](docs/examples.md#badging-for-multiple-apps-on-the-same-origin-as-in-the-case-of-multiple-github-pages-pwas).
 
 ## Background updates
 
@@ -301,7 +303,9 @@ Sync](https://wicg.github.io/BackgroundSync/spec/) API, that allows a service
 worker to periodically poll the server, which could be used to get an updated
 status and call `Badge.set`. However, this API is unreliable: the period that it
 gets called is at the discretion of the user agent and can be subject to things
-like battery status.
+like battery status. This isn't really the use case that Periodic Background
+Sync was designed for (which is having caches updated while the user isn't
+directly using a site, not updating UI that's immediately visible to the user).
 
 That means when the page isn't open, you could have the badge indicator update
 every once in awhile, but have no guarantee that it would be up to date.
@@ -345,7 +349,10 @@ We could make it so that use of the `Badge` API serves the same function as
 showing a notification (fulfilling the requirement to use the Push API). But
 doing so would probably nullify the reason for this requirement in the first
 place: a malicious site that wants to do crypto mining could just set a badge
-every 30 seconds and the user would probably not notice it.
+every 30 seconds and the user would probably not notice it. And they could set
+the badge to the same value it already had (which we definitely want to allow;
+otherwise the server has to keep track of what value is currently being
+displayed in each client).
 
 On the other hand, this may be acceptable if we allow user agents to dictate a
 high bar for waiving this requirement, e.g., "the user must have [installed the
@@ -367,10 +374,10 @@ notification, or turn off low-priority messages.
 #### A separate channel for Badge payloads
 
 A more comprehensive solution includes some significant additions to the Push
-API (which the authors of the Badge spec are not really equipped to do).
+API (which the authors of the Badge spec are not equipped to do).
 
-(This has been briefly discussed with Peter Beverloo, an editor of the Push API
-spec, but only at a very high level.)
+(This has been briefly discussed with Peter Beverloo, (@beverloo) an editor of
+the Push API spec, but only at a very high level.)
 
 Instead of allowing the service worker to run JavaScript code and call the
 `Badge` API, we would introduce a new concept to a Push subscription called a
@@ -425,6 +432,9 @@ if (Badge.canBadgeDocument()) {
 }
 ```
 
+We could also have `Badge.set()` return a list of places that received the badge
+(defining them somehow), to tell the site whether a fallback is required.
+
 ## A case for separation
 
 Having enumerated all of the complexity relating to "document" versus "handle"
@@ -468,6 +478,8 @@ At any time, the badge for a specific scope, if it is set, may be either:
 
 The model does not allow a badge to be a negative integer, or the integer value 0 (setting the badge to 0 is equivalent to clearing the badge).
 
+The user agent is allowed to clear the badge whenever there are no foreground pages open on the origin (the intention of this is so that when the user agent quits, it does not need to serialize all the badge data and restore it on start-up; sites should re-apply the badge when they open).
+
 ### The API
 
 The `Badge` interface is a member object on
@@ -486,15 +498,16 @@ The *options* parameter is a dictionary containing a single member, `scope`,
 which contains a URL prefix to scope the badge to. If omitted, it defaults to
 `"/"`.
 
-> Note: Should we have a separate overload for boolean flags now, as discussed in [Issue 19](https://github.com/WICG/badging/issues/19) and [Issue 42](https://github.com/WICG/badging/issues/42)?
+**Note**: Should we have a separate overload for boolean flags now, as discussed in [Issue 19](https://github.com/WICG/badging/issues/19) and [Issue 42](https://github.com/WICG/badging/issues/42)?
 
 ### UX treatment
 Badges may appear in any place that the user agent deems appropriate. In general, these places should be obviously related to the pages being badged, so users understand what the status is for. Appropriate places could include:
 - Tab favicons.
 - Bookmark icons.
+- A "most visited sites" menu, e.g., on the user agent's "new tab" page.
 - [OS Specific Contexts](#OS-Specific-Contexts) for [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications).
 
-> Note: When showing an badge in an [OS Specific Context](#OS-Specific-Contexts) user agents should attempt reuse existing [operating system APIs and conventions](#Specific-operating-system-treatment-for-installed-web-applications), to achieve a native look-and-feel.
+**Note**: When showing a badge in an [OS Specific Context](#OS-Specific-Contexts) user agents should attempt reuse existing [operating system APIs and conventions](docs/implementation.md), to achieve a native look-and-feel.
 
 ## Security and Privacy Considerations
 The API is set only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
@@ -518,6 +531,8 @@ whether it might be worth adding support for other characters or symbols in futu
 
 ### Couldn’t this be a declarative API (i.e., a DOM element), so it would work without JavaScript?
 It could be, yes. However, as badges may be shared across multiple documents, this could be kind of confusing (e.g. there is a `<link rel="shortcut icon badge" href="/favicon.ico" badge="99">` in the head of a document, but it is being badged with 7 because another page was loaded afterwards). There is some discussion of this [here](https://github.com/WICG/badging/issues/1#issuecomment-485635068).
+
+If we [split into two separate APIs](#a-case-for-separation), then the declarative API looks more attractive for the per-document badge.
 
 ### Is this API useful for mobile OS’s?
 iOS has support for badging APIs (see [iOS](#ios).
