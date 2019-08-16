@@ -6,6 +6,8 @@ Author: Marcos Cáceres <mcaceres@mozilla.org>
 
 Date: 2019-07-17
 
+**This is a proposal. It represents our current thinking and is expected to change as part of ongoing discussions and as we gain implementation experience. If you have thoughts or suggestions, we'd like to hear from you - [Please file an issue](http://github.com/wicg/badging/issues).** 
+
 ## Table of Contents
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
@@ -110,16 +112,17 @@ OS shelf, but it generalizes to non-installed sites as well.
 ## Usage examples
 
 The simplest possible usage of the API is a single call to `Badge.set` from a
-foreground context (which might be used to show an unread count in an email
+document (which might be used to show an unread count in an email
 app):
 
 ```js
 Badge.set(getUnreadCount());
 ```
 
-This will set the badge for all pages and apps in the current origin until it is
-changed. If `getUnreadCount()` (the argument to `Badge.set`) is 0, it will
+This will set the badge until it is changed. If `getUnreadCount()` (the argument to `Badge.set`) is 0, it will
 automatically clear the badge.
+
+NB: We are currently discussing if badging applies to the a whole origin or just the document's URL. 
 
 If you just want to show a status indicator flag without a number, use the
 Boolean mode of the API by calling `Badge.set` without an argument, and
@@ -415,7 +418,7 @@ to know whether they need to fall back to setting the favicon (since,
 presumably, they don't want the badge being displayed twice). So we need to
 provide a way to feature detect — not just "whether the Badge API is supported",
 but "whether a Badge-API badge will show up on or near the favicon". So we
-introduce the `Badge.canBadgeDocument` API:
+are discussing potentially introducing a `Badge.canBadgeDocument` function:
 
 ```js
 if (Badge.canBadgeDocument()) {
@@ -454,7 +457,7 @@ Other reasons to separate:
 * Sites that only want to badge their app icon or only want to badge their tab
   could just concern themselves with the relevant API.
 * The "document" API could potentially support badges that aren't supported by
-  host operating systems, such as arbitrary Unicode characters.
+  host operating systems, such as arbitrary Unicode characters. However, these need careful consideration as different OS version may support different badges, which would risk confusing end users (e.g., the OS and the app showing conflicting "play" icons for an application that is playing music). 
 
 ## Detailed API proposal
 
