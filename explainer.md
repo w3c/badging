@@ -302,7 +302,8 @@ directly using a site, not updating UI that's immediately visible to the user).
 That means when the page isn't open, you could have the badge indicator update
 every once in awhile, but have no guarantee that it would be up to date.
 
-(Also, the Periodic Background Sync API is not yet implemented.)
+(Also, the Periodic Background Sync API is not yet implemented in any browser,
+though it is in an origin trial in Chrome.)
 
 It's possible that the use of Push API and Periodic Background Sync together is
 "good enough": high-priority notices (that show a notification) come in through
@@ -356,12 +357,13 @@ discussion around privacy trade-offs which we (the Badge API authors) aren't
 equipped to answer by ourselves.
 
 Technically, the way we would do this is by allowing certain sites to set
-`userVisibleOnly` to `false` in the push subscription (which currently has no
-defined meaning, and in Chrome at least, is not allowed to be `false`, so there
-is currently a de facto requirement that it be set to `true`). If a site is
-allowed to set `userVisibleOnly` to `false`, then it can receive badge-only push
-messages. If not, it is bound by the existing rules, and must either show a
-notification, or turn off low-priority messages.
+[`userVisibleOnly`](https://www.w3.org/TR/push-api/#dom-pushsubscriptionoptions-uservisibleonly)
+to `false` in the push subscription (which currently has no defined meaning, and
+in Chrome at least, is not allowed to be `false`, so there is currently a de
+facto requirement that it be set to `true`). If a site is allowed to set
+`userVisibleOnly` to `false`, then it can receive badge-only push messages. If
+not, it is bound by the existing rules, and must either show a notification, or
+turn off low-priority messages.
 
 #### A separate channel for Badge payloads
 
@@ -527,7 +529,7 @@ It could be, yes. However, as badges may be shared across multiple documents, th
 If we [split into two separate APIs](#a-case-for-separation), then the declarative API looks more attractive for the per-document badge.
 
 ### Is this API useful for mobile OS’s?
-iOS has support for badging APIs (see [iOS](#ios).
+iOS has support for badging APIs (see [iOS](docs/implementation.md#ios)).
 
 On Android, badging is blocked at an OS level, as there is [no API for setting a badge without also displaying a notification](#android). However, a badge will already be displayed if a PWA has pending notifications (it just doesn’t allow the fine grained control proposed by this API).
 
