@@ -94,6 +94,13 @@ to the Badge API.
 * Integer badges are passed directly to the host API.
 * Flag badges and strings other than digits are just represented by the number
   "1".
+* **Warning**: A potential issue on iOS is the sentence in [this
+  document](https://developer.apple.com/design/human-interface-guidelines/carekit/user-interaction/notifications-and-badging):
+  "Note that reducing a badge’s count to zero removes all related notifications
+  from Notification Center." This suggests a possibly unwanted interaction
+  between the Badge API and notifications on iOS (implying that web developers
+  can't use badges to show state that is unrelated to notifications, because it
+  might dismiss the notification).
 
 ## Ubuntu
 
