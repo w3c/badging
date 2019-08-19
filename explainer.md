@@ -129,6 +129,8 @@ Examples of sites that may use this API:
 * Any application that needs to signal that user action is required (e.g., in a turn-based game, when it is the player's turn).
 * As a permanent indicator of a page's status (e.g., on a build page, to show that the build has completed).
 
+(See [Usage examples](#usage-examples) below for the code you might use.)
+
 ### Comparison to Notifications
 
 The Badge API goes hand-in-hand with Notifications, since both APIs provide a
@@ -334,9 +336,9 @@ user doesn't want to see the notice in a timely fashion.
 Here we discuss ways to potentially allow the Push API to update badges without
 showing notifications.
 
-**Note: This should not be considered blocking.** The Badge API is perfectly
-usable, including from service workers, without these changes, so we consider
-these as add-ons that we could introduce at a later time.
+**Note: This should not be considered blocking.** The Badge API is usable,
+including from service workers, without these changes, so we consider these as
+add-ons that we could introduce at a later time.
 
 #### Waiving the notification requirement
 
@@ -376,7 +378,8 @@ in Chrome at least, is not allowed to be `false`, so there is currently a de
 facto requirement that it be set to `true`). If a site is allowed to set
 `userVisibleOnly` to `false`, then it can receive badge-only push messages. If
 not, it is bound by the existing rules, and must either show a notification, or
-turn off low-priority messages.
+turn off low-priority messages. This might require user opt-in (or a separate
+permission to notifications).
 
 #### A separate channel for Badge payloads
 
@@ -409,6 +412,11 @@ This solution still has the following two flaws (expressed by Peter Beverloo):
    of user-visible notifications due to user spam; the same forcing function
    does not apply for setting a badge).
 
+These could be partly mitigated by introducing a throttle mechanism, which would
+mean badge updates can't be immediate (moving towards Periodic Background Sync),
+but at least we would be able to set a throttle sensible for badge updates,
+rather than the total lack of guarantees that PBS gives us.
+
 #### Conclusion
 
 Both of the above changes present huge obstacles and discussions involving
@@ -434,7 +442,7 @@ introduce the `Badge.canBadgeDocument` API:
 if (Badge.canBadgeDocument()) {
   Badge.set(getUnreadCount(), {scopeDocument: true});
 } else {
-  // Fall back to favicon.
+  // Fall back to setting favicon (or page title).
   showBadgeOnFavicon(getUnreadCount());
 }
 ```
@@ -453,6 +461,35 @@ another API for setting a badge on the current document.
 This would mean we no longer have a quick solution for setting the badge
 everywhere on the current origin: to do that, you would need to call both APIs,
 the latter on each page load.
+
+This example shows usage of the separated APIs (method names TBD):
+
+```js
+// Should be called whenever the unread count changes (new mail arrives, or mail
+// is marked read/unread).
+function unreadCountChanged(newUnreadCount) {
+  // This would only set the "handle" badge, for app icons and links. This has a
+  // global and semi-permanent effect, outliving the current document.
+  if (Badge.setForScope) {
+    Badge.setForScope(newUnreadCount);
+  }
+
+  // This would only set the "document" badge, for the tab / window icon. This
+  // only affects the current document.
+  if (Badge.setForDocument) {
+    Badge.setForDocument(newUnreadCount);
+  } else {
+    // Fall back to setting favicon (or page title).
+    showBadgeOnFavicon(newUnreadCount);
+  }
+}
+
+window.addEventListener('load', () => {
+  // Need to do this on each page load, so every document shows the correct
+  // badge.
+  unreadCountChanged(getUnreadCount());
+});
+```
 
 The reason to do this is that the two APIs have very different concerns which
 would be properly separated:
