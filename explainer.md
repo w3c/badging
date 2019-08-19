@@ -12,9 +12,9 @@ Date: 2019-07-17
 
 
 - [Overview](#overview)
-- [Usage examples](#usage-examples)
 - [Goals and use cases](#goals-and-use-cases)
-  - [Use with Notifications](#use-with-notifications)
+  - [Comparison to Notifications](#comparison-to-notifications)
+- [Usage examples](#usage-examples)
 - [Badge scope](#badge-scope)
   - [Nested scopes](#nested-scopes)
 - [Background updates](#background-updates)
@@ -107,6 +107,58 @@ a badge so that it appears on the desired set of pages or apps. The most
 commonly requested use case for "handle" badging is badging an app icon on the
 OS shelf, but it generalizes to non-installed sites as well.
 
+## Goals and use cases
+
+The purpose of this API is:
+
+* To subtly notify the user that there is new activity that might require their attention without requiring an OS-level [notification](https://notifications.spec.whatwg.org/).
+* To indicate a small amount of additional information, such as an unread count.
+* To allow certain pages that a user agent deems interesting to a user (such as Bookmarks or [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications)) to convey this information, regardless of whether they are currently open.
+
+Non-goals are:
+
+* To provide an arbitrary image badge. The web platform already provides this capability via favicons.
+
+Possible areas for expansion:
+
+* Support rendering a small status indicator (e.g., a music app shows ▶️ or ⏸️; a weather app shows ⛈️ or ⛅️): either a pre-defined set of glyphs or simply allowing a Unicode character to be rendered.
+
+Examples of sites that may use this API:
+
+* Chat, email, and social apps could signal that new messages have arrived.
+* Any application that needs to signal that user action is required (e.g., in a turn-based game, when it is the player's turn).
+* As a permanent indicator of a page's status (e.g., on a build page, to show that the build has completed).
+
+(See [Usage examples](#usage-examples) below for the code you might use.)
+
+### Comparison to Notifications
+
+The Badge API goes hand-in-hand with Notifications, since both APIs provide a
+way to give the user updates when they aren't directly looking at the page.
+
+Arguably, Badge could be part of the
+[Notifications API](https://notifications.spec.whatwg.org/), but we view it as a
+separate, complementary API. A notification is, [by
+definition](https://notifications.spec.whatwg.org/#notifications), "an abstract
+representation of something that happened, such as the delivery of a message,"
+whereas, at least in this context, a badge is an abstract representation of the
+underlying state, such as the number of unread messages. A badge is not a
+notification.
+
+Some situations will call for just using notifications, or just using a badge
+update, or both simultaneously. Commonly, you will both show a notification and
+set a badge at the same time (such as when a new email message arrives). But
+there are situations where it is appropriate to use the badging API without a
+notification: for much higher frequency / lower priority events (such as group
+chat messages not directly addressed to the user). Whenever some underlying
+state changes that would be convenient for the user to be able to see at a
+glance, but not important enough to disrupt the user, use of the Badge API
+without a notification is warranted.
+
+There may be no need to request permission to use the badging API, since it is
+much less invasive than a notification, but this is at the discretion of the
+user agent.
+
 ## Usage examples
 
 The simplest possible usage of the API is a single call to `Badge.set` from a
@@ -148,43 +200,6 @@ The scope is a URL prefix; the badge is applied on all pages whose URL [starts
 with](https://www.w3.org/TR/appmanifest/#dfn-within-scope) that prefix.
 
 More advanced examples are given in a [separate document](docs/examples.md).
-
-## Goals and use cases
-
-The purpose of this API is:
-
-* To subtly notify the user that there is new activity that might require their attention without requiring an OS-level [notification](https://notifications.spec.whatwg.org/).
-* To indicate a small amount of additional information, such as an unread count.
-* To allow certain pages that a user agent deems interesting to a user (such as Bookmarks or [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications)) to convey this information, regardless of whether they are currently open.
-* To allow setting the badge when no documents from the site are running (e.g. an email app updating an unread count in the background).
-
-Non-goals are:
-
-* To provide an arbitrary image badge. The web platform already provides this capability via favicons.
-
-Possible areas for expansion:
-
-* Support rendering a small status indicator (e.g., a music app shows ▶️ or ⏸️; a weather app shows ⛈️ or ⛅️): either a pre-defined set of glyphs or simply allowing a Unicode character to be rendered.
-
-Examples of sites that may use this API:
-
-* Chat, email, and social apps could signal that new messages have arrived.
-* Any application that needs to signal that user action is required (e.g., in a turn-based game, when it is the player's turn).
-* As a permanent indicator of a page's status (e.g., on a build page, to show that the build has completed).
-
-### Use with Notifications
-
-The Badge API goes hand-in-hand with Notifications, since both APIs provide a
-way to give the user updates when they aren't directly looking at the page.
-Arguably, Badge could be part of Notifications, but we view it as a separate,
-complementary API.
-
-Advantages of using the badging API over notifications:
-
-* Can be used for much higher frequency / lower priority events than notifications, because each new event does not disrupt the user.
-* There may be no need to request permission to use the badging API, since it is much less invasive than a notification.
-
-Typically, sites will want to use both APIs together: notifications for high-importance events such as new direct messages or incoming calls, and badges for all new messages including group chats not directly addressed to the user.
 
 ## Badge scope
 
@@ -321,9 +336,9 @@ user doesn't want to see the notice in a timely fashion.
 Here we discuss ways to potentially allow the Push API to update badges without
 showing notifications.
 
-**Note: This should not be considered blocking.** The Badge API is perfectly
-usable, including from service workers, without these changes, so we consider
-these as add-ons that we could introduce at a later time.
+**Note: This should not be considered blocking.** The Badge API is usable,
+including from service workers, without these changes, so we consider these as
+add-ons that we could introduce at a later time.
 
 #### Waiving the notification requirement
 
@@ -363,7 +378,8 @@ in Chrome at least, is not allowed to be `false`, so there is currently a de
 facto requirement that it be set to `true`). If a site is allowed to set
 `userVisibleOnly` to `false`, then it can receive badge-only push messages. If
 not, it is bound by the existing rules, and must either show a notification, or
-turn off low-priority messages.
+turn off low-priority messages. This might require user opt-in (or a separate
+permission to notifications).
 
 #### A separate channel for Badge payloads
 
@@ -396,6 +412,11 @@ This solution still has the following two flaws (expressed by Peter Beverloo):
    of user-visible notifications due to user spam; the same forcing function
    does not apply for setting a badge).
 
+These could be partly mitigated by introducing a throttle mechanism, which would
+mean badge updates can't be immediate (moving towards Periodic Background Sync),
+but at least we would be able to set a throttle sensible for badge updates,
+rather than the total lack of guarantees that PBS gives us.
+
 #### Conclusion
 
 Both of the above changes present huge obstacles and discussions involving
@@ -421,7 +442,7 @@ introduce the `Badge.canBadgeDocument` API:
 if (Badge.canBadgeDocument()) {
   Badge.set(getUnreadCount(), {scopeDocument: true});
 } else {
-  // Fall back to favicon.
+  // Fall back to setting favicon (or page title).
   showBadgeOnFavicon(getUnreadCount());
 }
 ```
@@ -440,6 +461,35 @@ another API for setting a badge on the current document.
 This would mean we no longer have a quick solution for setting the badge
 everywhere on the current origin: to do that, you would need to call both APIs,
 the latter on each page load.
+
+This example shows usage of the separated APIs (method names TBD):
+
+```js
+// Should be called whenever the unread count changes (new mail arrives, or mail
+// is marked read/unread).
+function unreadCountChanged(newUnreadCount) {
+  // This would only set the "handle" badge, for app icons and links. This has a
+  // global and semi-permanent effect, outliving the current document.
+  if (Badge.setForScope) {
+    Badge.setForScope(newUnreadCount);
+  }
+
+  // This would only set the "document" badge, for the tab / window icon. This
+  // only affects the current document.
+  if (Badge.setForDocument) {
+    Badge.setForDocument(newUnreadCount);
+  } else {
+    // Fall back to setting favicon (or page title).
+    showBadgeOnFavicon(newUnreadCount);
+  }
+}
+
+window.addEventListener('load', () => {
+  // Need to do this on each page load, so every document shows the correct
+  // badge.
+  unreadCountChanged(getUnreadCount());
+});
+```
 
 The reason to do this is that the two APIs have very different concerns which
 would be properly separated:
