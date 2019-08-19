@@ -114,7 +114,6 @@ The purpose of this API is:
 * To subtly notify the user that there is new activity that might require their attention without requiring an OS-level [notification](https://notifications.spec.whatwg.org/).
 * To indicate a small amount of additional information, such as an unread count.
 * To allow certain pages that a user agent deems interesting to a user (such as Bookmarks or [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications)) to convey this information, regardless of whether they are currently open.
-* To allow setting the badge when no documents from the site are running (e.g. an email app updating an unread count in the background).
 
 Non-goals are:
 
