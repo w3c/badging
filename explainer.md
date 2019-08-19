@@ -130,19 +130,33 @@ Examples of sites that may use this API:
 * Any application that needs to signal that user action is required (e.g., in a turn-based game, when it is the player's turn).
 * As a permanent indicator of a page's status (e.g., on a build page, to show that the build has completed).
 
-### Use with Notifications
+### Comparison to Notifications
 
 The Badge API goes hand-in-hand with Notifications, since both APIs provide a
 way to give the user updates when they aren't directly looking at the page.
-Arguably, Badge could be part of Notifications, but we view it as a separate,
-complementary API.
 
-Advantages of using the badging API over notifications:
+Arguably, Badge could be part of the
+[Notifications API](https://notifications.spec.whatwg.org/), but we view it as a
+separate, complementary API. A notification is, [by
+definition](https://notifications.spec.whatwg.org/#notifications), "an abstract
+representation of something that happened, such as the delivery of a message,"
+whereas, at least in this context, a badge is an abstract representation of the
+underlying state, such as the number of unread messages. A badge is not a
+notification.
 
-* Can be used for much higher frequency / lower priority events than notifications, because each new event does not disrupt the user.
-* There may be no need to request permission to use the badging API, since it is much less invasive than a notification.
+Some situations will call for just using notifications, or just using a badge
+update, or both simultaneously. Commonly, you will both show a notification and
+set a badge at the same time (such as when a new email message arrives). But
+there are situations where it is appropriate to use the badging API without a
+notification: for much higher frequency / lower priority events (such as group
+chat messages not directly addressed to the user). Whenever some underlying
+state changes that would be convenient for the user to be able to see at a
+glance, but not important enough to disrupt the user, use of the Badge API
+without a notification is warranted.
 
-Typically, sites will want to use both APIs together: notifications for high-importance events such as new direct messages or incoming calls, and badges for all new messages including group chats not directly addressed to the user.
+There may be no need to request permission to use the badging API, since it is
+much less invasive than a notification, but this is at the discretion of the
+user agent.
 
 ## Usage examples
 
