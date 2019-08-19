@@ -12,9 +12,9 @@ Date: 2019-07-17
 
 
 - [Overview](#overview)
-- [Usage examples](#usage-examples)
 - [Goals and use cases](#goals-and-use-cases)
-  - [Use with Notifications](#use-with-notifications)
+  - [Comparison to Notifications](#comparison-to-notifications)
+- [Usage examples](#usage-examples)
 - [Badge scope](#badge-scope)
   - [Nested scopes](#nested-scopes)
 - [Background updates](#background-updates)
