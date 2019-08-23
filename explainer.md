@@ -48,8 +48,8 @@ Date: 2019-07-17
 
 The **Badging API** is a proposed Web Platform API allowing websites to apply
 badges (small status indicators) to pages or sets of pages on their origin. We
-are deliberately agnostic about which contexts a badge can appear in, but have
-two fairly different contexts in mind:
+are deliberately agnostic about which contexts a badge can appear in, but there
+are two major categories of context that will be supported:
 
 * "Document" contexts, associated with an open document, such as when a badge is
   shown on or near the page's icon in a browser tab.
@@ -100,12 +100,13 @@ Here are some examples of app badging applied at the OS level:
 <br>Android home screen badge
 
 Unlike document contexts, badges applied in "handle" contexts can be shown and
-updated even when there are no tabs or windows open for the app. So there are
-some special considerations for this use case, such as how to set the badge in
-response to a [Push message](https://www.w3.org/TR/push-api/), and how to scope
-a badge so that it appears on the desired set of pages or apps. The most
-commonly requested use case for "handle" badging is badging an app icon on the
-OS shelf, but it generalizes to non-installed sites as well.
+updated even when there are no tabs or windows open for the app. After much
+deliberation, we decided to provide a separate method for badging URLs in a
+"handle" context, due to the very different scoping and lifetime considerations.
+This use case also has some special considerations for how to set the badge in
+response to a [Push message](https://www.w3.org/TR/push-api/). The most commonly
+requested use case for "handle" badging is badging an app icon on the OS shelf,
+but it generalizes to non-installed sites as well.
 
 ## Goals and use cases
 
