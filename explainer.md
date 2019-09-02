@@ -239,12 +239,12 @@ badge on both the current document and for apps/handles across the origin:
 function unreadCountChanged(newUnreadCount) {
   // Set the "handle" badge, for app icons and links. This has a global and
   // semi-permanent effect, outliving the current document.
-  if (Badge && Badge.setForScope) {
+  if (window.Badge && Badge.setForScope) {
     Badge.setForScope(newUnreadCount);
   }
 
   // Set the "document" badge, for the current tab / window icon.
-  if (Badge && Badge.setForDocument) {
+  if (window.Badge && Badge.setForDocument) {
     Badge.setForDocument(newUnreadCount);
   } else {
     // Fall back to setting favicon (or page title).
@@ -458,7 +458,7 @@ favicon. Therefore, sites can reliably use the presence of this method to fall
 back to a conventional favicon or title badge:
 
 ```js
-if (Badge && Badge.setForDocument) {
+if (window.Badge && Badge.setForDocument) {
   Badge.setForDocument(getUnreadCount());
 } else {
   // Fall back to setting favicon (or page title).
