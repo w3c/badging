@@ -186,8 +186,8 @@ else
 ```
 
 All of the above set the badge *only* on the current document (e.g., in the page
-tab), and won't badge installed apps that have no window open. To set a badge
-that applies to all apps and other "handles" on the current origin:
+tab), and won't affect any other documents, even those at the same URL. To set a
+badge that applies to all apps and other "handles" on the current origin:
 
 ```js
 Badge.setForScope(getUnreadCount());
@@ -195,8 +195,8 @@ Badge.setForScope(getUnreadCount());
 
 As above, a value of 0 clears the badge and `Badge.clearForScope` can also
 explicitly clear the badge for this origin. The effects of the scope API are
-global and may outlast the document (it is intended to persist until the user
-agent closes). It can also be used from a service worker.
+global and may outlast the document (it is intended to persist at least until
+the user agent closes). It can also be used from a service worker.
 
 If you just want to badge a specific set of URLs (perhaps restrict to a
 particular app scope), and not the whole origin, use the `scope` option:
@@ -248,6 +248,7 @@ function unreadCountChanged(newUnreadCount) {
     Badge.setForDocument(newUnreadCount);
   } else {
     // Fall back to setting favicon (or page title).
+    // (This is a user-supplied function, not part of the Badge API.)
     showBadgeOnFavicon(newUnreadCount);
   }
 }
@@ -462,6 +463,7 @@ if (window.Badge && Badge.setForDocument) {
   Badge.setForDocument(getUnreadCount());
 } else {
   // Fall back to setting favicon (or page title).
+  // (This is a user-supplied function, not part of the Badge API.)
   showBadgeOnFavicon(getUnreadCount());
 }
 ```
@@ -477,7 +479,15 @@ badged.
 A badge is associated with either a document, or a [scope](https://www.w3.org/TR/appmanifest/#navigation-scope).
 
 * A document is only badged by a badge associated with that document (not by
-  scope-associated badges).
+  scope-associated badges). This will be a requirement of the spec (not
+  something user agents can choose to do anyway), for a number of reasons:
+  * Without this restriction, the [feature detection](#feature-detection) story
+    is a lot more complicated, since sites can't tell whether scoped badges
+    will apply to the document, and thus whether to fall back to another method.
+  * It breaks the use case of wanting to set a badge for handles across the
+    entire origin, but with individual pages in that origin having their own
+    badges. (In particular, there would be no way to avoid the fact that
+    clearing a badge for a document would revert back to the origin badge.)
 * For [installed applications](https://www.w3.org/TR/appmanifest/#installable-web-applications), a user agent **MAY** display the badge with the most specific scope encompassing the [navigation scope](https://www.w3.org/TR/appmanifest/#navigation-scope) of the application (e.g. prefer a badge for `/apps/x/` to a badge for `/apps/` for an app with scope `/apps/x/`) in an [OS specific context](#OS-Specific-Contexts).
 
 At any time, the badge for a specific document or scope, if it is set, may be either:
