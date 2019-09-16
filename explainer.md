@@ -46,8 +46,8 @@ Date: 2019-07-17
 
 The **Badging API** is a proposed Web Platform API allowing websites to apply
 badges (small status indicators) to pages or sets of pages on their origin. We
-are deliberately agnostic about which contexts a badge can appear in, but there
-are two major categories of context that will be supported:
+are deliberately agnostic about which contexts a badge can appear in, but we are
+specifying methods to handle two major different categories of context:
 
 * "Document" contexts, associated with an open document, such as when a badge is
   shown on or near the page's icon in a browser tab.
