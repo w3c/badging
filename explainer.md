@@ -151,8 +151,8 @@ user agent.
 ## Usage examples
 
 The API is divided into two parts: one for setting/clearing a badge on the
-current document, and one for setting/clearing a badge applied to a particular
-scope.
+current document, and one for setting/clearing a badge on the current
+application.
 
 To simply set a numeric badge on the current document:
 
@@ -177,34 +177,23 @@ else
 
 All of the above set the badge *only* on the current document (e.g., in the page
 tab), and won't affect any other documents, even those at the same URL. To set a
-badge that applies to all apps on the current origin:
+badge that applies to the current app:
 
 ```js
 navigator.setAppBadge(getUnreadCount());
 ```
 
 As above, a value of 0 clears the badge and `navigator.clearAppBadge` can also
-explicitly clear the badge for this origin. The effects of the scope API are
+explicitly clear the badge for this origin. The effects of the app API are
 global and may outlast the document (it is intended to persist at least until
-the user agent closes). It can also be used from a service worker.
-
-If you just want to badge a specific set of URLs (perhaps restrict to a
-particular app scope), and not the whole origin, use the `scope` option:
-
-```js
-navigator.setAppBadge(getUnreadCount(), {scope: '/myapp/'});
-```
-
-The scope is a URL prefix; the badge is applied on all URLs that [start
-with](https://www.w3.org/TR/appmanifest/#dfn-within-scope) that prefix. This
-*does not* apply the badge to documents, only to installed app icons. An app
-icon receives a badge if the badge scope is a prefix of the [app
-scope](https://www.w3.org/TR/appmanifest/#scope-member).
+the user agent closes). It can also be used from a service worker, although the
+meaning of that will be somewhat different.
 
 The reason we have separate APIs is that they have very different concerns which
 are now properly separated:
 
-* The URL scoping and push message complexity only applies to the scope API.
+* The push message complexity only applies to the app API.
+* The lifetime of the app API is considerably different to the document API.
 * The presence of the document API itself indicates whether the tab will be
   badged in the UI (obviating the need for a dedicated feature detection method
   specifically for tab badging).
@@ -220,7 +209,7 @@ User agents may provide either or both of the two APIs, so sites should
 feature-detect them individually. In particular, this allows you to fall back to
 showing your own badge in the page favicon or title if the
 `navigator.setClientBadge` API is not available (regardless of the availability
-of the scope API). This is a complete example for a site that wants to set the
+of the app API). This is a complete example for a site that wants to set the
 badge on both the current document and for apps across the origin:
 
 ```js
@@ -233,7 +222,7 @@ function unreadCountChanged(newUnreadCount) {
     navigator.setAppBadge(newUnreadCount);
   }
 
-  // Set the "document" badge, for the current tab / window icon.
+  // Set the document badge, for the current tab / window icon.
   if (navigator.setClientBadge) {
     navigator.setClientBadge(newUnreadCount);
   } else {
@@ -246,39 +235,22 @@ function unreadCountChanged(newUnreadCount) {
 
 More advanced examples are given in a [separate document](docs/examples.md).
 
-## Nested scopes
+## Usage from service workers
 
-Since we allow badges to be scoped to different, potentially nested, URLs, it
-means that a particular app can be subject to more than one badge at a time.
-In this case, the user agent should display only the badge with the most
-specific [scope](https://www.w3.org/TR/appmanifest/#scope-member).
+**TODO**: This section could use some fleshing out.
 
-Therefore, clearing a badge (either by calling `navigator.clearAppBadge()` or
-`navigator.setAppBadge(0)`) does *not necessarily* mean that no badge will be
-displayed; by erasing a badge at one level, a page may inherit a badge from a
-higher level.
+Calling the API from a service worker has some differences:
 
-For example, consider a site that has made the following two calls:
-
-* `navigator.setAppBadge(6, {scope: '/users/'});`
-* `navigator.setAppBadge(2, {scope: '/users/1'});`
-
-Now all pages in '/users/' show the badge "6", except for `/users/1`, which
-shows the badge "2".
-
-Now if we see `navigator.clearAppBadge({scope: '/users/1'})`, the pages under
-`/users/1` will start showing the badge "6" since that badge is still in effect.
-If instead we see `navigator.clearAppBadge({scope: '/users/'})`, the pages under
-`/users/1` will still show the badge "2", *even if `clear` is called from one of
-those pages*. See [this
-example](docs/examples.md#badging-for-multiple-apps-on-the-same-origin-as-in-the-case-of-multiple-github-pages-pwas).
+* `navigator.setClientBadge` either shouldn't be callable from service workers,
+  or it would need a `Client` argument to specify which document to badge.
+* When `navigator.setAppBadge` is called from a service worker, it badges all
+  apps whose scope is inside the service worker scope.
 
 ## Background updates
 
-For scope badges, we would like to be able to update the badge with a
-server-side push, while there are no active documents open. This would allow,
-for example, app icon badges to show an up-to-date unread count even when no
-pages are open.
+For app badges, we would like to be able to update the badge with a server-side
+push, while there are no active documents open. This would allow, for example,
+app icon badges to show an up-to-date unread count even when no pages are open.
 
 In this section, we explore two APIs that could be useful for this: [Push
 API](https://www.w3.org/TR/push-api/) and [Periodic Background
@@ -466,21 +438,9 @@ badged.
 
 ### The model
 
-A badge is associated with either a document, or a [scope](https://www.w3.org/TR/appmanifest/#navigation-scope).
+A badge is associated with either a document, or an [installed app](https://www.w3.org/TR/appmanifest/#installable-web-applications).
 
-* A document is only badged by a badge associated with that document (not by
-  scope-associated badges). This will be a requirement of the spec (not
-  something user agents can choose to do anyway), for a number of reasons:
-  * Without this restriction, the [feature detection](#feature-detection) story
-    is a lot more complicated, since sites can't tell whether scoped badges
-    will apply to the document, and thus whether to fall back to another method.
-  * It breaks the use case of wanting to set a badge for apps across the entire
-    origin, but with individual pages in that origin having their own badges.
-    (In particular, there would be no way to avoid the fact that clearing a
-    badge for a document would revert back to the origin badge.)
-* For [installed applications](https://www.w3.org/TR/appmanifest/#installable-web-applications), a user agent **MAY** display the badge with the most specific scope encompassing the [navigation scope](https://www.w3.org/TR/appmanifest/#navigation-scope) of the application (e.g. prefer a badge for `/apps/x/` to a badge for `/apps/` for an app with scope `/apps/x/`) in an [OS specific context](#OS-Specific-Contexts).
-
-At any time, the badge for a specific document or scope, if it is set, may be either:
+At any time, the badge for a specific document or app, if it is set, may be either:
 
 * A "flag" indicating the presence of a badge with no contents, or
 * A positive integer.
@@ -502,15 +462,22 @@ They are as follows:
   is 0, clears the badge for the given document.
 * `navigator.clearClientBadge()`: Clears the badge for the current
   document.
-* `navigator.setAppBadge([contents], [options])`: Sets the badge for the scope
-  in *options* to *contents* (an integer), or to "flag" if *contents* is
-  omitted. If *contents* is 0, clears the badge for the given scope.
-* `navigator.clearAppBadge([options])`: Clears the badge for the scope in
-  *options*.
+* `navigator.setAppBadge([contents])`: Sets the badge for the matching app(s) to
+  *contents* (an integer), or to "flag" if *contents* is omitted. If *contents*
+  is 0, clears the badge for the matching app(s).
+* `navigator.clearAppBadge()`: Clears the badge for the matching app(s).
 
-The *options* parameter is a dictionary containing a single member, `scope`,
-which contains a URL prefix to scope the badge to. If omitted, it defaults to
-`"/"`.
+The **matching app(s)** has a different meaning depending on the context:
+
+* If called from a document, this refers to an installed app that this document
+  is [within
+  scope](https://www.w3.org/TR/appmanifest/#dfn-within-scope-manifest) of. If
+  multiple apps match, it is the one with the most specific scope. If none
+  match, the method has no effect. (Zero or one apps.)
+* If called from a service worker, this refers to all apps whose scope URL
+  [matches the service worker
+  registration](https://www.w3.org/TR/service-workers-1/#scope-match-algorithm)
+  of this service worker. (Zero or more apps.)
 
 **Note**: Should we have a separate overload for boolean flags now, as discussed in [Issue 19](https://github.com/WICG/badging/issues/19) and [Issue 42](https://github.com/WICG/badging/issues/42)?
 
@@ -518,18 +485,14 @@ which contains a URL prefix to scope the badge to. If omitted, it defaults to
 Badges may appear in any place that the user agent deems appropriate. In general, these places should be obviously related to the pages being badged, so users understand what the status is for.
 
 Appropriate places for a document badge could include:
+
 - Tab favicons.
 - OS-specific contexts for app window icons if the document is open in a [standalone window](https://www.w3.org/TR/appmanifest/#display-modes).
 
-Appropriate places for a scope badge could include:
-- Bookmark icons.
-- A "most visited sites" menu, e.g., on the user agent's "new tab" page.
-- OS-specific contexts for [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications).
-
-**Note**: When showing a badge in an OS-specific context, user agents should attempt reuse existing [operating system APIs and conventions](docs/implementation.md), to achieve a native look-and-feel.
+App badges are shown in OS-specific contexts. User agents should attempt reuse existing [operating system APIs and conventions](docs/implementation.md), to achieve a native look-and-feel for the badge.
 
 ## Security and Privacy Considerations
-The API is set only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
+The API is write-only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
 
 There are additional privacy considerations relating to the proposed extensions to the Push API, noted above. However, this does not apply to the base Badge API.
 
@@ -549,7 +512,7 @@ Limiting support to integers makes behavior more predictable, though we are cons
 whether it might be worth adding support for other characters or symbols in future.
 
 ### Couldn’t this be a declarative API (i.e., a DOM element), so it would work without JavaScript?
-This would make sense for the document API, but not the scope API (which is
+This would make sense for the client API, but not the app API (which is
 shared between different pages and has a lifetime beyond the page).
 
 For now, we're specifying both as a JavaScript API to keep them consistent, but
