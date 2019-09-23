@@ -4,7 +4,7 @@ Author: Matt Giuca <mgiuca@chromium.org><br>
 Author: Jay Harris <harrisjay@chromium.org><br>
 Author: Marcos Cáceres <mcaceres@mozilla.org>
 
-Date: 2019-07-17
+Date: 2019-09-23
 
 ## Table of Contents
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -157,22 +157,22 @@ scope.
 To simply set a numeric badge on the current document:
 
 ```js
-Badge.setForDocument(getUnreadCount());
+navigator.setForDocument(getUnreadCount());
 ```
 
-If `getUnreadCount()` (the argument to `Badge.setForDocument`) is 0, it will
+If `getUnreadCount()` (the argument to `navigator.setForDocument`) is 0, it will
 automatically clear the badge.
 
 If you just want to show a status indicator flag without a number, use the
-Boolean mode of the API by calling `Badge.setForDocument` without an argument,
-and `Badge.clearForDocument` (which might be done to indicate that it is the
-player's turn to move in a multiplayer game):
+Boolean mode of the API by calling `navigator.setForDocument` without an
+argument, and `navigator.clearForDocument` (which might be done to indicate that
+it is the player's turn to move in a multiplayer game):
 
 ```js
 if (myTurn())
-  Badge.setForDocument();
+  navigator.setForDocument();
 else
-  Badge.clearForDocument();
+  navigator.clearForDocument();
 ```
 
 All of the above set the badge *only* on the current document (e.g., in the page
@@ -180,10 +180,10 @@ tab), and won't affect any other documents, even those at the same URL. To set a
 badge that applies to all apps on the current origin:
 
 ```js
-Badge.setForScope(getUnreadCount());
+navigator.setForScope(getUnreadCount());
 ```
 
-As above, a value of 0 clears the badge and `Badge.clearForScope` can also
+As above, a value of 0 clears the badge and `navigator.clearForScope` can also
 explicitly clear the badge for this origin. The effects of the scope API are
 global and may outlast the document (it is intended to persist at least until
 the user agent closes). It can also be used from a service worker.
@@ -192,7 +192,7 @@ If you just want to badge a specific set of URLs (perhaps restrict to a
 particular app scope), and not the whole origin, use the `scope` option:
 
 ```js
-Badge.setForScope(getUnreadCount(), {scope: '/myapp/'});
+navigator.setForScope(getUnreadCount(), {scope: '/myapp/'});
 ```
 
 The scope is a URL prefix; the badge is applied on all URLs that [start
@@ -219,8 +219,8 @@ Other reasons to separate:
 User agents may provide either or both of the two APIs, so sites should
 feature-detect them individually. In particular, this allows you to fall back to
 showing your own badge in the page favicon or title if the
-`Badge.setForDocument` API is not available (regardless of the availability of
-the scope API). This is a complete example for a site that wants to set the
+`navigator.setForDocument` API is not available (regardless of the availability
+of the scope API). This is a complete example for a site that wants to set the
 badge on both the current document and for apps across the origin:
 
 ```js
@@ -229,13 +229,13 @@ badge on both the current document and for apps across the origin:
 function unreadCountChanged(newUnreadCount) {
   // Set the app badge, for app icons and links. This has a global and
   // semi-permanent effect, outliving the current document.
-  if (window.Badge && Badge.setForScope) {
-    Badge.setForScope(newUnreadCount);
+  if (navigator.setForScope) {
+    navigator.setForScope(newUnreadCount);
   }
 
   // Set the "document" badge, for the current tab / window icon.
-  if (window.Badge && Badge.setForDocument) {
-    Badge.setForDocument(newUnreadCount);
+  if (navigator.setForDocument) {
+    navigator.setForDocument(newUnreadCount);
   } else {
     // Fall back to setting favicon (or page title).
     // (This is a user-supplied function, not part of the Badge API.)
@@ -253,22 +253,22 @@ means that a particular app can be subject to more than one badge at a time.
 In this case, the user agent should display only the badge with the most
 specific [scope](https://www.w3.org/TR/appmanifest/#scope-member).
 
-Therefore, clearing a badge (either by calling `Badge.clearForScope()` or
-`Badge.setForScope(0)`) does *not necessarily* mean that no badge will be
+Therefore, clearing a badge (either by calling `navigator.clearForScope()` or
+`navigator.setForScope(0)`) does *not necessarily* mean that no badge will be
 displayed; by erasing a badge at one level, a page may inherit a badge from a
 higher level.
 
 For example, consider a site that has made the following two calls:
 
-* `Badge.setForScope(6, {scope: '/users/'});`
-* `Badge.setForScope(2, {scope: '/users/1'});`
+* `navigator.setForScope(6, {scope: '/users/'});`
+* `navigator.setForScope(2, {scope: '/users/1'});`
 
 Now all pages in '/users/' show the badge "6", except for `/users/1`, which
 shows the badge "2".
 
-Now if we see `Badge.clearForScope({scope: '/users/1'})`, the pages under
+Now if we see `navigator.clearForScope({scope: '/users/1'})`, the pages under
 `/users/1` will start showing the badge "6" since that badge is still in effect.
-If instead we see `Badge.clearForScope({scope: '/users/'})`, the pages under
+If instead we see `navigator.clearForScope({scope: '/users/'})`, the pages under
 `/users/1` will still show the badge "2", *even if `clear` is called from one of
 those pages*. See [this
 example](docs/examples.md#badging-for-multiple-apps-on-the-same-origin-as-in-the-case-of-multiple-github-pages-pwas).
@@ -288,7 +288,7 @@ Sync](https://github.com/WICG/BackgroundSync/blob/master/explainer.md#periodic-s
 
 The [Push API](https://www.w3.org/TR/push-api/) allows servers to send messages
 to service workers, which can run JavaScript code even when no foreground page
-is running. Thus, a server push could trigger a `Badge.set`.
+is running. Thus, a server push could trigger a `navigator.set`.
 
 However, there is a [de facto standard
 requirement](https://github.com/w3c/push-api/issues/313) that whenever a push is
@@ -313,12 +313,12 @@ Sync](https://github.com/WICG/BackgroundSync/blob/master/explainer.md#periodic-s
 is a proposed extension to the [Background
 Sync](https://wicg.github.io/BackgroundSync/spec/) API, that allows a service
 worker to periodically poll the server, which could be used to get an updated
-status and call `Badge.setForScope`. However, this API is unreliable: the period
-that it gets called is at the discretion of the user agent and can be subject to
-things like battery status. This isn't really the use case that Periodic
-Background Sync was designed for (which is having caches updated while the user
-isn't directly using a site, not updating UI that's immediately visible to the
-user).
+status and call `navigator.setForScope`. However, this API is unreliable: the
+period that it gets called is at the discretion of the user agent and can be
+subject to things like battery status. This isn't really the use case that
+Periodic Background Sync was designed for (which is having caches updated while
+the user isn't directly using a site, not updating UI that's immediately visible
+to the user).
 
 That means when the page isn't open, you could have the badge indicator update
 every once in awhile, but have no guarantee that it would be up to date.
@@ -359,7 +359,7 @@ least going to be aware that the site is constantly doing something, and if it's
 unreasonably spammy, the user is likely to revoke the notification permission,
 thus erasing the push subscription.
 
-We could make it so that use of the `Badge` API serves the same function as
+We could make it so that use of the Badge API serves the same function as
 showing a notification (fulfilling the requirement to use the Push API). But
 doing so would probably nullify the reason for this requirement in the first
 place: a malicious site that wants to do crypto mining could just set a badge
@@ -396,13 +396,13 @@ API (which the authors of the Badge spec are not equipped to do).
 the Push API spec, but only at a very high level.)
 
 Instead of allowing the service worker to run JavaScript code and call the
-`Badge` API, we would introduce a new concept to a Push subscription called a
+Badge API, we would introduce a new concept to a Push subscription called a
 "channel", which dictates what is done with the payload upon receipt. The
 default channel would be "event" (the payload is delivered to the `"push"`
 event), with a new channel, "badge", which imposes a specific format to the
 payload. The payload would now be interpreted as a JSON dictionary containing
-parameters to the `Badge.setForScope` API. Upon receipt of the push, the user
-agent would automatically call the `Badge` API without running any user code,
+parameters to the `navigator.setForScope` API. Upon receipt of the push, the
+user agent would automatically call the Badge API without running any user code,
 and with no requirement to show a notification.
 
 This solution still has the following two flaws (expressed by Peter Beverloo):
@@ -437,20 +437,20 @@ should be at the discretion of the user agent. For example, the site shouldn't
 need to know whether the badge is displayed on a tab icon or on an app icon.
 
 However, a practical concern overrides this: because the favicon can be (and
-often is) used to display a page badge, sites upgrading to the `Badge` API need
+often is) used to display a page badge, sites upgrading to the Badge API need
 to know whether they need to fall back to setting the favicon (since,
 presumably, they don't want the badge being displayed twice). So we need to
 provide a way to feature detect — not just "whether the Badge API is supported",
 but "whether a Badge-API badge will show up on or near the favicon".
 
-Therefore, we will explicitly specify that if the `Badge.setForDocument` method
-exists, the user agent MUST show a badge set through this method on or near the
-favicon. Therefore, sites can reliably use the presence of this method to fall
-back to a conventional favicon or title badge:
+Therefore, we will explicitly specify that if the `navigator.setForDocument`
+method exists, the user agent MUST show a badge set through this method on or
+near the favicon. Therefore, sites can reliably use the presence of this method
+to fall back to a conventional favicon or title badge:
 
 ```js
-if (window.Badge && Badge.setForDocument) {
-  Badge.setForDocument(getUnreadCount());
+if (navigator.setForDocument) {
+  navigator.setForDocument(getUnreadCount());
 } else {
   // Fall back to setting favicon (or page title).
   // (This is a user-supplied function, not part of the Badge API.)
@@ -491,20 +491,22 @@ The user agent is allowed to clear all badges on an origin whenever there are no
 
 ### The API
 
-The `Badge` interface is a member object on
-[`Window`](https://html.spec.whatwg.org/#the-window-object) and
-[`ServiceWorkerGlobalScope`](https://w3c.github.io/ServiceWorker/#serviceworkerglobalscope-interface).
-It contains the following methods:
+The Badge API methods are members of interface is a member object on
+[`Navigator`](https://html.spec.whatwg.org/multipage/system-state.html#the-navigator-object)
+and
+[`WorkerNavigator`](https://html.spec.whatwg.org/multipage/workers.html#workernavigator).
+They are as follows:
 
-* `Badge.setForDocument([contents])`: Sets the badge for the current document to
-  *contents*, or to "flag" if *contents* is omitted. If *contents* is 0, clears
-  the badge for the given document.
-* `Badge.clearForDocument()`: Clears the badge for the current
+* `navigator.setForDocument([contents])`: Sets the badge for the current
+  document to *contents*, or to "flag" if *contents* is omitted. If *contents*
+  is 0, clears the badge for the given document.
+* `navigator.clearForDocument()`: Clears the badge for the current
   document.
-* `Badge.setForScope([contents], [options])`: Sets the badge for the scope in
-  *options* to *contents* (an integer), or to "flag" if *contents* is omitted.
-  If *contents* is 0, clears the badge for the given scope.
-* `Badge.clearForScope([options])`: Clears the badge for the scope in *options*.
+* `navigator.setForScope([contents], [options])`: Sets the badge for the scope
+  in *options* to *contents* (an integer), or to "flag" if *contents* is
+  omitted. If *contents* is 0, clears the badge for the given scope.
+* `navigator.clearForScope([options])`: Clears the badge for the scope in
+  *options*.
 
 The *options* parameter is a dictionary containing a single member, `scope`,
 which contains a URL prefix to scope the badge to. If omitted, it defaults to
