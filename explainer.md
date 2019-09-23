@@ -45,16 +45,16 @@ Date: 2019-07-17
 ## Overview
 
 The **Badging API** is a proposed Web Platform API allowing websites to apply
-badges (small status indicators) to pages or sets of pages on their origin. We
-are deliberately agnostic about which contexts a badge can appear in, but we are
-specifying methods to handle two major different categories of context:
+badges (small status indicators) to pages or [installed web
+apps](https://www.w3.org/tr/appmanifest/#installable-web-applications) on their
+origin. The API is divided into two parts, each of which can be supported, or
+not, by a user agent:
 
-* "Document" contexts, associated with an open document, such as when a badge is
+* Document badges, associated with an open document, such as when a badge is
   shown on or near the page's icon in a browser tab.
-* "Handle" contexts, associated with a handle or link to a site somewhere in the
-  user agent or operating system UI, but not necessarily associated with a
-  running document, such as a bookmark or [installed web
-  app](https://www.w3.org/TR/appmanifest/#installable-web-applications) icon.
+* App badges, associated with an [installed web
+  app](https://www.w3.org/tr/appmanifest/#installable-web-applications) icon,
+  typically in the operating system UI.
 
 Here is a mock of a badge being applied to the page tab:
 
@@ -73,14 +73,6 @@ badge API has a number of advantages over the "hack" ways:
 * User agents can provide a way for users to disable badges on a per-site or
   global basis.
 
-The "handle" context is more nebulous because it means associating a badge with
-any place the user agent shows an icon representing a site, page or app. For
-example, it could be applied to an icon in the bookmark bar, or a "commonly
-visited sites" index on the new tab page.
-
-![Mock of a badge being applied to the bookmark bar](images/bookmark-badge.png)
-<br>Mock of a badge being applied to the bookmark bar
-
 For [installed web
 applications](https://www.w3.org/TR/appmanifest/#installable-web-applications),
 the badge can be applied in whatever place the OS shows apps, such as the shelf,
@@ -97,14 +89,12 @@ Here are some examples of app badging applied at the OS level:
 ![Android home screen badge](images/android-badge.png)
 <br>Android home screen badge
 
-Unlike document contexts, badges applied in "handle" contexts can be shown and
-updated even when there are no tabs or windows open for the app. After much
-deliberation, we decided to provide a separate method for badging URLs in a
-"handle" context, due to the very different scoping and lifetime considerations.
-This use case also has some special considerations for how to set the badge in
-response to a [Push message](https://www.w3.org/TR/push-api/). The most commonly
-requested use case for "handle" badging is badging an app icon on the OS shelf,
-but it generalizes to non-installed sites as well.
+Unlike document badges, badges applied to apps can be shown and updated even
+when there are no tabs or windows open for the app. After much deliberation, we
+decided to provide a separate method for badging app icons, due to the very
+different scoping and lifetime considerations.  This use case also
+has some special considerations for how to set the badge in response to a [Push
+message](https://www.w3.org/TR/push-api/).
 
 ## Goals and use cases
 
@@ -112,7 +102,7 @@ The purpose of this API is:
 
 * To subtly notify the user that there is new activity that might require their attention without requiring an OS-level (banner) [notification](https://notifications.spec.whatwg.org/).
 * To indicate a small amount of additional information, such as an unread count.
-* To allow certain pages that a user agent deems interesting to a user (such as Bookmarks or [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications)) to convey this information, regardless of whether they are currently open.
+* To allow [Installed Web Applications](https://www.w3.org/TR/appmanifest/#installable-web-applications) to convey this information, regardless of whether they are currently open.
 
 Non-goals are:
 
@@ -187,7 +177,7 @@ else
 
 All of the above set the badge *only* on the current document (e.g., in the page
 tab), and won't affect any other documents, even those at the same URL. To set a
-badge that applies to all apps and other "handles" on the current origin:
+badge that applies to all apps on the current origin:
 
 ```js
 Badge.setForScope(getUnreadCount());
@@ -207,9 +197,9 @@ Badge.setForScope(getUnreadCount(), {scope: '/myapp/'});
 
 The scope is a URL prefix; the badge is applied on all URLs that [start
 with](https://www.w3.org/TR/appmanifest/#dfn-within-scope) that prefix. This
-*does not* apply the badge to documents, only to "handles", such as installed
-app icons. An app icon receives a badge if the badge scope is a prefix of the
-[app scope](https://www.w3.org/TR/appmanifest/#scope-member).
+*does not* apply the badge to documents, only to installed app icons. An app
+icon receives a badge if the badge scope is a prefix of the [app
+scope](https://www.w3.org/TR/appmanifest/#scope-member).
 
 The reason we have separate APIs is that they have very different concerns which
 are now properly separated:
@@ -231,13 +221,13 @@ feature-detect them individually. In particular, this allows you to fall back to
 showing your own badge in the page favicon or title if the
 `Badge.setForDocument` API is not available (regardless of the availability of
 the scope API). This is a complete example for a site that wants to set the
-badge on both the current document and for apps/handles across the origin:
+badge on both the current document and for apps across the origin:
 
 ```js
 // Should be called whenever the unread count changes (new mail arrives, or mail
 // is marked read/unread).
 function unreadCountChanged(newUnreadCount) {
-  // Set the "handle" badge, for app icons and links. This has a global and
+  // Set the app badge, for app icons and links. This has a global and
   // semi-permanent effect, outliving the current document.
   if (window.Badge && Badge.setForScope) {
     Badge.setForScope(newUnreadCount);
@@ -259,7 +249,7 @@ More advanced examples are given in a [separate document](docs/examples.md).
 ## Nested scopes
 
 Since we allow badges to be scoped to different, potentially nested, URLs, it
-means that a particular handle can be subject to more than one badge at a time.
+means that a particular app can be subject to more than one badge at a time.
 In this case, the user agent should display only the badge with the most
 specific [scope](https://www.w3.org/TR/appmanifest/#scope-member).
 
@@ -484,10 +474,10 @@ A badge is associated with either a document, or a [scope](https://www.w3.org/TR
   * Without this restriction, the [feature detection](#feature-detection) story
     is a lot more complicated, since sites can't tell whether scoped badges
     will apply to the document, and thus whether to fall back to another method.
-  * It breaks the use case of wanting to set a badge for handles across the
-    entire origin, but with individual pages in that origin having their own
-    badges. (In particular, there would be no way to avoid the fact that
-    clearing a badge for a document would revert back to the origin badge.)
+  * It breaks the use case of wanting to set a badge for apps across the entire
+    origin, but with individual pages in that origin having their own badges.
+    (In particular, there would be no way to avoid the fact that clearing a
+    badge for a document would revert back to the origin badge.)
 * For [installed applications](https://www.w3.org/TR/appmanifest/#installable-web-applications), a user agent **MAY** display the badge with the most specific scope encompassing the [navigation scope](https://www.w3.org/TR/appmanifest/#navigation-scope) of the application (e.g. prefer a badge for `/apps/x/` to a badge for `/apps/` for an app with scope `/apps/x/`) in an [OS specific context](#OS-Specific-Contexts).
 
 At any time, the badge for a specific document or scope, if it is set, may be either:
@@ -597,7 +587,8 @@ full power of showing a native badge.
 The API allows `set()`ing an `unsigned long long`. When presenting this value, it should be formatted according to the user's locale settings.
 
 ### Index of Considered Alternatives
-- A single URL-scoped API that sets both the document and handle badges at the same time (applying to all documents within the URL scope).
+- The "app" API being a more general API that [sets a badge on a URL scope](https://github.com/WICG/badging/issues/55), applying to all apps within that scope.
+- A single URL-scoped API that sets both the document and app badges at the same time (applying to all documents within the URL scope).
 - A [declarative API](#Couldnt-this-be-a-declarative-API-so-it-would-work-without-JavaScript).
 - Exposing the badging API [elsewhere](#Why-is-this-API-attached-to-window-instead-of-navigator-or-notifications).
 - Supporting [non-integers](#Why-limit-support-to-just-an-integer-What-about-other-characters).
