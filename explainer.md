@@ -15,7 +15,7 @@ Date: 2019-09-23
 - [Goals and use cases](#goals-and-use-cases)
   - [Comparison to Notifications](#comparison-to-notifications)
 - [Usage examples](#usage-examples)
-- [Nested scopes](#nested-scopes)
+- [Usage from service workers](#usage-from-service-workers)
 - [Background updates](#background-updates)
   - [The Push problem](#the-push-problem)
   - [Periodic Background Sync](#periodic-background-sync)
