@@ -4,7 +4,7 @@ Author: Matt Giuca <mgiuca@chromium.org><br>
 Author: Jay Harris <harrisjay@chromium.org><br>
 Author: Marcos Cáceres <mcaceres@mozilla.org>
 
-Date: 2019-09-23
+Date: 2019-10-10
 
 ## Table of Contents
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
