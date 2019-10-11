@@ -90,11 +90,22 @@ Here are some examples of app badging applied at the OS level:
 <br>Android home screen badge
 
 Unlike document badges, badges applied to apps can be shown and updated even
-when there are no tabs or windows open for the app. After much deliberation, we
-decided to provide a separate method for badging app icons, due to the very
-different scoping and lifetime considerations.  This use case also
-has some special considerations for how to set the badge in response to a [Push
-message](https://www.w3.org/TR/push-api/).
+when there are no tabs or windows open for the app.
+
+The reason we have separate APIs is that they have very different concerns:
+
+* The app API has additional complexity when used with [push messages](https://www.w3.org/TR/push-api/).
+* The scope and lifetime of the app API is considerably different to the document API.
+* The presence of the document API itself indicates whether the tab will be
+  badged in the UI (obviating the need for a dedicated feature detection method
+  specifically for tab badging).
+
+Other reasons to separate:
+
+* Sites that only want to badge their app icon or only want to badge their tab
+  can just concern themselves with the relevant API.
+* The document API could, in the future, support badges that aren't supported by
+  host operating systems, such as arbitrary Unicode characters.
 
 ## Goals and use cases
 
@@ -165,8 +176,8 @@ automatically clear the badge.
 
 If you just want to show a status indicator flag without a number, use the
 Boolean mode of the API by calling `navigator.setClientBadge` without an
-argument, and `navigator.clearClientBadge` (which might be done to indicate that
-it is the player's turn to move in a multiplayer game):
+argument, and `navigator.clearClientBadge()` (which might be done to indicate
+that it is the player's turn to move in a multiplayer game):
 
 ```js
 if (myTurn())
@@ -183,34 +194,18 @@ badge that applies to the current app:
 navigator.setAppBadge(getUnreadCount());
 ```
 
-As above, a value of 0 clears the badge and `navigator.clearAppBadge` can also
-explicitly clear the badge for this origin. The effects of the app API are
-global and may outlast the document (it is intended to persist at least until
-the user agent closes). It can also be used from a service worker, although the
-meaning of that will be somewhat different.
+As above, a value of 0 clears the badge and `navigator.clearAppBadge()` can also
+explicitly clear the badge for this installed web application. The effects of
+the app API are global and may outlast the document (it is intended to persist
+at least until the user agent closes). It can also be used from a service
+worker, although the meaning of that will be somewhat different.
 
-The reason we have separate APIs is that they have very different concerns which
-are now properly separated:
-
-* The push message complexity only applies to the app API.
-* The lifetime of the app API is considerably different to the document API.
-* The presence of the document API itself indicates whether the tab will be
-  badged in the UI (obviating the need for a dedicated feature detection method
-  specifically for tab badging).
-
-Other reasons to separate:
-
-* Sites that only want to badge their app icon or only want to badge their tab
-  can just concern themselves with the relevant API.
-* The document API can potentially support badges that aren't supported by host
-  operating systems, such as arbitrary Unicode characters.
-
-User agents may provide either or both of the two APIs, so sites should
+User agents may expose either or both of the two APIs, so sites should
 feature-detect them individually. In particular, this allows you to fall back to
 showing your own badge in the page favicon or title if the
-`navigator.setClientBadge` API is not available (regardless of the availability
-of the app API). This is a complete example for a site that wants to set the
-badge on both the current document and for apps across the origin:
+`navigator.setClientBadge()` method is not available (regardless of the
+availability of the app API). This is a complete example for a site that wants
+to set the badge on both the current document and the current installed web app:
 
 ```js
 // Should be called whenever the unread count changes (new mail arrives, or mail
@@ -241,9 +236,10 @@ More advanced examples are given in a [separate document](docs/examples.md).
 
 Calling the API from a service worker has some differences:
 
-* `navigator.setClientBadge` either shouldn't be callable from service workers,
-  or it would need a `Client` argument to specify which document to badge.
-* When `navigator.setAppBadge` is called from a service worker, it badges all
+* `navigator.setClientBadge()` either shouldn't be callable from service
+  workers, or it would need a `Client` argument to specify which document to
+  badge.
+* When `navigator.setAppBadge()` is called from a service worker, it badges all
   apps whose scope is inside the service worker scope.
 
 ## Background updates
@@ -260,7 +256,7 @@ Sync](https://github.com/WICG/BackgroundSync/blob/master/explainer.md#periodic-s
 
 The [Push API](https://www.w3.org/TR/push-api/) allows servers to send messages
 to service workers, which can run JavaScript code even when no foreground page
-is running. Thus, a server push could trigger a `navigator.setAppBadge`.
+is running. Thus, a server push could trigger a `navigator.setAppBadge()`.
 
 However, there is a [de facto standard
 requirement](https://github.com/w3c/push-api/issues/313) that whenever a push is
@@ -285,7 +281,7 @@ Sync](https://github.com/WICG/BackgroundSync/blob/master/explainer.md#periodic-s
 is a proposed extension to the [Background
 Sync](https://wicg.github.io/BackgroundSync/spec/) API, that allows a service
 worker to periodically poll the server, which could be used to get an updated
-status and call `navigator.setAppBadge`. However, this API is unreliable: the
+status and call `navigator.setAppBadge()`. However, this API is unreliable: the
 period that it gets called is at the discretion of the user agent and can be
 subject to things like battery status. This isn't really the use case that
 Periodic Background Sync was designed for (which is having caches updated while
@@ -373,9 +369,9 @@ Badge API, we would introduce a new concept to a Push subscription called a
 default channel would be "event" (the payload is delivered to the `"push"`
 event), with a new channel, "badge", which imposes a specific format to the
 payload. The payload would now be interpreted as a JSON dictionary containing
-parameters to the `navigator.setAppBadge` API. Upon receipt of the push, the
-user agent would automatically call the Badge API without running any user code,
-and with no requirement to show a notification.
+parameters to the `navigator.setAppBadge()` method. Upon receipt of the push,
+the user agent would automatically call the Badge API without running any user
+code, and with no requirement to show a notification.
 
 This solution still has the following two flaws (expressed by Peter Beverloo):
 
@@ -415,7 +411,7 @@ presumably, they don't want the badge being displayed twice). So we need to
 provide a way to feature detect — not just "whether the Badge API is supported",
 but "whether a Badge-API badge will show up on or near the favicon".
 
-Therefore, we will explicitly specify that if the `navigator.setClientBadge`
+Therefore, we will explicitly specify that if the `navigator.setClientBadge()`
 method exists, the user agent MUST show a badge set through this method on or
 near the favicon. Therefore, sites can reliably use the presence of this method
 to fall back to a conventional favicon or title badge:
@@ -430,9 +426,9 @@ if (navigator.setClientBadge) {
 }
 ```
 
-A user agent could provide the `setAppBadge` API without `setClientBadge`, which
-means the above check will apply the fallback, while app icons can still be
-badged.
+A user agent could provide the `setAppBadge()` methods without
+`setClientBadge()`, which means the above check will apply the fallback, while
+app icons can still be badged.
 
 ## Detailed API proposal
 
@@ -493,6 +489,10 @@ App badges are shown in OS-specific contexts. User agents should attempt reuse e
 
 ## Security and Privacy Considerations
 The API is write-only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
+
+These methods are only usable from secure contexts, so forged pages can't set badges on behalf of an origin they don't control.
+
+If the badge methods are called from inside an iframe, the client API should have no effect, and the app API should apply to the app enclosing the iframed contents' URL, not the containing page's URL.
 
 There are additional privacy considerations relating to the proposed extensions to the Push API, noted above. However, this does not apply to the base Badge API.
 
