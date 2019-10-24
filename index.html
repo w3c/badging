@@ -42,12 +42,13 @@
     <section id="abstract" class="informative">
       <p>
         This specification defines an API allowing <a data-cite=
-        "appmanifest#installable-web-applications">web applications</a> to set an application-wide badge,
-        shown in an operating-system-specific place associated with the
-        application (such as the shelf or home screen), for the purpose of
-        notifying the user when the state of the application has changed (e.g.,
-        when new messages have arrived), without showing a more heavyweight
-        <a data-cite="notifications#concept-notification">notification</a>.
+        "appmanifest#installable-web-applications">web applications</a> to set
+        an application-wide badge, shown in an operating-system-specific place
+        associated with the application (such as the shelf or home screen), for
+        the purpose of notifying the user when the state of the application has
+        changed (e.g., when new messages have arrived), without showing a more
+        heavyweight <a data-cite=
+        "notifications#concept-notification">notification</a>.
       </p>
     </section>
     <section id="sotd">
@@ -91,43 +92,50 @@
         Badge model
       </h2>
       <p>
-        There is a single global badge associated with each <a data-cite=
-        "appmanifest#installable-web-applications">web application</a>. At any time, the application's badge
-        is set to one of the following values:
+        A <dfn>badge</dfn> may be one of the following values:
       </p>
       <ul>
-        <li>The special value <a>nothing</a>.
+        <li>The special value <dfn>nothing</dfn>.
         </li>
-        <li>The special value <a>flag</a>.
+        <li>The special value <dfn>flag</dfn>.
         </li>
         <li>An <code><a data-cite="WEBIDL#idl-unsigned-long-long">unsigned long
         long</a></code> value, which MUST NOT be 0.
         </li>
       </ul>
       <p>
-        The user agent MUST initialize each application's badge to
-        <a>nothing</a>. The user agent MAY reset an application's badge to
-        <a>nothing</a> at its discretion (for example, when the system is
-        restarted).
+        Each <a data-cite="dom#concept-document">document</a> and each
+        <a data-cite="appmanifest#installable-web-applications">web
+        application</a> is associated with a <a>badge</a> value, which is
+        initialized to <a>nothing</a>.
       </p>
       <p>
-        If the application's badge is <dfn>nothing</dfn>, the badge is said to be
+        The user agent MAY reset an application's badge to <a>nothing</a> at
+        its discretion (for example, when the system is restarted).
+      </p>
+      <p>
+        If a <a>badge</a> is <a>nothing</a>, it is said to be
         "<dfn>cleared</dfn>". Otherwise, it is said to be "<dfn>set</dfn>".
       </p>
-      <p>Note: The API is set only, so the badge data cannot be used to identify users.</p>
     </section>
     <section>
       <h2>
         Badge display
       </h2>
       <p>
-        When the application's flag is <a>set</a>, the user agent SHOULD display
-        the application's badge alongside the symbolic representation of the
-        application in the user's operating system (for example, as a small
-        overlay on top of the application's icon).
+        When a document's badge is <a>set</a>, the user agent SHOULD display
+        the document's badge value alongside the other identifying information
+        for that document (for example, on top of the document's icon or near
+        its title).
       </p>
       <p>
-        The special value <dfn>flag</dfn> indicates that the badge is set, but
+        When the application's badge is <a>set</a>, the user agent SHOULD
+        display the application's badge alongside the symbolic representation
+        of the application in the user's operating system (for example, as a
+        small overlay on top of the application's icon).
+      </p>
+      <p>
+        The special value <a>flag</a> indicates that the badge is set, but
         contains no specific data. In this case, the user agent SHOULD show an
         indicator with a non-specific symbol (such as a coloured circle).
       </p>
@@ -140,66 +148,171 @@
       </p>
       <p>
         When presenting a badge, it SHOULD be formatted according to the user's
-        <a data-cite="ltli/#locale">locale</a> settings.
-
-        For example, the badge content '7' should be displayed as '7' in the
-        <a data-cite="ltli/#locale">locale</a> 'en-NZ' but as '٧' in 'ar-EG'.
-      </p>
-      <p class="note">
-        The user agent can choose to clear the badge if it deems it
-        necessary, such as when site data is cleared.
+        <a data-cite="ltli/#locale">locale</a> settings. For example, the badge
+        content '7' should be displayed as '7' in the <a data-cite=
+        "ltli/#locale">locale</a> 'en-NZ' but as '٧' in 'ar-EG'.
       </p>
     </section>
-    <section data-dfn-for="Badge">
+    <section data-dfn-for="Navigator">
       <h2>
-        <code>Badge</code> namespace
+        `Navigator` interface
       </h2>
+      <p>
+        The {{Navigator}} and {{WorkerNavigator}} interfaces are extended with
+        methods for setting and clearing both the document and application
+        badge indicators.
+      </p>
       <pre class="idl">
-        [Exposed=(Window)]
-        namespace Badge {
-          void set(optional [EnforceRange] unsigned long long contents);
-          void clear();
+        // Methods only exposed on Navigator.
+        [SecureContext]
+        partial interface Navigator {
+          Promise&lt;void&gt; setClientBadge(optional [EnforceRange] unsigned long long contents);
+          Promise&lt;void&gt; clearClientBadge();
         };
+
+        // Methods exposed on both Navigator and WorkerNavigator.
+        [SecureContext]
+        interface mixin NavigatorBadge {
+          Promise&lt;void&gt; setAppBadge(optional [EnforceRange] unsigned long long contents);
+          Promise&lt;void&gt; clearAppBadge();
+        };
+
+        Navigator includes NavigatorBadge;
+        WorkerNavigator includes NavigatorBadge;
       </pre>
       <p>
-        The <dfn>Badge</dfn> namespace provides functions for setting and
-        clearing the application badge indicator.
+        User agents that never display document badges SHOULD NOT expose the
+        {{Navigator/setClientBadge}} and {{Navigator/clearClientBadge}}
+        methods. Similarly, user agents that never display application badges
+        SHOULD NOT expose the {{NavigatorBadge/setAppBadge}} and
+        {{NavigatorBadge/clearAppBadge}} methods.
+      </p>
+      <p class="note">
+        This is important as a feature-detection mechanism to allow sites to
+        determine whether setting a badge will have any effect, based on the
+        presence of the methods. In particular, sites can use the absence of
+        {{Navigator/setClientBadge}} as a condition for displaying a fallback
+        badge in the page's <a data-cite=
+        "html#the-title-attribute"><code>title</code></a> or <a data-cite=
+        "html#rel-icon"><code>icon</code></a>.
       </p>
       <section>
         <h3>
-          <dfn>set()</dfn> function
+          <dfn for="Navigator">setClientBadge()</dfn> method
         </h3>
         <p>
-          When the <code>set()</code> function is called with argument
+          When the <code>setClientBadge()</code> method is called with argument
           <var>contents</var>, run the following steps:
         </p>
         <ol>
-          <li>If <var>contents</var> is omitted, set the application's badge to
-          <a>flag</a>.
+          <li>If <var>contents</var> is omitted, set the badge associated with
+          the current document to <a>flag</a>.
           </li>
-          <li>If <var>contents</var> is 0, set the application's badge to
-          <a>nothing</a>.
+          <li>Else, if <var>contents</var> is 0, set the badge associated with
+          the current document to <a>nothing</a>.
           </li>
-          <li>Else, set the application's badge to <var>contents</var>.
+          <li>Else, set the badge associated with the current document to <var>
+            contents</var>.
           </li>
         </ol>
-        <div class="issue">
-          It is a bit weird that <code>set(0)</code> clears the badge, while
-          <code>set()</code> sets it to <a>flag</a>. This is designed so that
-          the above example code for setting the unread count will
-          automatically clear the badge when the unread count is 0. But it
-          could be a bit unintuitive.
-        </div>
       </section>
       <section>
         <h3>
-          <dfn>clear()</dfn> function
+          <dfn for="Navigator">clearClientBadge()</dfn> method
         </h3>
         <p>
-          When the <code>clear()</code> function is called, set the application's
-          badge to <a>nothing</a>.
+          When the <code>clearClientBadge()</code> method is called, set the
+          the badge associated with the current document to <a>nothing</a>.
         </p>
       </section>
+      <section>
+        <h3>
+          <dfn for="NavigatorBadge">setAppBadge()</dfn> method
+        </h3>
+        <p>
+          When the <code>setAppBadge()</code> method is called with argument
+          <var>contents</var>, run the following steps:
+        </p>
+        <ol>
+          <li>For each <var>app</var> in the result of <a>determining the
+          matching applications</a>:
+            <ol>
+              <li>If <var>contents</var> is omitted, set the badge associated
+              with <var>app</var> to <a>flag</a>.
+              </li>
+              <li>Else, if <var>contents</var> is 0, set the badge associated
+              with <var>app</var> to <a>nothing</a>.
+              </li>
+              <li>Else, set the badge associated with <var>app</var> to
+              <var>contents</var>.
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h3>
+          <dfn for="NavigatorBadge">clearAppBadge()</dfn> method
+        </h3>
+        <p>
+          When the <code>clearAppBadge()</code> method is called, for each
+          <var>app</var> in the result of <a>determining the matching
+          applications</a>:
+        </p>
+        <ol>
+          <li>Set the badge associated with <var>app</var> to <a>nothing</a>.
+          </li>
+        </ol>
+      </section>
+      <section>
+        <h3>
+          Determining the set of matching applications
+        </h3>
+        <p class="issue">
+          This section could be more formal.
+        </p>
+        <p class="issue">
+          The API needs to be restricted to service workers, not all workers.
+        </p>
+        <p>
+          The steps to <dfn data-lt=
+          "determining the matching applications">determine the matching
+          applications</dfn> returns a sequence of applications:
+        </p>
+        <ol>
+          <li>If this is a document:
+            <ol>
+              <li>Get the set of installed applications such that this document
+              is <a data-cite="appmanifest#dfn-within-scope-manifest">within
+              scope</a> of the application's manifest.
+              </li>
+              <li>Return the application with the most specific (i.e., longest)
+              scope, if any, in a single-entry sequence.
+              </li>
+              <li>If no application matches, return the empty sequence.
+              </li>
+            </ol>
+          </li>
+          <li>Otherwise (called from a service worker):
+            <ol>
+              <li>Return the list of apps whose scope URL matches the service
+              worker registration of this service worker.
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </section>
+    </section>
+    <section class="informative">
+      <h2>
+        Security and privacy considerations
+      </h2>
+      <p>
+        The API is write-only by design. There is no way for a site to read
+        back the value of a badge that was previously set, to ensure that the
+        application badge cannot be used as a storage or fingerprinting
+        mechanism.
+      </p>
     </section>
     <section>
       <h2>
@@ -209,6 +322,12 @@
         <code><dfn data-cite=
         "!ECMASCRIPT#sec-native-error-types-used-in-this-standard-typeerror">TypeError</dfn></code>
         is defined by [[ECMASCRIPT]].
+      </p>
+      <p>
+        <code><dfn data-cite="!HTML#navigator">Navigator</dfn></code> and
+        <code><dfn data-cite=
+        "!HTML#workernavigator">WorkerNavigator</dfn></code> are defined by
+        [[HTML]].
       </p>
     </section>
   </body>
