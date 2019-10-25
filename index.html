@@ -123,10 +123,25 @@
         Badge display
       </h2>
       <p>
-        When a document's badge is <a>set</a>, the user agent SHOULD display
-        the document's badge value alongside the other identifying information
-        for that document (for example, on top of the document's icon or near
-        its title).
+        When a document's badge is <a>set</a>, if the <a data-cite=
+        "html#concept-document-bc">document's browsing context</a> is a
+        <a data-cite="html#top-level-browsing-context">top-level browsing
+        context</a>, the user agent SHOULD display the document's badge value
+        alongside the other identifying information for that document (for
+        example, on top of the document's icon or near its title).
+      </p>
+      <p class="issue">
+        Perhaps the badge should be associated with a <a data-cite=
+        "html#browsing-context">browsing context</a> instead of a <a data-cite=
+        "dom#concept-document">document</a>.
+      </p>
+      <p class="note">
+        The user agent is not expected to display a badge associated with a
+        document that is not a <a data-cite=
+        "html#top-level-browsing-context">top-level browsing context</a>,
+        although it is allowed to. A user agent does not need to store the
+        badge for a non-top-level browsing context if it does not intend to
+        display it.
       </p>
       <p>
         When the application's badge is <a>set</a>, the user agent SHOULD
@@ -153,24 +168,24 @@
         "ltli/#locale">locale</a> 'en-NZ' but as '٧' in 'ar-EG'.
       </p>
     </section>
-    <section data-dfn-for="Navigator">
+    <section>
       <h2>
-        `Navigator` interface
+        `Navigator` and `WorkerNavigator` interfaces
       </h2>
       <p>
         The {{Navigator}} and {{WorkerNavigator}} interfaces are extended with
         methods for setting and clearing both the document and application
-        badge indicators.
+        badge indicators from documents and service workers, respectively.
       </p>
       <pre class="idl">
-        // Methods only exposed on Navigator.
+        // Methods only exposed on documents.
         [SecureContext]
         partial interface Navigator {
           Promise&lt;void&gt; setClientBadge(optional [EnforceRange] unsigned long long contents);
           Promise&lt;void&gt; clearClientBadge();
         };
 
-        // Methods exposed on both Navigator and WorkerNavigator.
+        // Methods exposed on both documents and service workers.
         [SecureContext]
         interface mixin NavigatorBadge {
           Promise&lt;void&gt; setAppBadge(optional [EnforceRange] unsigned long long contents);
@@ -196,46 +211,68 @@
         "html#the-title-attribute"><code>title</code></a> or <a data-cite=
         "html#rel-icon"><code>icon</code></a>.
       </p>
+      <p class="note">
+        These methods return a {{Promise}}, even though there are no
+        asynchronous failure conditions (the only failure conditions are WebIDL
+        type errors). This is to allow us to add asynchronous failure
+        conditions in the future without altering how type errors are returned.
+      </p>
       <section>
         <h3>
-          <dfn for="Navigator">setClientBadge()</dfn> method
+          <dfn data-dfn-for="Navigator">setClientBadge()</dfn> method
         </h3>
         <p>
           When the <code>setClientBadge()</code> method is called with argument
           <var>contents</var>, run the following steps:
         </p>
         <ol>
+          <li>Let <var>document</var> be the <a data-cite=
+          "html#current-settings-object">current settings object</a>'s
+          <a data-cite="html#responsible-document">responsible document</a>.
+          </li>
           <li>If <var>contents</var> is omitted, set the badge associated with
-          the current document to <a>flag</a>.
+          <var>document</var> to <a>flag</a>.
           </li>
           <li>Else, if <var>contents</var> is 0, set the badge associated with
-          the current document to <a>nothing</a>.
+          <var>document</var> to <a>nothing</a>.
           </li>
-          <li>Else, set the badge associated with the current document to <var>
+          <li>Else, set the badge associated with <var>document</var> to <var>
             contents</var>.
+          </li>
+          <li>Return a <a data-cite="webidl#a-promise-resolved-with">resolved
+          promise</a>.
           </li>
         </ol>
       </section>
       <section>
         <h3>
-          <dfn for="Navigator">clearClientBadge()</dfn> method
+          <dfn data-dfn-for="Navigator">clearClientBadge()</dfn> method
         </h3>
         <p>
           When the <code>clearClientBadge()</code> method is called, set the
-          the badge associated with the current document to <a>nothing</a>.
+          the badge associated with the <a data-cite=
+          "html#current-settings-object">current settings object</a>'s
+          <a data-cite="html#responsible-document">responsible document</a> to
+          <a>nothing</a>, and return a <a data-cite=
+          "webidl#a-promise-resolved-with">resolved promise</a>.
         </p>
       </section>
       <section>
         <h3>
-          <dfn for="NavigatorBadge">setAppBadge()</dfn> method
+          <dfn data-dfn-for="NavigatorBadge">setAppBadge()</dfn> method
         </h3>
         <p>
           When the <code>setAppBadge()</code> method is called with argument
           <var>contents</var>, run the following steps:
         </p>
         <ol>
-          <li>For each <var>app</var> in the result of <a>determining the
-          matching applications</a>:
+          <li>Let <var>result</var> be the result of <a>determining the
+          matching applications</a>. If <var>result</var> was a
+          {{DOMException}}, return a <a data-cite=
+          "webidl#a-promise-rejected-with">rejected promise</a> with reason
+          <var>result</var>.
+          </li>
+          <li>For each <var>app</var> in <var>result</var>:
             <ol>
               <li>If <var>contents</var> is omitted, set the badge associated
               with <var>app</var> to <a>flag</a>.
@@ -248,19 +285,34 @@
               </li>
             </ol>
           </li>
+          <li>Return a <a data-cite="webidl#a-promise-resolved-with">resolved
+          promise</a>.
+          </li>
         </ol>
       </section>
       <section>
         <h3>
-          <dfn for="NavigatorBadge">clearAppBadge()</dfn> method
+          <dfn data-dfn-for="NavigatorBadge">clearAppBadge()</dfn> method
         </h3>
         <p>
-          When the <code>clearAppBadge()</code> method is called, for each
-          <var>app</var> in the result of <a>determining the matching
-          applications</a>:
+          When the <code>clearAppBadge()</code> method is called:
         </p>
         <ol>
-          <li>Set the badge associated with <var>app</var> to <a>nothing</a>.
+          <li>Let <var>result</var> be the result of <a>determining the
+          matching applications</a>. If <var>result</var> was a
+          {{DOMException}}, return a <a data-cite=
+          "webidl#a-promise-rejected-with">rejected promise</a> with reason
+          <var>result</var>.
+          </li>
+          <li>For each <var>app</var> in <var>result</var>:
+            <ol>
+              <li>Set the badge associated with <var>app</var> to
+              <a>nothing</a>.
+              </li>
+            </ol>
+          </li>
+          <li>Return a <a data-cite="webidl#a-promise-resolved-with">resolved
+          promise</a>.
           </li>
         </ol>
       </section>
@@ -268,37 +320,78 @@
         <h3>
           Determining the set of matching applications
         </h3>
-        <p class="issue">
-          This section could be more formal.
-        </p>
-        <p class="issue">
-          The API needs to be restricted to service workers, not all workers.
-        </p>
+        <div class="note">
+          <p>
+            This algorithm is used to decide which app(s) receive a badge when
+            the {{NavigatorBadge/setAppBadge()}} method is called from various
+            contexts.
+          </p>
+          <p>
+            If called from a document context, the badge is applied to at most
+            one application: the one with the most specific scope whose scope
+            encloses this document URL.
+          </p>
+          <p>
+            If called from a service worker context, the badge is applied to
+            all applications whose scope sits within the service worker's
+            scope.
+          </p>
+          <p>
+            It is an error to call the API from a worker that is not a service
+            worker.
+          </p>
+        </div>
         <p>
           The steps to <dfn data-lt=
           "determining the matching applications">determine the matching
-          applications</dfn> returns a sequence of applications:
+          applications</dfn> returns a sequence of <a data-cite=
+          "appmanifest#installable-web-applications">applications</a> or a
+          {{DOMException}}:
         </p>
         <ol>
-          <li>If this is a document:
+          <li>If <a data-cite="html#current-settings-object">current settings
+          object</a> has a <a data-cite="html#responsible-document">responsible
+          document</a> <var>document</var>:
             <ol>
-              <li>Get the set of installed applications such that this document
-              is <a data-cite="appmanifest#dfn-within-scope-manifest">within
-              scope</a> of the application's manifest.
+              <li>Let <var>apps</var> be the <a data-cite="infra#ordered-set">
+                set</a> of <a data-cite=
+                "appmanifest#installable-web-applications">installed web
+                applications</a> such that <var>document</var>'s <a data-cite=
+                "dom#concept-document-url">URL</a> is <a data-cite=
+                "appmanifest#dfn-within-scope-manifest">within scope</a> of the
+                application's manifest. (Order is not important.)
               </li>
-              <li>Return the application with the most specific (i.e., longest)
-              scope, if any, in a single-entry sequence.
+              <li>
+                <a data-cite="infra#list-remove">Remove</a> all elements of
+                <var>apps</var> other than the one with the longest (i.e., most
+                specific) <a data-cite=
+                "appmanifest#dfn-navigation-scope">navigation scope</a>.
               </li>
-              <li>If no application matches, return the empty sequence.
+              <li>Return <var>apps</var>.
               </li>
             </ol>
           </li>
-          <li>Otherwise (called from a service worker):
+          <li>Otherwise, if the <a data-cite=
+          "html#current-settings-object">current settings object</a> is a
+          <a data-cite="service-workers-1#dfn-service-worker-client">service
+          worker client</a> <var>worker</var>:
             <ol>
-              <li>Return the list of apps whose scope URL matches the service
-              worker registration of this service worker.
+              <li>Return the <a data-cite="infra#ordered-set">set</a> of
+              <a data-cite="appmanifest#installable-web-applications">installed
+              web applications</a> whose <a data-cite=
+              "appmanifest#dfn-navigation-scope">navigation scope</a> is
+              <a data-cite="appmanifest#dfn-within-scope-manifest">within
+              scope</a> (as defined in [[AppManifest]]) of <var>worker</var>'s
+              <a data-cite=
+              "service-workers-1#dfn-containing-service-worker-registration">containing
+              service worker registration</a>'s <a data-cite=
+              "service-workers-1#dfn-scope-url">scope url</a>. (Order is not
+              important.)
               </li>
             </ol>
+          </li>
+          <li>Otherwise (this is a worker, but not a service worker), return a
+          {{NotSupportedError}}.
           </li>
         </ol>
       </section>
