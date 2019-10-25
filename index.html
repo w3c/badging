@@ -65,13 +65,16 @@
         showing the unread count, which is updated whenever the client polls
         for mail from the server.
       </p>
+      <p class="issue">
+        Add examples of client/document badging.
+      </p>
       <pre class="example javascript" title="Showing unread count">
         async function pollForMail() {
           // ... Fetch unread mail from server. ...
 
           // Set the app icon badge. If getUnreadCount() returns 0, this is
           // equivalent to Badge.clear().
-          Badge.set(getUnreadCount());
+          navigator.setAppBadge(getUnreadCount());
         }
       </pre>
       <p>
@@ -81,9 +84,9 @@
       <pre class="example javascript" title="Showing ready status">
         function showPlayerTurn(playerTurnId) {
           if (playerTurnId == localPlayerId)
-            Badge.set();
+            navigator.setAppBadge();
           else
-            Badge.clear();
+            navigator.clearAppBadge();
         }
       </pre>
     </section>
