@@ -35,7 +35,8 @@
             value: "Chromium",
             href: "https://www.chromestatus.com/features/6068482055602176"
           }]
-        }]
+        }],
+        xref: "web-platform"
       };
     </script>
   </head>
@@ -66,9 +67,7 @@
         showing the unread count, which is updated whenever the client polls
         for mail from the server.
       </p>
-      <p class="issue">
-        Add examples of client/document badging.
-      </p>
+      <div class="issue" data-number="58"></div>
       <pre class="example javascript" title="Showing unread count">
         function pollForMail() {
           // ... Fetch unread mail from server. ...
@@ -99,19 +98,20 @@
         A <dfn>badge</dfn> may be one of the following values:
       </p>
       <ul>
-        <li>The special value <dfn>nothing</dfn>.
+        <li>The special value <dfn>nothing</dfn>, which indicates that there is
+        no badge currently set.
         </li>
-        <li>The special value <dfn>flag</dfn>.
+        <li>The special value <dfn>flag</dfn>, which indicates that the badge
+        is set, but contains no specific data.
         </li>
-        <li>An {{unsigned long long}}
-       value, which MUST NOT be 0.
+        <li>An {{unsigned long long}} value, which MUST NOT be 0.
         </li>
       </ul>
       <p>
-        Each [=document=] and each
-        <a data-cite="appmanifest#installable-web-applications">web
-        application</a> is associated with a <a>badge</a> value, which is
-        initialized to <a>nothing</a>.
+        Each [=document=] and each <a data-cite=
+        "appmanifest#installable-web-applications">web application</a> is
+        associated with a <a>badge</a> value, which is initialized to
+        <a>nothing</a>.
       </p>
       <p>
         The user agent MAY reset an application's badge to <a>nothing</a> at
@@ -134,11 +134,7 @@
         alongside the other identifying information for that document (for
         example, on top of the document's icon or near its title).
       </p>
-      <p class="issue">
-        Perhaps the badge should be associated with a <a data-cite=
-        "html#browsing-context">browsing context</a> instead of a <a data-cite=
-        "dom#concept-document">document</a>.
-      </p>
+      <div class="issue" data-number="59"></div>
       <p class="note">
         The user agent is not expected to display a badge associated with a
         document that is not a <a data-cite=
@@ -149,14 +145,14 @@
       </p>
       <p>
         When the application's badge is <a>set</a>, the user agent SHOULD
-        display the application's badge alongside the symbolic representation
+        display the application's badge alongside any symbolic representations
         of the application in the user's operating system (for example, as a
         small overlay on top of the application's icon).
       </p>
       <p>
-        The special value <a>flag</a> indicates that the badge is set, but
-        contains no specific data. In this case, the user agent SHOULD show an
-        indicator with a non-specific symbol (such as a coloured circle).
+        If the badge is set to special value <a>flag</a>, the user agent SHOULD
+        show an indicator with a non-specific symbol (such as a coloured
+        circle).
       </p>
       <p>
         The user agent MAY simplify or degrade the data in any way. For
@@ -203,45 +199,39 @@
         User agents that never display document badges SHOULD NOT expose the
         {{Navigator/setClientBadge()}} and {{Navigator/clearClientBadge()}}
         methods. Similarly, user agents that never display application badges
-        SHOULD NOT expose the {{NavigatorBadge/setAppBadge}} and
-        {{NavigatorBadge/clearAppBadge}} methods.
+        SHOULD NOT expose the {{NavigatorBadge/setAppBadge()}} and
+        {{NavigatorBadge/clearAppBadge()}} methods.
       </p>
       <p class="note">
         This is important as a feature-detection mechanism to allow sites to
         determine whether setting a badge will have any effect, based on the
         presence of the methods. In particular, sites can use the absence of
-        {{Navigator/setClientBadge}} as a condition for displaying a fallback
-        badge in the page's <a data-cite=
-        "html#the-title-attribute"><code>title</code></a> or <a data-cite=
+        {{Navigator/setClientBadge()}} as a condition for displaying a fallback
+        badge in the page's [^title^] or <a data-cite=
         "html#rel-icon"><code>icon</code></a>.
       </p>
-      <p class="note">
-        These methods return a {{Promise}}, even though there are no
-        asynchronous failure conditions (the only failure conditions are WebIDL
-        type errors). This is to allow us to add asynchronous failure
-        conditions in the future without altering how type errors are returned.
-      </p>
+      <div class="issue" data-number="60"></div>
+      <div class="issue" data-number="61"></div>
       <section>
         <h3>
           <dfn data-dfn-for="Navigator">setClientBadge()</dfn> method
         </h3>
         <p>
-          When the {{Navigator/setClientBadge()}} method is called with argument
-          <var>contents</var>, run the following steps:
+          When the {{Navigator/setClientBadge()}} method is called with
+          argument |contents:unsigned long long|, run the following steps:
         </p>
         <ol>
-          <li>Let <var>document</var> be the <a data-cite=
+          <li>Let |document:Document| be the <a data-cite=
           "html#current-settings-object">current settings object</a>'s
           <a data-cite="html#responsible-document">responsible document</a>.
           </li>
-          <li>If <var>contents</var> is omitted, set the badge associated with
-          <var>document</var> to <a>flag</a>.
+          <li>If |contents| is omitted, set the badge associated with
+          |document| to <a>flag</a>.
           </li>
-          <li>Else, if <var>contents</var> is 0, set the badge associated with
-          <var>document</var> to <a>nothing</a>.
+          <li>Else, if |contents| is 0, set the badge associated with
+          |document| to <a>nothing</a>.
           </li>
-          <li>Else, set the badge associated with <var>document</var> to <var>
-            contents</var>.
+          <li>Else, set the badge associated with |document| to |contents|.
           </li>
           <li>Return a <a data-cite="webidl#a-promise-resolved-with">resolved
           promise</a>.
@@ -253,7 +243,7 @@
           <dfn data-dfn-for="Navigator">clearClientBadge()</dfn> method
         </h3>
         <p>
-          When the <code>clearClientBadge()</code> method is called, set the
+          When the {{Navigator/clearClientBadge()}} method is called, set the
           the badge associated with the <a data-cite=
           "html#current-settings-object">current settings object</a>'s
           <a data-cite="html#responsible-document">responsible document</a> to
@@ -266,26 +256,25 @@
           <dfn data-dfn-for="NavigatorBadge">setAppBadge()</dfn> method
         </h3>
         <p>
-          When the {{NavigatorBadge/setAppBadge()}} method is called with argument
-          <var>contents</var>, run the following steps:
+          When the {{NavigatorBadge/setAppBadge()}} method is called with
+          argument |contents:unsigned long long|, run the following steps:
         </p>
         <ol>
-          <li>Let <var>result</var> be the result of <a>determining the
-          matching applications</a>. If <var>result</var> was a
-          {{DOMException}}, return a <a data-cite=
+          <li>Let |result:sequence of applications or DOMException| be the
+          result of <a>determining the matching applications</a>. If |result|
+          was a {{DOMException}}, return a <a data-cite=
           "webidl#a-promise-rejected-with">rejected promise</a> with reason
-          <var>result</var>.
+          |result|.
           </li>
-          <li>For each <var>app</var> in <var>result</var>:
+          <li>For each |app:application| in |result|:
             <ol>
-              <li>If <var>contents</var> is omitted, set the badge associated
-              with <var>app</var> to <a>flag</a>.
+              <li>If |contents| is omitted, set the badge associated with |app|
+              to <a>flag</a>.
               </li>
-              <li>Else, if <var>contents</var> is 0, set the badge associated
-              with <var>app</var> to <a>nothing</a>.
+              <li>Else, if |contents| is 0, set the badge associated with |app|
+              to <a>nothing</a>.
               </li>
-              <li>Else, set the badge associated with <var>app</var> to
-              <var>contents</var>.
+              <li>Else, set the badge associated with |app| to |contents|.
               </li>
             </ol>
           </li>
@@ -302,16 +291,15 @@
           When the {{NavigatorBadge/clearAppBadge()}} method is called:
         </p>
         <ol>
-          <li>Let <var>result</var> be the result of <a>determining the
-          matching applications</a>. If <var>result</var> was a
-          {{DOMException}}, return a <a data-cite=
+          <li>Let |result:sequence of applications or DOMException| be the
+          result of <a>determining the matching applications</a>. If |result|
+          was a {{DOMException}}, return a <a data-cite=
           "webidl#a-promise-rejected-with">rejected promise</a> with reason
-          <var>result</var>.
+          |result|.
           </li>
-          <li>For each <var>app</var> in <var>result</var>:
+          <li>For each |app:application| in |result|:
             <ol>
-              <li>Set the badge associated with <var>app</var> to
-              <a>nothing</a>.
+              <li>Set the badge associated with |app| to <a>nothing</a>.
               </li>
             </ol>
           </li>
@@ -355,37 +343,35 @@
         <ol>
           <li>If <a data-cite="html#current-settings-object">current settings
           object</a> has a <a data-cite="html#responsible-document">responsible
-          document</a> <var>document</var>:
+          document</a> |document:Document|:
             <ol>
-              <li>Let <var>apps</var> be the <a data-cite="infra#ordered-set">
-                set</a> of <a data-cite=
-                "appmanifest#installable-web-applications">installed web
-                applications</a> such that <var>document</var>'s <a data-cite=
-                "dom#concept-document-url">URL</a> is <a data-cite=
-                "appmanifest#dfn-within-scope-manifest">within scope</a> of the
-                application's manifest. (Order is not important.)
+              <li>Let |apps:sequence of applications| be the <a data-cite=
+              "infra#ordered-set">set</a> of <a data-cite=
+              "appmanifest#installable-web-applications">installed web
+              applications</a> such that |document|'s <a data-cite=
+              "dom#concept-document-url">URL</a> is <a data-cite=
+              "appmanifest#dfn-within-scope-manifest">within scope</a> of the
+              application's manifest. (Order is not important.)
               </li>
-              <li>
-                [=list/Remove=] all elements of
-                <var>apps</var> other than the one with the longest (i.e., most
-                specific) <a data-cite=
-                "appmanifest#dfn-navigation-scope">navigation scope</a>.
+              <li>[=list/Remove=] all elements of |apps| other than the one
+              with the longest (i.e., most specific) <a data-cite=
+              "appmanifest#dfn-navigation-scope">navigation scope</a>.
               </li>
-              <li>Return <var>apps</var>.
+              <li>Return |apps|.
               </li>
             </ol>
           </li>
           <li>Otherwise, if the <a data-cite=
           "html#current-settings-object">current settings object</a> is a
           <a data-cite="service-workers-1#dfn-service-worker-client">service
-          worker client</a> <var>worker</var>:
+          worker client</a> |worker:service worker client|:
             <ol>
               <li>Return the <a data-cite="infra#ordered-set">set</a> of
               <a data-cite="appmanifest#installable-web-applications">installed
               web applications</a> whose <a data-cite=
               "appmanifest#dfn-navigation-scope">navigation scope</a> is
               <a data-cite="appmanifest#dfn-within-scope-manifest">within
-              scope</a> (as defined in [[AppManifest]]) of <var>worker</var>'s
+              scope</a> (as defined in [[AppManifest]]) of |worker|'s
               <a data-cite=
               "service-workers-1#dfn-containing-service-worker-registration">containing
               service worker registration</a>'s <a data-cite=
@@ -410,22 +396,13 @@
         application badge cannot be used as a storage or fingerprinting
         mechanism.
       </p>
+      <div class="issue" data-number="44"></div>
     </section>
-    <section>
+    <section class="informative">
       <h2>
-        Dependencies
+        Accessibility considerations
       </h2>
-      <p>
-        <code><dfn data-cite=
-        "!ECMASCRIPT#sec-native-error-types-used-in-this-standard-typeerror">TypeError</dfn></code>
-        is defined by [[ECMASCRIPT]].
-      </p>
-      <p>
-        <code><dfn data-cite="!HTML#navigator">Navigator</dfn></code> and
-        <code><dfn data-cite=
-        "!HTML#workernavigator">WorkerNavigator</dfn></code> are defined by
-        [[HTML]].
-      </p>
+      <div class="issue" data-number="24"></div>
     </section>
   </body>
 </html>
