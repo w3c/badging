@@ -63,24 +63,52 @@
       </h2>
       <p>
         The following example shows how an email application might set a badge
-        showing the unread count, which is updated whenever the client polls
-        for mail from the server.
+        showing the unread count associated with the current document, which is
+        updated whenever the client polls for mail from the server.
       </p>
-      <div class="issue" data-number="58"></div>
-      <pre class="example javascript" title="Showing unread count">
+      <pre class="example javascript" title=
+      "Showing unread count for this document">
         function pollForMail() {
           // ... Fetch unread mail from server. ...
 
-          // Set the app icon badge. If getUnreadCount() returns 0, this is
-          // equivalent to Badge.clear().
-          navigator.setAppBadge(getUnreadCount());
+          // Set the document badge. If getUnreadCount() returns 0, this is
+          // equivalent to navigator.clearClientBadge().
+          navigator.setClientBadge(getUnreadCount());
         }
       </pre>
       <p>
         The next example shows how a game might show when it is the player's
-        turn.
+        turn. Again, this associates the badge with the current document.
       </p>
-      <pre class="example javascript" title="Showing ready status">
+      <pre class="example javascript" title=
+      "Showing ready status for this document">
+        function showPlayerTurn(playerTurnId) {
+          if (playerTurnId === localPlayerId)
+            navigator.setClientBadge();
+          else
+            navigator.clearClientBadge();
+        }
+      </pre>
+      <p>
+        A separate set of methods set the badge on the installed [=web
+        application=], if any, whose [=navigation scope=] this document is
+        within. The badge might show up on the application's icon in the
+        operating system shelf. These examples work the same as above, except
+        that the badge has global scope (if multiple documents within the same
+        application set or clear a badge, the most recent one takes effect),
+        and can continue being seen even after the last document closes.
+      </p>
+      <pre class="example javascript" title=
+      "Showing unread count on the app icon">
+        function pollForMail() {
+          // ... Fetch unread mail from server. ...
+
+          // Set the app badge.
+          navigator.setAppBadge(getUnreadCount());
+        }
+      </pre>
+      <pre class="example javascript" title=
+      "Showing ready status on the app icon">
         function showPlayerTurn(playerTurnId) {
           if (playerTurnId === localPlayerId)
             navigator.setAppBadge();
@@ -88,6 +116,10 @@
             navigator.clearAppBadge();
         }
       </pre>
+      <p>
+        To show a badge on both the document(s) and app icon(s), use both APIs
+        together.
+      </p>
     </section>
     <section>
       <h2>
