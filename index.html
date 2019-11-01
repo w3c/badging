@@ -218,22 +218,26 @@
         </h3>
         <p>
           When the {{Navigator/setClientBadge()}} method is called with
-          argument |contents:unsigned long long|, run the following steps:
+          argument |contents:unsigned long long|:
         </p>
         <ol>
-          <li>Let |document:Document| be the <a data-cite=
-          "html#current-settings-object">current settings object</a>'s
-          <a data-cite="html#responsible-document">responsible document</a>.
-          </li>
-          <li>If |contents| is omitted, set the badge associated with
-          |document| to <a>flag</a>.
-          </li>
-          <li>Else, if |contents| is 0, set the badge associated with
-          |document| to <a>nothing</a>.
-          </li>
-          <li>Else, set the badge associated with |document| to |contents|.
-          </li>
-          <li>Return <a>a promise resolved with</a> undefined.
+          <li>Return <a>a promise resolved with</a> undefined, and [=in
+          parallel=]:
+            <ol>
+              <li>Let |document:Document| be the <a data-cite=
+              "html#current-settings-object">current settings object</a>'s
+              <a data-cite="html#responsible-document">responsible
+              document</a>.
+              </li>
+              <li>If |contents| is omitted, set the badge associated with
+              |document| to <a>flag</a>.
+              </li>
+              <li>Else, if |contents| is 0, set the badge associated with
+              |document| to <a>nothing</a>.
+              </li>
+              <li>Else, set the badge associated with |document| to |contents|.
+              </li>
+            </ol>
           </li>
         </ol>
       </section>
@@ -242,11 +246,12 @@
           <dfn data-dfn-for="Navigator">clearClientBadge()</dfn> method
         </h3>
         <p>
-          When the {{Navigator/clearClientBadge()}} method is called, set the
-          the badge associated with the <a data-cite=
+          When the {{Navigator/clearClientBadge()}} method is called, return
+          <a>a promise resolved with</a> undefined, and [=in parallel=], set
+          the the badge associated with the <a data-cite=
           "html#current-settings-object">current settings object</a>'s
           <a data-cite="html#responsible-document">responsible document</a> to
-          <a>nothing</a>, and return <a>a promise resolved with</a> undefined.
+          <a>nothing</a>.
         </p>
       </section>
       <section>
@@ -255,27 +260,35 @@
         </h3>
         <p>
           When the {{NavigatorBadge/setAppBadge()}} method is called with
-          argument |contents:unsigned long long|, run the following steps:
+          argument |contents:unsigned long long|:
         </p>
         <ol>
-          <li>Let |result:sequence of applications or DOMException| be the
-          result of <a>determining the matching applications</a>. If |result|
-          was a {{DOMException}}, return <a>a promise rejected with</a> reason
-          |result|.
+          <li>If the <a data-cite="html#current-settings-object">current
+          settings object</a> does not have a <a data-cite=
+          "html#responsible-document">responsible document</a>, and is not a
+          <a data-cite="service-workers-1#dfn-service-worker-client">service
+          worker client</a>, return <a>a promise rejected with</a> a
+          {{"NotSupportedError"}}.
           </li>
-          <li>For each |app:application| in |result|:
+          <li>Otherwise, return <a>a promise resolved with</a> undefined, and
+          [=in parallel=]:
             <ol>
-              <li>If |contents| is omitted, set the badge associated with |app|
-              to <a>flag</a>.
+              <li>Let |result:sequence of applications| be the result of
+              <a>determining the matching applications</a>.
               </li>
-              <li>Else, if |contents| is 0, set the badge associated with |app|
-              to <a>nothing</a>.
-              </li>
-              <li>Else, set the badge associated with |app| to |contents|.
+              <li>For each |app:application| in |result|:
+                <ol>
+                  <li>If |contents| is omitted, set the badge associated with
+                  |app| to <a>flag</a>.
+                  </li>
+                  <li>Else, if |contents| is 0, set the badge associated with
+                  |app| to <a>nothing</a>.
+                  </li>
+                  <li>Else, set the badge associated with |app| to |contents|.
+                  </li>
+                </ol>
               </li>
             </ol>
-          </li>
-          <li>Return <a>a promise resolved with</a> undefined.
           </li>
         </ol>
       </section>
@@ -287,18 +300,23 @@
           When the {{NavigatorBadge/clearAppBadge()}} method is called:
         </p>
         <ol>
-          <li>Let |result:sequence of applications or DOMException| be the
-          result of <a>determining the matching applications</a>. If |result|
-          was a {{DOMException}}, return <a>a promise rejected with</a> reason
-          |result|.
+          <li>If the <a data-cite="html#current-settings-object">current
+          settings object</a> does not have a <a data-cite=
+          "html#responsible-document">responsible document</a>, and is not a
+          <a data-cite="service-workers-1#dfn-service-worker-client">service
+          worker client</a>, return <a>a promise rejected with</a> a
+          {{"NotSupportedError"}}.
           </li>
-          <li>For each |app:application| in |result|:
+          <li>Otherwise, return <a>a promise resolved with</a> undefined, and
+          [=in parallel=]:
             <ol>
-              <li>Set the badge associated with |app| to <a>nothing</a>.
+              <li>Let |result:sequence of applications| be the result of
+              <a>determining the matching applications</a>.
+              </li>
+              <li>Set the badge associated with each application in |result| to
+              <a>nothing</a>.
               </li>
             </ol>
-          </li>
-          <li>Return <a>a promise resolved with</a> undefined.
           </li>
         </ol>
       </section>
@@ -309,8 +327,8 @@
         <div class="note">
           <p>
             This algorithm is used to decide which app(s) receive a badge when
-            the {{NavigatorBadge/setAppBadge()}} method is called from various
-            contexts.
+            the {{NavigatorBadge/setAppBadge()}} method is called from either a
+            document or service worker context.
           </p>
           <p>
             If called from a document context, the badge is applied to at most
@@ -322,17 +340,17 @@
             all applications whose scope sits within the service worker's
             scope.
           </p>
-          <p>
-            It is an error to call the API from a worker that is not a service
-            worker.
-          </p>
         </div>
         <p>
           The steps to <dfn data-lt=
           "determining the matching applications">determine the matching
-          applications</dfn> returns a sequence of <a data-cite=
-          "appmanifest#installable-web-applications">applications</a> or a
-          {{DOMException}}:
+          applications</dfn> assumes that the <a data-cite=
+          "html#current-settings-object">current settings object</a> either has
+          a <a data-cite="html#responsible-document">responsible document</a>,
+          or is a <a data-cite=
+          "service-workers-1#dfn-service-worker-client">service worker
+          client</a>, and returns a sequence of <a data-cite=
+          "appmanifest#installable-web-applications">applications</a>:
         </p>
         <ol>
           <li>If <a data-cite="html#current-settings-object">current settings
@@ -355,11 +373,14 @@
               </li>
             </ol>
           </li>
-          <li>Otherwise, if the <a data-cite=
-          "html#current-settings-object">current settings object</a> is a
-          <a data-cite="service-workers-1#dfn-service-worker-client">service
-          worker client</a> |worker:service worker client|:
+          <li>Otherwise:
             <ol>
+              <li>Let |worker:service worker client| be the <a data-cite=
+              "html#current-settings-object">current settings object</a>
+              (assumed to be a <a data-cite=
+              "service-workers-1#dfn-service-worker-client">service worker
+              client</a>).
+              </li>
               <li>Return the <a data-cite="infra#ordered-set">set</a> of
               <a data-cite="appmanifest#installable-web-applications">installed
               web applications</a> whose <a data-cite=
@@ -373,9 +394,6 @@
               important.)
               </li>
             </ol>
-          </li>
-          <li>Otherwise (this is a worker, but not a service worker), return a
-          {{"NotSupportedError"}}.
           </li>
         </ol>
       </section>
