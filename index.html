@@ -8,7 +8,8 @@
     <script src="https://www.w3.org/Tools/respec/respec-w3c-common" class=
     "remove"></script>
     <script class='remove'>
-      var respecConfig = {
+       var respecConfig = {
+        xref: "web-platform",
         specStatus: "CG-DRAFT",
         edDraftURI: "https://wicg.github.io/badging/",
         github: {
@@ -48,7 +49,7 @@
         as the shelf or home screen), for the purpose of notifying the user
         when the state of the page or application has changed (e.g., when new
         messages have arrived), without showing a more heavyweight
-        <a data-cite="notifications#concept-notification">notification</a>.
+        notification.
       </p>
     </section>
     <section id="sotd">
@@ -69,7 +70,7 @@
         Add examples of client/document badging.
       </p>
       <pre class="example javascript" title="Showing unread count">
-        async function pollForMail() {
+        function pollForMail() {
           // ... Fetch unread mail from server. ...
 
           // Set the app icon badge. If getUnreadCount() returns 0, this is
@@ -83,7 +84,7 @@
       </p>
       <pre class="example javascript" title="Showing ready status">
         function showPlayerTurn(playerTurnId) {
-          if (playerTurnId == localPlayerId)
+          if (playerTurnId === localPlayerId)
             navigator.setAppBadge();
           else
             navigator.clearAppBadge();
@@ -102,12 +103,12 @@
         </li>
         <li>The special value <dfn>flag</dfn>.
         </li>
-        <li>An <code><a data-cite="WEBIDL#idl-unsigned-long-long">unsigned long
-        long</a></code> value, which MUST NOT be 0.
+        <li>An {{unsigned long long}}
+       value, which MUST NOT be 0.
         </li>
       </ul>
       <p>
-        Each <a data-cite="dom#concept-document">document</a> and each
+        Each [=document=] and each
         <a data-cite="appmanifest#installable-web-applications">web
         application</a> is associated with a <a>badge</a> value, which is
         initialized to <a>nothing</a>.
@@ -173,7 +174,7 @@
     </section>
     <section>
       <h2>
-        `Navigator` and `WorkerNavigator` interfaces
+        Extensions to the `Navigator` and `WorkerNavigator` interfaces
       </h2>
       <p>
         The {{Navigator}} and {{WorkerNavigator}} interfaces are extended with
@@ -200,7 +201,7 @@
       </pre>
       <p>
         User agents that never display document badges SHOULD NOT expose the
-        {{Navigator/setClientBadge}} and {{Navigator/clearClientBadge}}
+        {{Navigator/setClientBadge()}} and {{Navigator/clearClientBadge()}}
         methods. Similarly, user agents that never display application badges
         SHOULD NOT expose the {{NavigatorBadge/setAppBadge}} and
         {{NavigatorBadge/clearAppBadge}} methods.
@@ -225,7 +226,7 @@
           <dfn data-dfn-for="Navigator">setClientBadge()</dfn> method
         </h3>
         <p>
-          When the <code>setClientBadge()</code> method is called with argument
+          When the {{Navigator/setClientBadge()}} method is called with argument
           <var>contents</var>, run the following steps:
         </p>
         <ol>
@@ -265,7 +266,7 @@
           <dfn data-dfn-for="NavigatorBadge">setAppBadge()</dfn> method
         </h3>
         <p>
-          When the <code>setAppBadge()</code> method is called with argument
+          When the {{NavigatorBadge/setAppBadge()}} method is called with argument
           <var>contents</var>, run the following steps:
         </p>
         <ol>
@@ -298,7 +299,7 @@
           <dfn data-dfn-for="NavigatorBadge">clearAppBadge()</dfn> method
         </h3>
         <p>
-          When the <code>clearAppBadge()</code> method is called:
+          When the {{NavigatorBadge/clearAppBadge()}} method is called:
         </p>
         <ol>
           <li>Let <var>result</var> be the result of <a>determining the
@@ -365,7 +366,7 @@
                 application's manifest. (Order is not important.)
               </li>
               <li>
-                <a data-cite="infra#list-remove">Remove</a> all elements of
+                [=list/Remove=] all elements of
                 <var>apps</var> other than the one with the longest (i.e., most
                 specific) <a data-cite=
                 "appmanifest#dfn-navigation-scope">navigation scope</a>.
@@ -394,7 +395,7 @@
             </ol>
           </li>
           <li>Otherwise (this is a worker, but not a service worker), return a
-          {{NotSupportedError}}.
+          {{"NotSupportedError"}}.
           </li>
         </ol>
       </section>
