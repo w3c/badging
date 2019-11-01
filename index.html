@@ -295,7 +295,7 @@
           <li>Otherwise, return [=a promise resolved with=] undefined, and [=in
           parallel=]:
             <ol>
-              <li>Let |result:sequence of applications| be the result of
+              <li>Let |result:set of applications| be the result of
               <a>determining the matching applications</a>.
               </li>
               <li>For each |app:application| in |result|:
@@ -330,7 +330,7 @@
           <li>Otherwise, return [=a promise resolved with=] undefined, and [=in
           parallel=]:
             <ol>
-              <li>Let |result:sequence of applications| be the result of
+              <li>Let |result:set of applications| be the result of
               <a>determining the matching applications</a>.
               </li>
               <li>Set the badge associated with each application in |result| to
@@ -367,13 +367,14 @@
           applications</dfn> assumes that the [=current settings object=]
           either has a [=environment settings object/responsible document=], or
           is a <a data-cite="service-workers">service worker client</a>, and
-          returns a sequence of [=web applications=]:
+          returns a <a data-cite="infra#ordered-set">set</a> of [=web
+          applications=]:
         </p>
         <ol>
           <li>If [=current settings object=] has a [=environment settings
           object/responsible document=] |document:Document|:
             <ol>
-              <li>Let |apps:sequence of applications| be the <a data-cite=
+              <li>Let |apps:set of applications| be the <a data-cite=
               "infra#ordered-set">set</a> of installed [=web applications=]
               such that |document|'s <a data-cite=
               "dom#concept-document-url">URL</a> is <a data-cite=
