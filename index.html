@@ -244,15 +244,15 @@
           <dfn data-dfn-for="Navigator">setClientBadge()</dfn> method
         </h3>
         <p>
-          When the {{Navigator/setClientBadge()}} method is called with
-          argument |contents:unsigned long long|:
+          When the {{Navigator/setClientBadge()}} method is called on
+          |navigator:Navigator| with argument |contents:unsigned long long|:
         </p>
         <ol>
           <li>Return [=a promise resolved with=] undefined, and [=in
           parallel=]:
             <ol>
-              <li>Let |document:Document| be the [=current settings object=]'s
-              [=environment settings object/responsible document=].
+              <li>Let |document:Document| be |navigator|'s [=relevant settings
+              object=]'s [=environment settings object/responsible document=].
               </li>
               <li>If |contents| is omitted, set the badge associated with
               |document| to <a>flag</a>.
@@ -271,11 +271,11 @@
           <dfn data-dfn-for="Navigator">clearClientBadge()</dfn> method
         </h3>
         <p>
-          When the {{Navigator/clearClientBadge()}} method is called, return
-          [=a promise resolved with=] undefined, and [=in parallel=], set the
-          the badge associated with the [=current settings object=]'s
-          [=environment settings object/responsible document=] to
-          <a>nothing</a>.
+          When the {{Navigator/clearClientBadge()}} method is called on
+          |navigator:Navigator|, return [=a promise resolved with=] undefined,
+          and [=in parallel=], set the the badge associated with |navigator|'s
+          [=relevant settings object=]'s [=environment settings
+          object/responsible document=] to <a>nothing</a>.
         </p>
       </section>
       <section>
@@ -283,20 +283,21 @@
           <dfn data-dfn-for="NavigatorBadge">setAppBadge()</dfn> method
         </h3>
         <p>
-          When the {{NavigatorBadge/setAppBadge()}} method is called with
-          argument |contents:unsigned long long|:
+          When the {{NavigatorBadge/setAppBadge()}} method is called on
+          |navigator:Navigator| with argument |contents:unsigned long long|:
         </p>
         <ol>
-          <li>If the [=current settings object=] does not have a [=environment
-          settings object/responsible document=], and is not a <a data-cite=
-          "service-workers">service worker client</a>, return [=a promise
-          rejected with=] a {{"NotSupportedError"}}.
+          <li>If |navigator|'s [=relevant settings object=] does not have a
+          [=environment settings object/responsible document=], and is not a
+          <a data-cite="service-workers">service worker client</a>, return [=a
+          promise rejected with=] a {{"NotSupportedError"}}.
           </li>
           <li>Otherwise, return [=a promise resolved with=] undefined, and [=in
           parallel=]:
             <ol>
               <li>Let |result:set of applications| be the result of
-              <a>determining the matching applications</a>.
+              <a>determining the matching applications</a> on |navigator|'s
+              [=relevant settings object=].
               </li>
               <li>For each |app:application| in |result|:
                 <ol>
@@ -319,19 +320,21 @@
           <dfn data-dfn-for="NavigatorBadge">clearAppBadge()</dfn> method
         </h3>
         <p>
-          When the {{NavigatorBadge/clearAppBadge()}} method is called:
+          When the {{NavigatorBadge/clearAppBadge()}} method is called on
+          |navigator:Navigator|:
         </p>
         <ol>
-          <li>If the [=current settings object=] does not have a [=environment
-          settings object/responsible document=], and is not a <a data-cite=
-          "service-workers">service worker client</a>, return [=a promise
-          rejected with=] a {{"NotSupportedError"}}.
+          <li>If |navigator|'s [=relevant settings object=] does not have a
+          [=environment settings object/responsible document=], and is not a
+          <a data-cite="service-workers">service worker client</a>, return [=a
+          promise rejected with=] a {{"NotSupportedError"}}.
           </li>
           <li>Otherwise, return [=a promise resolved with=] undefined, and [=in
           parallel=]:
             <ol>
               <li>Let |result:set of applications| be the result of
-              <a>determining the matching applications</a>.
+              <a>determining the matching applications</a> on |navigator|'s
+              [=relevant settings object=].
               </li>
               <li>Set the badge associated with each application in |result| to
               <a>nothing</a>.
@@ -364,15 +367,15 @@
         <p>
           The steps to <dfn data-lt=
           "determining the matching applications">determine the matching
-          applications</dfn> assumes that the [=current settings object=]
-          either has a [=environment settings object/responsible document=], or
-          is a <a data-cite="service-workers">service worker client</a>, and
-          returns a <a data-cite="infra#ordered-set">set</a> of [=web
-          applications=]:
+          applications</dfn> takes an [=environment settings object=]
+          |environment:environment settings object| that either has a
+          [=environment settings object/responsible document=], or is a
+          <a data-cite="service-workers">service worker client</a>, and returns
+          a <a data-cite="infra#ordered-set">set</a> of [=web applications=]:
         </p>
         <ol>
-          <li>If [=current settings object=] has a [=environment settings
-          object/responsible document=] |document:Document|:
+          <li>If |environment| has a [=environment settings object/responsible
+          document=] |document:Document|:
             <ol>
               <li>Let |apps:set of applications| be the <a data-cite=
               "infra#ordered-set">set</a> of installed [=web applications=]
@@ -388,16 +391,13 @@
               </li>
             </ol>
           </li>
-          <li>Otherwise:
+          <li>Otherwise (|environment| is a <a data-cite=
+          "service-workers">service worker client</a>):
             <ol>
-              <li>Let |worker:service worker client| be the [=current settings
-              object=] (assumed to be a <a data-cite="service-workers">service
-              worker client</a>).
-              </li>
               <li>Return the <a data-cite="infra#ordered-set">set</a> of
               installed [=web applications=] whose [=navigation scope=] is
               <a data-cite="appmanifest#dfn-within-scope-manifest">within
-              scope</a> (as defined in [[AppManifest]]) of |worker|'s
+              scope</a> (as defined in [[AppManifest]]) of |environment|'s
               <a data-cite=
               "service-workers-1#dfn-containing-service-worker-registration">containing
               service worker registration</a>'s <a data-cite=
