@@ -525,9 +525,9 @@ On Android, badging is blocked at an OS level, as there is [no API for setting a
 
 To summarize: This API cannot be used in PWAs on either mobile operating system. Support on iOS is blocked until Safari implements the API and Android does not have an API for controlling badges. Should either situation change, the badging API will become trivially available.
 
-### Why is this API attached to `window` instead of `navigator` or `notifications`?
+### Why is this API attached to `navigator` instead of `window` or `notifications`?
 
-There was a [poll](https://github.com/WICG/badging/issues/14#issuecomment-445548190), and the current style seemed most popular. There is more detail and discussion in [Issue 14](https://github.com/WICG/badging/issues/14).
+There is more detail and discussion in [Issue 55](https://github.com/WICG/badging/issues/55).
 
 ### Is there an upper limit on the size of the integer? And if so, what's the behavior if that limit is reached?
 
