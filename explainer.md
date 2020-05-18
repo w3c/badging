@@ -475,7 +475,7 @@ The **matching app(s)** has a different meaning depending on the context:
   registration](https://www.w3.org/TR/service-workers-1/#scope-match-algorithm)
   of this service worker. (Zero or more apps.)
 
-**Note**: Should we have a separate overload for boolean flags now, as discussed in [Issue 19](https://github.com/WICG/badging/issues/19) and [Issue 42](https://github.com/WICG/badging/issues/42)?
+**Note**: Should we have a separate overload for boolean flags now, as discussed in [Issue 19](https://github.com/w3c/badging/issues/19) and [Issue 42](https://github.com/w3c/badging/issues/42)?
 
 ### UX treatment
 Badges may appear in any place that the user agent deems appropriate. In general, these places should be obviously related to the pages being badged, so users understand what the status is for.
@@ -527,7 +527,7 @@ To summarize: This API cannot be used in PWAs on either mobile operating system.
 
 ### Why is this API attached to `navigator` instead of `window` or `notifications`?
 
-There is more detail and discussion in [Issue 55](https://github.com/WICG/badging/issues/55).
+There is more detail and discussion in [Issue 55](https://github.com/w3c/badging/issues/55).
 
 ### Is there an upper limit on the size of the integer? And if so, what's the behavior if that limit is reached?
 
@@ -552,16 +552,16 @@ full power of showing a native badge.
 The API allows `set()`ing an `unsigned long long`. When presenting this value, it should be formatted according to the user's locale settings.
 
 ### Index of Considered Alternatives
-- The "app" API being a more general API that [sets a badge on a URL scope](https://github.com/WICG/badging/issues/55), applying to all apps within that scope.
-- Setting an app badge badges [app associated with the current document's linked manifest](https://github.com/WICG/badging/issues/55), as opposed to any app that scopes this document.
+- The "app" API being a more general API that [sets a badge on a URL scope](https://github.com/w3c/badging/issues/55), applying to all apps within that scope.
+- Setting an app badge badges [app associated with the current document's linked manifest](https://github.com/w3c/badging/issues/55), as opposed to any app that scopes this document.
 - A single URL-scoped API that sets both the document and app badges at the same time (applying to all documents within the URL scope).
 - A [declarative API](#Couldnt-this-be-a-declarative-API-so-it-would-work-without-JavaScript).
 - Exposing the badging API [elsewhere](#Why-is-this-API-attached-to-window-instead-of-navigator-or-notifications).
 - Supporting [non-integers](#Why-limit-support-to-just-an-integer-What-about-other-characters).
 - Use in the [background](#Why-cant-this-be-used-in-the-background-from-the-ServiceWorker-see-28-and-5).
-- [Separate methods](https://github.com/WICG/badging/issues/19) for setting/clearing boolean flags and numbers.
-- Exposing a [getter](https://github.com/WICG/badging/issues/18) for badge contents.
-- Only [badging](https://github.com/WICG/badging/issues/1) [PWAs](https://github.com/WICG/badging/issues/12).
-- Supporting [query-string scopes](https://github.com/WICG/badging/issues/1#issuecomment-511634128).
-- Adding [fallbacks](https://github.com/WICG/badging/issues/2), when the system can't display a badge.
-- [Promise based](https://github.com/WICG/badging/issues/35#issue-459665145) badging API.
+- [Separate methods](https://github.com/w3c/badging/issues/19) for setting/clearing boolean flags and numbers.
+- Exposing a [getter](https://github.com/w3c/badging/issues/18) for badge contents.
+- Only [badging](https://github.com/w3c/badging/issues/1) [PWAs](https://github.com/w3c/badging/issues/12).
+- Supporting [query-string scopes](https://github.com/w3c/badging/issues/1#issuecomment-511634128).
+- Adding [fallbacks](https://github.com/w3c/badging/issues/2), when the system can't display a badge.
+- [Promise based](https://github.com/w3c/badging/issues/35#issue-459665145) badging API.
