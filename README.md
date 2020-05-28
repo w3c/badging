@@ -4,7 +4,7 @@ The Badging API is a proposed Web Platform API allowing web applications to set
 a taskbar or home screen icon badge.
 
 * [Explainer](explainer.md)
-* [Spec draft](https://wicg.github.io/badging)
+* [Spec draft](https://w3c.github.io/badging)
 * [Open questions](choices.md)
 
 ## Links
