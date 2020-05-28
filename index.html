@@ -39,16 +39,16 @@
       };
     </script>
   </head>
-  <body>
-    <section id="abstract" class="informative">
+  <body data-cite="appmanifest service-workers">
+    <section id="abstract">
       <p>
-        This specification defines an API allowing web pages and [=web
-        applications=] to set a badge on the document, or an application-wide
-        badge, shown in an operating-system-specific place associated with the
-        application (such as the shelf or home screen), for the purpose of
-        notifying the user when the state of the page or application has
-        changed (e.g., when new messages have arrived), without showing a more
-        heavyweight notification.
+        This specification defines an API allowing web pages and [=installed
+        web applications=] to set a badge on the document, or an
+        application-wide badge, shown in an operating-system-specific place
+        associated with the application (such as the shelf or home screen), for
+        the purpose of notifying the user when the state of the page or
+        application has changed (e.g., when new messages have arrived), without
+        showing a more heavyweight notification.
       </p>
     </section>
     <section id="sotd">
@@ -89,7 +89,7 @@
         }
       </pre>
       <p>
-        A separate set of methods set the badge on the installed [=web
+        A separate set of methods set the badge on the [=installed web
         application=], if any, whose [=navigation scope=] this document is
         within. The badge might show up on the application's icon in the
         operating system shelf. These examples work the same as above, except
@@ -138,8 +138,8 @@
         </li>
       </ul>
       <p>
-        Each [=document=] and each [=web application=] is associated with a
-        <a>badge</a> value, which is initialized to <a>nothing</a>.
+        Each [=document=] and each [=installed web application=] is associated
+        with a <a>badge</a> value, which is initialized to <a>nothing</a>.
       </p>
       <p>
         The user agent MAY reset an application's badge to <a>nothing</a> at
@@ -155,12 +155,11 @@
         Badge display
       </h2>
       <p>
-        When a document's badge is <a>set</a>, if the <a data-cite=
-        "html#concept-document-bc">document's browsing context</a> is a
-        [=top-level browsing context=], the user agent SHOULD display the
-        document's badge value alongside the other identifying information for
-        that document (for example, on top of the document's icon or near its
-        title).
+        When a document's badge is <a>set</a>, if the document's [=browsing
+        context=] is a [=top-level browsing context=], the user agent SHOULD
+        display the document's badge value alongside the other identifying
+        information for that document (for example, on top of the document's
+        icon or near its title).
       </p>
       <p class="note">
         The user agent is not expected to display a badge associated with a
@@ -232,8 +231,7 @@
         determine whether setting a badge will have any effect, based on the
         presence of the methods. In particular, sites can use the absence of
         {{Navigator/setClientBadge()}} as a condition for displaying a fallback
-        badge in the page's [^title^] or <a data-cite=
-        "html#rel-icon"><code>icon</code></a>.
+        badge in the page's [^title^] or [=link type "icon"=].
       </p>
       <div class="issue" data-number="60"></div>
       <div class="issue" data-number="61"></div>
@@ -287,8 +285,8 @@
         <ol>
           <li>If |navigator|'s [=relevant settings object=] does not have a
           [=environment settings object/responsible document=], and is not a
-          <a data-cite="service-workers">service worker client</a>, return [=a
-          promise rejected with=] a {{"NotSupportedError"}}.
+          [=service worker client=], return [=a promise rejected with=] a
+          {{"NotSupportedError"}} {{DOMException}}.
           </li>
           <li>Otherwise, return [=a promise resolved with=] undefined, and [=in
           parallel=]:
@@ -324,8 +322,8 @@
         <ol>
           <li>If |navigator|'s [=relevant settings object=] does not have a
           [=environment settings object/responsible document=], and is not a
-          <a data-cite="service-workers">service worker client</a>, return [=a
-          promise rejected with=] a {{"NotSupportedError"}}.
+          [=service worker client=], return [=a promise rejected with=] a
+          {{"NotSupportedError"}} {{DOMException}}.
           </li>
           <li>Otherwise, return [=a promise resolved with=] undefined, and [=in
           parallel=]:
@@ -363,24 +361,21 @@
           </p>
         </div>
         <p>
-          The steps to <dfn data-lt=
-          "determining the matching applications">determine the matching
-          applications</dfn> takes an [=environment settings object=]
-          |environment:environment settings object| that either has a
-          [=environment settings object/responsible document=], or is a
-          <a data-cite="service-workers">service worker client</a>, and returns
-          a <a data-cite="infra#ordered-set">set</a> of [=web applications=]:
+          The steps for <dfn>determining the matching applications</dfn> takes
+          an [=environment settings object=] |environment:environment settings
+          object| that either has a [=environment settings object/responsible
+          document=], or is a [=service worker client=], and returns a [=set=]
+          of [=installed web applications=]:
         </p>
         <ol>
           <li>If |environment| has a [=environment settings object/responsible
           document=] |document:Document|:
             <ol>
-              <li>Let |apps:set of applications| be the <a data-cite=
-              "infra#ordered-set">set</a> of installed [=web applications=]
-              such that |document|'s <a data-cite=
-              "dom#concept-document-url">URL</a> is <a data-cite=
-              "appmanifest#dfn-within-scope-manifest">within scope</a> of the
-              application's manifest. (Order is not important.)
+              <li>Let |apps:set of applications| be the [=set=] of [=installed
+              web applications=] such that |document|'s {{Document/URL}} is
+              <a data-cite="appmanifest#dfn-within-scope-manifest">within
+              scope</a> of the application's manifest. (Order is not
+              important.)
               </li>
               <li>[=list/Remove=] all elements of |apps| other than the one
               with the longest (i.e., most specific) [=navigation scope=].
@@ -389,18 +384,14 @@
               </li>
             </ol>
           </li>
-          <li>Otherwise (|environment| is a <a data-cite=
-          "service-workers">service worker client</a>):
+          <li>Otherwise (|environment| is a [=service worker client=]):
             <ol>
-              <li>Return the <a data-cite="infra#ordered-set">set</a> of
-              installed [=web applications=] whose [=navigation scope=] is
-              <a data-cite="appmanifest#dfn-within-scope-manifest">within
-              scope</a> (as defined in [[AppManifest]]) of |environment|'s
-              <a data-cite=
-              "service-workers-1#dfn-containing-service-worker-registration">containing
-              service worker registration</a>'s <a data-cite=
-              "service-workers-1#dfn-scope-url">scope url</a>. (Order is not
-              important.)
+              <li>Return the [=set=] of [=installed web applications=] whose
+              [=navigation scope=] is <a data-cite=
+              "appmanifest#dfn-within-scope-manifest">within scope</a> (as
+              defined in [[AppManifest]]) of |environment|'s [=service
+              worker/containing service worker registration=]'s [=service
+              worker registration/scope url=]. (Order is not important.)
               </li>
             </ol>
           </li>
@@ -424,17 +415,6 @@
         Accessibility considerations
       </h2>
       <div class="issue" data-number="24"></div>
-    </section>
-    <section>
-      <h2>
-        Dependencies
-      </h2>
-      <p>
-        <dfn data-cite="appmanifest#installable-web-applications" data-lt=
-        "web application|web applications">Installable web applications</dfn>
-        and <dfn data-cite="appmanifest#dfn-navigation-scope">navigation
-        scope</dfn> are defined by [[appmanifest]].
-      </p>
     </section>
     <section id="conformance"></section>
   </body>
