@@ -197,15 +197,15 @@
         // Methods only exposed on documents.
         [SecureContext]
         partial interface Navigator {
-          Promise&lt;void&gt; setClientBadge(optional [EnforceRange] unsigned long long contents);
-          Promise&lt;void&gt; clearClientBadge();
+          Promise&lt;undefined&gt; setClientBadge(optional [EnforceRange] unsigned long long contents);
+          Promise&lt;undefined&gt; clearClientBadge();
         };
 
         // Methods exposed on both documents and service workers.
         [SecureContext]
         interface mixin NavigatorBadge {
-          Promise&lt;void&gt; setAppBadge(optional [EnforceRange] unsigned long long contents);
-          Promise&lt;void&gt; clearAppBadge();
+          Promise&lt;undefined&gt; setAppBadge(optional [EnforceRange] unsigned long long contents);
+          Promise&lt;undefined&gt; clearAppBadge();
         };
 
         Navigator includes NavigatorBadge;
