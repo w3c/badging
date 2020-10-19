@@ -14,9 +14,7 @@
           repoURL: "w3c/badging",
           branch: "master"
         },
-        wg: "Web Applications Working Group",
-        wgURI: "https://www.w3.org/2019/webapps/",
-        wgPatentURI: "https://www.w3.org/2004/01/pp-impl/114929/status",
+        group: "webapps",
         editors: [{
           name: "Matt Giuca",
           company: "Google Inc.",
@@ -26,7 +24,7 @@
           company: "Google Inc.",
           companyURL: "https://google.com"
         }],
-        mdn: true,
+        // mdn: true, (not available yet)
         xref: "web-platform",
       };
     </script>
@@ -82,12 +80,13 @@
       </pre>
       <p>
         A separate set of methods set the badge on the [=installed web
-        application=], if any, whose [=navigation scope=] this document is
-        within. The badge might show up on the application's icon in the
-        operating system shelf. These examples work the same as above, except
-        that the badge has global scope (if multiple documents within the same
-        application set or clear a badge, the most recent one takes effect),
-        and can continue being seen even after the last document closes.
+        application=], if any, whose [=manifest/navigation scope=] this
+        document is within. The badge might show up on the application's icon
+        in the operating system shelf. These examples work the same as above,
+        except that the badge has global scope (if multiple documents within
+        the same application set or clear a badge, the most recent one takes
+        effect), and can continue being seen even after the last document
+        closes.
       </p>
       <pre class="example javascript" title=
       "Showing unread count on the app icon">
@@ -370,7 +369,8 @@
               important.)
               </li>
               <li>[=list/Remove=] all elements of |apps| other than the one
-              with the longest (i.e., most specific) [=navigation scope=].
+              with the longest (i.e., most specific) [=manifest/navigation
+              scope=].
               </li>
               <li>Return |apps|.
               </li>
@@ -379,7 +379,7 @@
           <li>Otherwise (|environment| is a [=service worker client=]):
             <ol>
               <li>Return the [=set=] of [=installed web applications=] whose
-              [=navigation scope=] is <a data-cite=
+              [=manifest/navigation scope=] is <a data-cite=
               "appmanifest#dfn-within-scope-manifest">within scope</a> (as
               defined in [[AppManifest]]) of |environment|'s [=service
               worker/containing service worker registration=]'s [=service
