@@ -238,8 +238,8 @@
           <li>Return [=a promise resolved with=] undefined, and [=in
           parallel=]:
             <ol>
-              <li>Let |document:Document| be |navigator|'s [=relevant settings
-              object=]'s [=environment settings object/responsible document=].
+              <li>Let |document:Document| be |navigator|'s
+              [=relevant global object=]'s [=associated `Document`=].
               </li>
               <li>If |contents| is omitted, set the badge associated with
               |document| to <a>flag</a>.
@@ -261,8 +261,8 @@
           When the {{Navigator/clearClientBadge()}} method is called on
           |navigator:Navigator|, return [=a promise resolved with=] undefined,
           and [=in parallel=], set the the badge associated with |navigator|'s
-          [=relevant settings object=]'s [=environment settings
-          object/responsible document=] to <a>nothing</a>.
+          [=relevant global object=]'s [=associated `Document`=] to
+          <a>nothing</a>.
         </p>
       </section>
       <section>
@@ -274,9 +274,9 @@
           |navigator:Navigator| with argument |contents:unsigned long long|:
         </p>
         <ol>
-          <li>If |navigator|'s [=relevant settings object=] does not have a
-          [=environment settings object/responsible document=], and is not a
-          [=service worker client=], return [=a promise rejected with=] a
+          <li>If |navigator|'s [=relevant global object=] does not have an
+          [=associated `Document`=], and is not a [=service worker client=],
+          return [=a promise rejected with=] a
           {{"NotSupportedError"}} {{DOMException}}.
           </li>
           <li>Otherwise, return [=a promise resolved with=] undefined, and [=in
@@ -311,9 +311,9 @@
           |navigator:Navigator|:
         </p>
         <ol>
-          <li>If |navigator|'s [=relevant settings object=] does not have a
-          [=environment settings object/responsible document=], and is not a
-          [=service worker client=], return [=a promise rejected with=] a
+          <li>If |navigator|'s [=relevant global object=] does not have an
+          [=associated `Document`=], and is not a [=service worker client=],
+          return [=a promise rejected with=] a
           {{"NotSupportedError"}} {{DOMException}}.
           </li>
           <li>Otherwise, return [=a promise resolved with=] undefined, and [=in
@@ -354,13 +354,13 @@
         <p>
           The steps for <dfn>determining the matching applications</dfn> takes
           an [=environment settings object=] |environment:environment settings
-          object| that either has a [=environment settings object/responsible
-          document=], or is a [=service worker client=], and returns a [=set=]
-          of [=installed web applications=]:
+          object| that either has an [=associated `Document`=], or is a
+          [=service worker client=], and returns a [=set=] of
+          [=installed web applications=]:
         </p>
         <ol>
-          <li>If |environment| has a [=environment settings object/responsible
-          document=] |document:Document|:
+          <li>If |environment|'s [=relevant global object=] has an
+            [=associated `Document`=] |document:Document|:
             <ol>
               <li>Let |apps:set of applications| be the [=set=] of [=installed
               web applications=] such that |document|'s {{Document/URL}} is
