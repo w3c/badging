@@ -5,7 +5,6 @@ a taskbar or home screen icon badge.
 
 * [Explainer](explainer.md)
 * [Spec draft](https://w3c.github.io/badging)
-* [Open questions](choices.md)
 
 ## Links
 
