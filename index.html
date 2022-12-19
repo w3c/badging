@@ -21,9 +21,9 @@
           companyURL: "https://google.com"
         }, {
           name: "Jay Harris",
-          company: "Google Inc.",
-          companyURL: "https://google.com"
+          retiredDate: "2019-12-31"
         }],
+        latestVersion: null,
         // mdn: true, (not available yet)
         xref: "web-platform",
       };
@@ -138,7 +138,8 @@
       </p>
       <p>
         If a <a>badge</a> is <a>nothing</a>, it is said to be
-        "<dfn>cleared</dfn>". Otherwise, it is said to be "<dfn>set</dfn>".
+        "<dfn data-local-lt="clearing">cleared</dfn>". Otherwise, it is said to
+        be "<dfn>set</dfn>".
       </p>
     </section>
     <section>
@@ -189,18 +190,16 @@
       </h2>
       <p>
         The {{Navigator}} and {{WorkerNavigator}} interfaces are extended with
-        methods for setting and clearing both the document and application
+        methods for setting and [=clearing=] both the document and application
         badge indicators from documents and service workers, respectively.
       </p>
       <pre class="idl">
-        // Methods only exposed on documents.
         [SecureContext]
         partial interface Navigator {
           Promise&lt;undefined&gt; setClientBadge(optional [EnforceRange] unsigned long long contents);
           Promise&lt;undefined&gt; clearClientBadge();
         };
 
-        // Methods exposed on both documents and service workers.
         [SecureContext]
         interface mixin NavigatorBadge {
           Promise&lt;undefined&gt; setAppBadge(optional [EnforceRange] unsigned long long contents);
@@ -222,24 +221,23 @@
         determine whether setting a badge will have any effect, based on the
         presence of the methods. In particular, sites can use the absence of
         {{Navigator/setClientBadge()}} as a condition for displaying a fallback
-        badge in the page's [^title^] or [=link type "icon"=].
+        badge in the page's [^title^] or link type "icon".
       </p>
-      <div class="issue" data-number="60"></div>
       <div class="issue" data-number="61"></div>
       <section>
         <h3>
           <dfn data-dfn-for="Navigator">setClientBadge()</dfn> method
         </h3>
         <p>
-          When the {{Navigator/setClientBadge()}} method is called on
-          |navigator:Navigator| with argument |contents:unsigned long long|:
+          When the {{Navigator/setClientBadge()}} method is called with
+          argument |contents:unsigned long long|:
         </p>
         <ol>
           <li>Return [=a promise resolved with=] undefined, and [=in
           parallel=]:
             <ol>
-              <li>Let |document:Document| be |navigator|'s
-              [=relevant global object=]'s [=associated `Document`=].
+              <li>Let |document:Document| be [=this=]'s [=relevant global
+              object=]'s [=associated `Document`=].
               </li>
               <li>If |contents| is omitted, set the badge associated with
               |document| to <a>flag</a>.
@@ -258,32 +256,38 @@
           <dfn data-dfn-for="Navigator">clearClientBadge()</dfn> method
         </h3>
         <p>
-          When the {{Navigator/clearClientBadge()}} method is called on
-          |navigator:Navigator|, return [=a promise resolved with=] undefined,
-          and [=in parallel=], set the the badge associated with |navigator|'s
-          [=relevant global object=]'s [=associated `Document`=] to
-          <a>nothing</a>.
+          When the {{Navigator/clearClientBadge()}} method is called:
         </p>
+        <ol>
+          <li>Let |document:Document| be [=this=]'s [=relevant global object=]
+          [=associated document=].
+          </li>
+          <li>Return [=a promise resolved with=] undefined and [=In parallel=],
+          set the badge associated with |document| to <a>nothing</a>.
+          </li>
+        </ol>
       </section>
       <section>
         <h3>
           <dfn data-dfn-for="NavigatorBadge">setAppBadge()</dfn> method
         </h3>
         <p>
-          When the {{NavigatorBadge/setAppBadge()}} method is called on
-          |navigator:Navigator| with argument |contents:unsigned long long|:
+          When the {{NavigatorBadge/setAppBadge()}} method is called with
+          argument |contents:unsigned long long|:
         </p>
         <ol>
-          <li>If |navigator|'s [=relevant global object=] does not have an
-          [=associated `Document`=], and is not a [=service worker client=],
-          return [=a promise rejected with=] a
-          {{"NotSupportedError"}} {{DOMException}}.
+          <li>Let |global| be [=this=]'s [=relevant global object=].
+          </li>
+          <li>If |global|'s [=associated `Document`=] is null, and the
+          [=environment settings object=] is not a [=service worker client=],
+          return [=a promise rejected with=] a {{"NotSupportedError"}}
+          {{DOMException}}.
           </li>
           <li>Otherwise, return [=a promise resolved with=] undefined, and [=in
           parallel=]:
             <ol>
               <li>Let |result:set of applications| be the result of
-              <a>determining the matching applications</a> on |navigator|'s
+              <a>determining the matching applications</a> on [=this=]'s
               [=relevant settings object=].
               </li>
               <li>For each |app:application| in |result|:
@@ -307,20 +311,21 @@
           <dfn data-dfn-for="NavigatorBadge">clearAppBadge()</dfn> method
         </h3>
         <p>
-          When the {{NavigatorBadge/clearAppBadge()}} method is called on
-          |navigator:Navigator|:
+          When the {{NavigatorBadge/clearAppBadge()}} method is called:
         </p>
         <ol>
-          <li>If |navigator|'s [=relevant global object=] does not have an
-          [=associated `Document`=], and is not a [=service worker client=],
-          return [=a promise rejected with=] a
-          {{"NotSupportedError"}} {{DOMException}}.
+          <li>Let |global| be [=this=]'s [=relevant global object=].
+          </li>
+          <li>If |global|'s [=associated `Document`=] is null, and the
+          [=environment settings object=] is not a [=service worker client=],
+          return [=a promise rejected with=] a {{"NotSupportedError"}}
+          {{DOMException}}.
           </li>
           <li>Otherwise, return [=a promise resolved with=] undefined, and [=in
           parallel=]:
             <ol>
               <li>Let |result:set of applications| be the result of
-              <a>determining the matching applications</a> on |navigator|'s
+              <a>determining the matching applications</a> on [=this=]'s
               [=relevant settings object=].
               </li>
               <li>Set the badge associated with each application in |result| to
@@ -354,19 +359,18 @@
         <p>
           The steps for <dfn>determining the matching applications</dfn> takes
           an [=environment settings object=] |environment:environment settings
-          object| that either has an [=associated `Document`=], or is a
-          [=service worker client=], and returns a [=set=] of
-          [=installed web applications=]:
+          object| that either has a [=global object=] with an [=associated
+          `Document`=], or is a [=service worker client=], and returns a
+          [=set=] of [=installed web applications=]:
         </p>
         <ol>
-          <li>If |environment|'s [=relevant global object=] has an
-            [=associated `Document`=] |document:Document|:
+          <li>If |environment| has a [=global object=] with an [=associated
+          `Document`=] that is not null:
             <ol>
               <li>Let |apps:set of applications| be the [=set=] of [=installed
               web applications=] such that |document|'s {{Document/URL}} is
-              <a data-cite="appmanifest#dfn-within-scope-manifest">within
-              scope</a> of the application's manifest. (Order is not
-              important.)
+              [=manifest/within scope=] of the application's manifest. (Order
+              is not important.)
               </li>
               <li>[=list/Remove=] all elements of |apps| other than the one
               with the longest (i.e., most specific) [=manifest/navigation
@@ -379,11 +383,10 @@
           <li>Otherwise (|environment| is a [=service worker client=]):
             <ol>
               <li>Return the [=set=] of [=installed web applications=] whose
-              [=manifest/navigation scope=] is <a data-cite=
-              "appmanifest#dfn-within-scope-manifest">within scope</a> (as
-              defined in [[AppManifest]]) of |environment|'s [=service
-              worker/containing service worker registration=]'s [=service
-              worker registration/scope url=]. (Order is not important.)
+              [=manifest/navigation scope=] is [=manifest/within scope=] of
+              |environment|'s [=service worker/containing service worker
+              registration=]'s [=service worker registration/scope url=].
+              (Order is not important.)
               </li>
             </ol>
           </li>
