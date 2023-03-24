@@ -16,22 +16,25 @@
         },
         group: "webapps",
         editors: [{
-          name: "Matt Giuca",
-          company: "Google Inc.",
-          companyURL: "https://google.com"
-        },
-        {
           name: "Marcos Cáceres",
           company: "Apple Inc.",
           companyURL: "https://apple.com",
-          w3cid: 78903
+          w3cid: 78903,
+        },
+        {
+          name: "Matt Giuca",
+          company: "Google Inc.",
+          companyURL: "https://google.com",
+          retiredDate: "2022-12-21",
         },
         {
           name: "Jay Harris",
+          company: "Google Inc.",
+          companyURL: "https://google.com",
           retiredDate: "2019-12-31"
         }],
         latestVersion: null,
-        // mdn: true, (not available yet)
+        mdn: true,
         xref: "web-platform",
       };
     </script>
@@ -39,15 +42,15 @@
   <body data-cite="appmanifest">
     <section id="abstract">
       <p>
-        This specification defines an API allowing [=installed web
-        applications=] to set an application badge, which is usually shown in
-        an operating-system-specific place associated with the application
-        (such as the shelf, dock, or home screen).
+        This specification defines an API that allows [=installed web
+        applications=] to set an application badge, which is usually shown
+        alongside the application's icon on the device's home screen or
+        application dock.
       </p>
     </section>
     <section id="sotd">
       <p>
-        This is an early draft of the Badging API spec.
+        This is a work in progress.
       </p>
     </section>
     <section class="informative">
@@ -56,42 +59,72 @@
       </h2>
       <pre class="example javascript" title=
       "Showing unread count on the app icon">
-        function pollForMail() {
-          // ... Fetch unread mail from server. ...
+        async function updateMailBadge() {
+          // Check if the API is supported.
+          if (!navigator.setAppBadge) return;
 
-          // Set the app badge.
-          navigator.setAppBadge(getUnreadCount());
+          const unreadCount = await getUnreadMailCount();
+
+          // Try to set the app badge.
+          try {
+            await navigator.setAppBadge(unreadCount);
+          } catch (e) {
+            // The badge is not supported, or the user has prevented the app
+            // from setting a badge.
+          }
         }
       </pre>
       <p>
         The badge might show up on the application's icon in the operating
-        system. If multiple API calls within the same application [=set=] or
-        [=clear=] a badge, the most recent one takes effect, and may continue
-        being seen even after an application is closed.
+        system. If multiple API calls within the same application [=badge/set=]
+        or [=badge/clear=] a badge, the most recent one takes effect, and may
+        continue being seen even after an application is closed.
       </p>
       <pre class="example javascript" title=
       "Showing ready status on the app icon">
-        function showPlayerTurn(playerTurnId) {
+        async function showPlayerTurn(playerTurnId) {
           if (playerTurnId === localPlayerId)
-            navigator.setAppBadge();
+            await navigator.setAppBadge();
           else
-            navigator.clearAppBadge();
+            await navigator.clearAppBadge();
+        }
+      </pre>
+      <p data-cite="notifications">
+        On some operating systems [=badge/setting=] a badge can require
+        permission from the user. In this case, a developer need to query the
+        "[=notifications=]" permissions status before [=badge/setting=] a
+        badge. If the permission is not granted, the developer will need to
+        prompt for permission via the
+        {{Notification}}.{{Notification/requestPermission()}}.
+      </p>
+      <pre class="example javascript" title="Checking for permission">
+        async function checkPermission() {
+          permission = await navigator.permissions.query({
+            name: "notifications",
+          });
+          const button = document.getElementById("permission-button");
+          if (permission.state === "prompt") {
+            // Prompt the user to grant permission.
+            button.hidden = false;
+            button.addEventListener("click", async () =&gt; {
+              await Notification.requestPermission();
+              checkPermission();
+            }, { once: true });
+            return;
+          }
+          button.hidden = true;
         }
       </pre>
     </section>
     <section>
       <h2>
-        Badge model
+        Model
       </h2>
       <p>
-        A <dfn>badge</dfn> is intended as a light-weight mechanism for
-        applications to subtly notify the user that there is some new activity
-        that might require their attention, or as a way of indicating a small
-        amount of information, such as an unread count.
-      </p>
-      <p>
-        An [=installed web application=] has an associated [=badge=], which is
-        initialized to [="nothing"=].
+        A <dfn>badge</dfn> is intended as a mechanism for [=installed web
+        applications=] to notify the user that there is some new activity that
+        might require their attention, or as a way of indicating a small amount
+        of information, such as an unread count.
       </p>
       <p>
         A [=badge=] can have one of the following <dfn data-dfn-for=
@@ -102,54 +135,84 @@
           The special value <dfn>"nothing"</dfn>:
         </dt>
         <dd>
-          Indicates that there is no badge currently [=set=].
+          Indicates that there is no badge currently [=badge/set=].
         </dd>
         <dt>
           The special value <dfn>"flag"</dfn>:
         </dt>
         <dd>
-          Indicates that the badge is [=set=], but contains no specific value.
+          Indicates that the badge is [=badge/set=], but contains no specific
+          value.
         </dd>
         <dt>
           A <dfn>number</dfn> value:
         </dt>
         <dd>
-          Indicates that the badge is [=set=] to a numerical value greater than
-          `0`.
+          Indicates that the badge is [=badge/set=] to a numerical value
+          greater than `0`.
         </dd>
       </dl>
+      <p>
+        An [=installed web application=] has an associated [=badge=], which is
+        initialized to [="nothing"=].
+      </p>
+      <p>
+        The user agent MAY (re)[=set=] an application's badge to [="nothing"=]
+        at its discretion (for example, following system conventions).
+      </p>
     </section>
     <section id="presentation">
       <h2>
         Displaying a badge
       </h2>
       <p>
-        When the application's badge is <dfn>set</dfn>, the user agent SHOULD
-        display the application's badge alongside any iconic representations of
-        the application in the user's operating system (for example, as a small
-        overlay on top of the application's icon).
+        When the application's badge is <dfn data-dfn-for="badge" data-lt=
+        "setting">set</dfn>, the [=user agent=] or operating system SHOULD
+        display the application's [=badge=] alongside the primary iconic
+        representation of the application in the user's operating system (for
+        example, as a small overlay on top of the application's icon on the
+        home screen on a device).
+      </p>
+      <p data-cite="permissions notifications">
+        A user agent MAY require [=express permission=] from the user to
+        [=badge/set=] the badge. When a user agent requires such
+        [=permission=], it SHOULD tie the permission grant to the
+        "[=notifications=]" permission.
       </p>
       <p>
-        When the [=badge=] is [=set=] to [="flag"=], the user agent SHOULD show
-        an indicator with a non-specific symbol (such as a coloured circle).
+        When the [=badge=] is [=badge/set=] to [="flag"=], the [=user agent=]
+        or operating system SHOULD display an indicator with a non-specific
+        symbol (for example, a colored circle).
       </p>
       <p>
-        When the [=badge=] is set to a [=number=], it SHOULD be formatted
-        according to the user's locale settings. For example, the badge content
-        '7' should be displayed as '7' in the locale 'en-NZ' (English as spoken
-        in New Zealand) but as '٧' in 'ar-EG' (Arabic as spoken in Egypt).
-        Furthermore, the user agent MAY simplify or degrade a badge's
-        [=number=] [=badge/value=] in any way. For example, a large number can
-        be saturated (for example, as "99+"). The font and formatting are
-        entirely at the user agent's or host operating system's discretion,
-        ideally to match user preferences. The user agent MAY ignore a badge's
-        [=badge/value=] and show a marker when the status is [=set=].
+        When a [=badge=]'s value is [=badge/set=] to [="nothing"=], the [=user
+        agent=] or operating system SHOULD <dfn data-dfn-for="badge"
+        data-local-lt="clearing|cleared">clear</dfn> the [=badge=] by no longer
+        displaying it.
       </p>
       <p>
-        When a [=badge=]'s value is [=set=] to [="nothing"=], it SHOULD be
-        <dfn data-local-lt="clearing|clear">cleared</dfn>: removing any
-        application badge that is currently being displayed.
+        When the [=badge=] is [=badge/set=] to a [=number=], the [=user agent=]
+        or operating system:
       </p>
+      <ul>
+        <li>SHOULD format and display the number according to the user's font
+        and formatting preferences. For example, as a number in a circle on top
+        of the application's icon on the home screen on a device.
+        </li>
+        <li>MAY simplify or degrade a badge's [=number=] [=badge/value=] in any
+        way that matches the platform's conventions for representing numbers in
+        a badge. For example, a platform might choose to display a badge with a
+        value of '100' as '99+'.
+        </li>
+        <li>SHOULD localize the number according to the user's locale
+        preferences. For example, the [=badge/value=] '7' should be displayed
+        as '7' in the locale 'en' (English) but as '٧' in 'ar' (Arabic).
+        </li>
+        <li>MAY treat a [=number=] [=badge/value=] as [="flag"=], or whatever
+        representation is most appropriate for the platform, if the platform
+        does not support displaying [=numbers=] in a [=badge=].
+        </li>
+      </ul>
     </section>
     <section data-dfn-for="NavigatorBadge">
       <h2>
@@ -167,6 +230,10 @@
         Navigator includes NavigatorBadge;
         WorkerNavigator includes NavigatorBadge;
       </pre>
+      <p>
+        User agents that never display application badges SHOULD NOT
+        [=interface/include=] {{NavigatorBadge}}.
+      </p>
       <h3>
         <dfn>setAppBadge()</dfn> method
       </h3>
@@ -183,16 +250,17 @@
         agent MUST [=set the application badge=] of [=this=] to 0.
       </p>
     </section>
-    <section>
+    <section data-cite="permissions notifications">
       <h2>
         Setting the application badge
       </h2>
       <p>
-        To <dfn>set the application badge</dfn> of platform object [=this=] to
-        an optional {{unsigned long long}} |contents:unsigned long long| value:
+        To <dfn>set the application badge</dfn> of platform object
+        |context:platform object| to an optional {{unsigned long long}}
+        |contents:unsigned long long| value:
       </p>
-      <ol>
-        <li>Let |global| be [=this=]'s [=relevant global object=].
+      <ol class="algorithm">
+        <li>Let |global| be |context|'s [=relevant global object=].
         </li>
         <li>If |global| is a {{Window}} object, then:
           <ol>
@@ -203,44 +271,57 @@
             </li>
           </ol>
         </li>
-        <li>Let |environment| be |global|'s [=environment settings object=].
+        <li>Let |promise| be [=a new promise=].
         </li>
-        <li>Let |appId| be the |environment|'s [=environment settings
-        object/appId=].
-        </li>
-        <li>If |appId| is null, return [=a promise resolved with=] `undefined`.
-        </li>
-        <li>If the |environment|'s [=environment settings object/origin=] is
-        not [=same origin=] with with |appId|, return [=a promise rejected
-        with=] a {{SecurityError}}.
-        </li>
-        <li>Let |badge| be the [=badge=] associated with |appId|.
-        </li>
-        <li>Return [=a promise resolved with=] undefined, and [=in parallel=]:
+        <li>[=In parallel=]:
           <ol>
+            <li>If [=this=]'s [=relevant settings object=]'s [=origin=] is not
+            [=same origin=] with [=this=]'s [=relevant settings object=]'s
+            [=environment/top-level origin=], [=queue a global task=] on the
+            [=DOM manipulation task source=] given |global| to [=reject=]
+            |promise| with a {{"SecurityError"}} and terminate this algorithm.
+            </li>
+            <li>If the [=user agent=] requires [=express permission=] to
+            [=badge/set=] the application badge, then:
+              <ol>
+                <li>Let |permissionState| be the result of [=getting the
+                current permission state=] with "[=notifications=]".
+                </li>
+                <li>If |permissionState| is not {{PermissionState/"granted"}},
+                [=queue a global task=] on the [=user interaction task source=]
+                given |global| to [=reject=] |promise| with a
+                {{NotAllowedError}} and terminate this algorithm.
+                </li>
+              </ol>
+            </li>
             <li>Switching on |contents|, if it happens to be the case that:
               <dl class="switch">
                 <dt>
                   |contents| was not passed:
                 </dt>
                 <dd>
-                  [=Set=] |badge| to [="flag"=].
+                  [=badge/Set=] |badge| to [="flag"=].
                 </dd>
                 <dt>
                   |contents| is 0:
                 </dt>
                 <dd>
-                  [=Set=] the [=badge=] to [="nothing"=] and [=clear=] it.
+                  [=badge/Set=] |badge| to [="nothing"=].
                 </dd>
                 <dt>
-                  Default:
+                  |contents|:
                 </dt>
                 <dd>
-                  [=Set=] |badge| to |contents|.
+                  [=badge/Set=] |badge| to |contents|.
                 </dd>
               </dl>
             </li>
+            <li>[=Queue a global task=] on the [=DOM manipulation task source=]
+            given |global| to [=resolve=] |promise| with `undefined`.
+            </li>
           </ol>
+        </li>
+        <li>Return |promise|.
         </li>
       </ol>
     </section>
@@ -255,8 +336,9 @@
         mechanism.
       </p>
       <p>
-        The user agent MAY [=clear=] a [=badge=] at its discretion, and to
-        follow any system conventions (for example, when the system is reset).
+        The [=user agent=] or operating system MAY [=badge/clear=] a [=badge=]
+        at its discretion, and to follow any system conventions (for example,
+        when the system is reset).
       </p>
       <aside class="issue" data-number="68"></aside>
     </section>
