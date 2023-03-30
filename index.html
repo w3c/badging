@@ -262,7 +262,10 @@
       <ol class="algorithm">
         <li>Let |global| be |context|'s [=relevant global object=].
         </li>
-        <li>If |global| is a {{Window}} object, then:
+        <li>Let |isWindow| be true if |global| is a {{Window}} object, false
+        otherwise.
+        </li>
+        <li>If |isWindow| is true, then:
           <ol>
             <li>Let |document| be |global|'s [=associated `Document`=].
             </li>
@@ -275,11 +278,12 @@
         </li>
         <li>[=In parallel=]:
           <ol>
-            <li>If [=this=]'s [=relevant settings object=]'s [=origin=] is not
-            [=same origin=] with [=this=]'s [=relevant settings object=]'s
-            [=environment/top-level origin=], [=queue a global task=] on the
-            [=DOM manipulation task source=] given |global| to [=reject=]
-            |promise| with a {{"SecurityError"}} and terminate this algorithm.
+            <li>If |isWindow| is true and [=this=]'s [=relevant settings
+            object=]'s [=origin=] is not [=same origin=] with [=this=]'s
+            [=relevant settings object=]'s [=environment/top-level origin=],
+            [=queue a global task=] on the [=DOM manipulation task source=]
+            given |global| to [=reject=] |promise| with a {{"SecurityError"}}
+            and terminate this algorithm.
             </li>
             <li>If the [=user agent=] requires [=express permission=] to
             [=badge/set=] the application badge, then:
