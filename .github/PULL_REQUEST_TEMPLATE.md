@@ -14,11 +14,6 @@ Implementation commitment (delete if not making normative changes):
 * [ ] Chromium (https://bugs.chromium.org/)
 * [ ] Gecko (http://bugzilla.mozilla.org)
 
-Commit message:
-
-(Fill in. If making normative changes, describe exactly what the behavioral
-difference will be.)
-
 Person merging, please make sure that commits are squashed with one of the following as a commit message prefix:
 
 * chore:
