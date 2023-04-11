@@ -14,10 +14,6 @@ Implementation commitment (delete if not making normative changes):
 * [ ] Chromium (https://bugs.chromium.org/)
 * [ ] Gecko (http://bugzilla.mozilla.org)
 
-If change is normative, and it adds or changes a member:
-
-* [ ] [updated JSON schema](https://github.com/SchemaStore/schemastore/blob/master/src/schemas/json/web-manifest.json)
-
 Commit message:
 
 (Fill in. If making normative changes, describe exactly what the behavioral
