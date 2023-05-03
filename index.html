@@ -279,18 +279,17 @@
             <li>If |document| is not [=Document/fully active=], return [=a
             promise rejected with=] a {{InvalidStateError}}.
             </li>
+            <li>If |document|'s [=relevant settings object=]'s [=origin=] is not
+            [=same origin-domain=] with [=this=]'s [=relevant settings object=]'s
+            [=environment/top-level origin=], return [=a promise rejected
+            with=] a {{"SecurityError"}} {{DOMException}}.
+            </li>
           </ol>
         </li>
         <li>Let |promise| be [=a new promise=].
         </li>
         <li>[=In parallel=]:
           <ol>
-            <li>If [=this=]'s [=relevant settings object=]'s [=origin=] is not
-            [=same origin=] with [=this=]'s [=relevant settings object=]'s
-            [=environment/top-level origin=], [=queue a global task=] on the
-            [=DOM manipulation task source=] given |global| to [=reject=]
-            |promise| with a {{"SecurityError"}} and terminate this algorithm.
-            </li>
             <li>If the [=user agent=] requires [=express permission=] to
             [=badge/set=] the application badge, then:
               <ol>
