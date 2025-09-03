@@ -195,7 +195,7 @@
       </p>
     </section>
     <section id="presentation">
-      <h2>
+      <h2 id="displaying-a-badge">
         Displaying a badge
       </h2>
       <p>
@@ -386,12 +386,65 @@
         system load, user preferences, and accessibility considerations.
       </p>
     </section>
-    <section class="informative">
-      <h2>
-        Accessibility considerations
-      </h2>
-      <div class="issue" data-number="24"></div>
-    </section>
+    <h2>
+      Accessibility considerations
+    </h2>
+    <p>
+      Application badges convey status that can require the user's attention.
+      Because badges are often presented outside the web content area (for
+      example, on an app icon in the dock), user agents need to ensure that the
+      information remains accessible and controllable through platform
+      accessibility features and user preferences.
+    </p>
+    <h3>
+      Screen reader compatibility
+    </h3>
+    <p>
+      User agents SHOULD expose the current [=badge/value=] (including
+      [="flag"=] vs. [=number=]) through platform accessibility APIs so that
+      assistive technologies can present it on demand (for example, when the
+      user focuses the application icon).
+    </p>
+    <p>
+      User agents <em>SHOULD NOT</em> automatically announce badge changes;
+      instead, they SHOULD follow platform conventions that avoid unsolicited
+      interruptions.
+    </p>
+    <h3 class="informative">
+      Visual accessibility
+    </h3>
+    <p>
+      As badges are typically drawn by the underlying platform, visual
+      affordances are typically handled there. Nevertheless, user agents and
+      platforms need to consider:
+    </p>
+    <ul>
+      <li>Do not rely on color alone to convey meaning (provide text or an
+      accessible name).
+      </li>
+      <li>Ensure sufficient non-text contrast between badge glyph and
+      background.
+      </li>
+      <li>Use sizing that remains legible across system font/scale settings.
+      </li>
+      <li>Honor high-contrast / forced-colors and dark mode preferences where
+      applicable.
+      </li>
+      <li>If animating badge changes, honor reduced-motion preferences and
+      avoid flashing effects.
+      </li>
+    </ul>
+    <h3>
+      Platform integration and user preferences
+    </h3>
+    <p>
+      User agents SHOULD integrate with platform accessibility settings and
+      themes.
+    </p>
+    <p>
+      User agents SHOULD reflect OS-level per-application badge preferences
+      (for example, when the operating system disables badges for an app).
+    </p>
     <section id="conformance"></section>
   </body>
 </html>
