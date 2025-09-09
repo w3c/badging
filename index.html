@@ -145,14 +145,18 @@
           The special value <dfn>"nothing"</dfn>:
         </dt>
         <dd>
-          Indicates that there is no badge currently [=badge/set=].
+          Indicates that there is no badge currently [=badge/set=]. When a
+          [=badge=] has this value, no visual indicator should be displayed
+          to the user.
         </dd>
         <dt>
           The special value <dfn>"flag"</dfn>:
         </dt>
         <dd>
-          Indicates that the badge is [=badge/set=], but contains no specific
-          value.
+          Indicates that the badge is [=badge/set=] and should be displayed
+          to the user, but contains no specific numerical value. This is
+          distinct from [="nothing"=] in that a visual indicator should be
+          shown to the user to indicate the presence of the badge.
         </dd>
         <dt>
           A <dfn>number</dfn> value:
@@ -192,7 +196,10 @@
       <p>
         When the [=badge=] is [=badge/set=] to [="flag"=], the [=user agent=]
         or operating system SHOULD display an indicator with a non-specific
-        symbol (for example, a colored circle).
+        symbol (for example, a colored circle). If the platform does not support
+        displaying a [="flag"=] badge, the [=user agent=] SHOULD display the
+        badge using the closest available representation that indicates the
+        presence of a badge, rather than [=badge/clearing=] the badge entirely.
       </p>
       <p>
         When a [=badge=]'s value is [=badge/set=] to [="nothing"=], the [=user
@@ -220,7 +227,37 @@
         </li>
         <li>MAY treat a [=number=] [=badge/value=] as [="flag"=], or whatever
         representation is most appropriate for the platform, if the platform
-        does not support displaying [=numbers=] in a [=badge=].
+        does not support displaying [=numbers=] in a [=badge=]. Similarly, if
+        the platform does not support [="flag"=] badges, it MAY represent
+        [="flag"=] using a [=number=] or other appropriate visual indicator,
+        but MUST NOT [=badge/clear=] the badge when [="flag"=] is requested.
+        </li>
+      </ul>
+      <h3>
+        Implementation considerations for platform limitations
+      </h3>
+      <p>
+        Different operating systems have varying capabilities for displaying badges.
+        When communicating badge information to the operating system, [=user agents=]
+        SHOULD preserve the semantic intent of the badge request:
+      </p>
+      <ul>
+        <li>When the operating system does not support [="flag"=] badges, the
+        [=user agent=] SHOULD communicate to the OS using the closest available
+        representation that conveys the presence of a badge (such as a minimal
+        number or generic symbol) rather than communicating a request to
+        [=badge/clear=] the badge.
+        </li>
+        <li>When the operating system does not support [=number=] badges, the
+        [=user agent=] MAY communicate the badge to the OS as a [="flag"=]
+        representation.
+        </li>
+        <li>The [=user agent=] MUST NOT interpret a request to set a [="flag"=]
+        as equivalent to [=badge/clearing=] the badge when communicating with
+        the operating system.
+        </li>
+        <li>The ultimate display behavior is controlled by the operating system
+        and may be further modified by user settings or system conventions.
         </li>
       </ul>
     </section>
