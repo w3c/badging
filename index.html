@@ -103,7 +103,7 @@
       <p data-cite="notifications">
         On some operating systems, the actual display of a [=badge=] to the user
         may depend on notification permissions, even though [=badge/setting=] a
-        badge will always succeed. Developers can optionally check the
+        badge will always succeed (even if the badge value is not displayed to the user). Developers can optionally check the
         "[=notifications=]" permission status and prompt for permission to help
         ensure badge visibility on platforms where this is relevant.
       </p>
@@ -191,9 +191,9 @@
         The operating system ultimately controls whether a [=badge=] is displayed
         to the user, typically through system-level application settings. On some
         platforms, calling {{Notification}}.{{Notification/requestPermission()}}
-        may be necessary for a [=badge=] to become visible to the user, even though
-        the badge itself can be successfully [=badge/set=] by the application.
-        The [=user agent=] SHOULD allow applications to [=badge/set=] badges
+        can be necessary for a [=badge=] to become visible to the user, even though
+        the badge itself can be successfully [=badge/set=] by the [=installed web application|application=].
+        The [=user agent=] SHOULD allow [=installed web application|applications=] to [=badge/set=] badges
         regardless of permission state, with the understanding that the operating
         system will control the actual display behavior.
       </p>
