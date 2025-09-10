@@ -137,25 +137,27 @@
         of information, such as an unread count.
       </p>
       <p>
-        A [=badge=] can have one of the following <dfn data-dfn-for=
-        "badge">values</dfn>:
+        A [=badge=] can have one of the following <dfn class="export"
+        data-dfn-for="badge">values</dfn>:
       </p>
       <dl>
         <dt>
-          The special value <dfn>"nothing"</dfn>:
+          The special value <dfn class="export" data-dfn-for=
+          "badge">"nothing"</dfn>:
         </dt>
         <dd>
           Indicates that there is no badge currently [=badge/set=].
         </dd>
         <dt>
-          The special value <dfn>"flag"</dfn>:
+          The special value <dfn class="export" data-dfn-for=
+          "badge">"flag"</dfn>:
         </dt>
         <dd>
           Indicates that the badge is [=badge/set=], but contains no specific
           value.
         </dd>
         <dt>
-          A <dfn>number</dfn> value:
+          A <dfn data-dfn-for="badge">number</dfn> value:
         </dt>
         <dd>
           Indicates that the badge is [=badge/set=] to a numerical value
@@ -164,11 +166,12 @@
       </dl>
       <p>
         An [=installed web application=] has an associated [=badge=], which is
-        initialized to [="nothing"=].
+        initialized to [=badge/"nothing"=].
       </p>
       <p>
-        The user agent MAY (re)[=set=] an application's badge to [="nothing"=]
-        at its discretion (for example, following system conventions).
+        The user agent MAY (re)[=set=] an application's badge to
+        [=badge/"nothing"=] at its discretion (for example, following system
+        conventions).
       </p>
     </section>
     <section id="presentation">
@@ -190,37 +193,37 @@
         "[=notifications=]" permission.
       </p>
       <p>
-        When the [=badge=] is [=badge/set=] to [="flag"=], the [=user agent=]
-        or operating system SHOULD display an indicator with a non-specific
-        symbol (for example, a colored circle).
+        When the [=badge=] is [=badge/set=] to [=badge/"flag"=], the [=user
+        agent=] or operating system SHOULD display an indicator with a
+        non-specific symbol (for example, a colored circle).
       </p>
       <p>
-        When a [=badge=]'s value is [=badge/set=] to [="nothing"=], the [=user
-        agent=] or operating system SHOULD <dfn data-dfn-for="badge"
+        When a [=badge=]'s value is [=badge/set=] to [=badge/"nothing"=], the
+        [=user agent=] or operating system SHOULD <dfn data-dfn-for="badge"
         data-local-lt="clearing|cleared">clear</dfn> the [=badge=] by no longer
         displaying it.
       </p>
       <p>
-        When the [=badge=] is [=badge/set=] to a [=number=], the [=user agent=]
-        or operating system:
+        When the [=badge=] is [=badge/set=] to a [=badge/number=], the [=user
+        agent=] or operating system:
       </p>
       <ul>
         <li>SHOULD format and display the number according to the user's font
         and formatting preferences. For example, as a number in a circle on top
         of the application's icon on the home screen on a device.
         </li>
-        <li>MAY simplify or degrade a badge's [=number=] [=badge/value=] in any
-        way that matches the platform's conventions for representing numbers in
-        a badge. For example, a platform might choose to display a badge with a
-        value of '100' as '99+'.
+        <li>MAY simplify or degrade a badge's [=badge/number=] [=badge/value=]
+        in any way that matches the platform's conventions for representing
+        numbers in a badge. For example, a platform might choose to display a
+        badge with a value of '100' as '99+'.
         </li>
         <li>SHOULD localize the number according to the user's locale
         preferences. For example, the [=badge/value=] '7' should be displayed
         as '7' in the locale 'en' (English) but as '٧' in 'ar' (Arabic).
         </li>
-        <li>MAY treat a [=number=] [=badge/value=] as [="flag"=], or whatever
-        representation is most appropriate for the platform, if the platform
-        does not support displaying [=numbers=] in a [=badge=].
+        <li>MAY treat a [=badge/number=] [=badge/value=] as [=badge/"flag"=],
+        or whatever representation is most appropriate for the platform, if the
+        platform does not support displaying [=badge/numbers=] in a [=badge=].
         </li>
       </ul>
     </section>
@@ -309,13 +312,13 @@
                   |contents| was not passed:
                 </dt>
                 <dd>
-                  [=badge/Set=] |badge| to [="flag"=].
+                  [=badge/Set=] |badge| to [=badge/"flag"=].
                 </dd>
                 <dt>
                   |contents| is 0:
                 </dt>
                 <dd>
-                  [=badge/Set=] |badge| to [="nothing"=].
+                  [=badge/Set=] |badge| to [=badge/"nothing"=].
                 </dd>
                 <dt>
                   |contents|:
