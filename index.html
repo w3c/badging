@@ -93,12 +93,13 @@
 
           const unreadCount = await getUnreadMailCount();
 
-          // Try to set the app badge.
+          // Set the app badge - this will always succeed if the API is supported.
+          // The operating system controls whether the badge is actually displayed.
           try {
             await navigator.setAppBadge(unreadCount);
           } catch (e) {
-            // The badge is not supported, or the user has prevented the app
-            // from setting a badge.
+            // Errors are rare and typically indicate API unavailability
+            // or security restrictions, not permission issues.
           }
         }
       </pre>
@@ -118,25 +119,31 @@
         }
       </pre>
       <p data-cite="notifications">
-        On some operating systems [=badge/setting=] a badge can require
-        permission from the user. In this case, a developer need to query the
-        "[=notifications=]" permissions status before [=badge/setting=] a
-        badge. If the permission is not granted, the developer will need to
-        prompt for permission via the
-        {{Notification}}.{{Notification/requestPermission()}}.
+        On some operating systems, the actual display of a [=badge=] to the
+        user may depend on notification permissions, even though
+        [=badge/setting=] a badge will always succeed (even if the badge value
+        is not displayed to the user). Developers can optionally check the
+        "[=notifications=]" permission status and prompt for permission to help
+        ensure badge visibility on platforms where this is relevant.
       </p>
-      <pre class="example javascript" title="Checking for permission">
-        async function checkPermission() {
-          permission = await navigator.permissions.query({
+      <pre class="example javascript" title=
+      "Optionally checking for notification permission to ensure badge visibility">
+
+        async function checkNotificationPermissionForBadge() {
+          // Always set the badge first - this will succeed regardless of permissions
+          await navigator.setAppBadge(5);
+          
+          // Check if notification permission might affect badge visibility
+          const permission = await navigator.permissions.query({
             name: "notifications",
           });
           const button = document.getElementById("permission-button");
           if (permission.state === "prompt") {
-            // Prompt the user to grant permission.
+            // Show option to grant permission for badge visibility
             button.hidden = false;
             button.addEventListener("click", async () =&gt; {
               await Notification.requestPermission();
-              checkPermission();
+              checkNotificationPermissionForBadge();
             }, { once: true });
             return;
           }
@@ -207,10 +214,16 @@
         home screen on a device).
       </p>
       <p data-cite="permissions notifications">
-        A user agent MAY require [=express permission=] from the user to
-        [=badge/set=] the badge. When a user agent requires such
-        [=permission=], it SHOULD tie the permission grant to the
-        "[=notifications=]" permission.
+        The operating system ultimately controls whether a [=badge=] is
+        displayed to the user, typically through system-level application
+        settings. On some platforms, calling
+        {{Notification}}.{{Notification/requestPermission()}} can be necessary
+        for a [=badge=] to become visible to the user, even though the badge
+        itself can be successfully [=badge/set=] by the [=installed web
+        application|application=]. The [=user agent=] SHOULD allow [=installed
+        web application|applications=] to [=badge/set=] badges regardless of
+        permission state, with the understanding that the operating system will
+        control the actual display behavior.
       </p>
       <p>
         When the [=badge=] is [=badge/set=] to [=badge/"flag"=], the [=user
@@ -313,19 +326,6 @@
         </li>
         <li>[=In parallel=]:
           <ol>
-            <li>If the [=user agent=] requires [=express permission=] to
-            [=badge/set=] the application badge, then:
-              <ol>
-                <li>Let |permissionState| be the result of [=getting the
-                current permission state=] with "[=notifications=]".
-                </li>
-                <li>If |permissionState| is not {{PermissionState/"granted"}},
-                [=queue a global task=] on the [=user interaction task source=]
-                given |global| to [=reject=] |promise| with a
-                {{NotAllowedError}} and terminate this algorithm.
-                </li>
-              </ol>
-            </li>
             <li>Switching on |contents|, if it happens to be the case that:
               <dl class="switch">
                 <dt>
