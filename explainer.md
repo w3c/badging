@@ -491,7 +491,7 @@ App badges are shown in OS-specific contexts. User agents should attempt reuse e
 
 ### Implementation Considerations for Platform Limitations
 
-Different operating systems have varying support for badge types. Since the OS ultimately controls badge rendering, user agents must communicate the correct semantic intent:
+Different operating systems have varying support for badge types. Since the OS ultimately controls badge rendering, it is the user agent that communicate the correct semantic intent:
 
 * **Flag support**: Some platforms do not natively support "flag" badges (badges without numbers). In such cases, user agents should communicate to the OS using the closest available representation that conveys badge presence (such as a generic symbol or the number "1") rather than requesting badge clearing.
 * **Number support**: Some platforms may not support numbered badges. In such cases, user agents may communicate the badge to the OS as a flag representation.
