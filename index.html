@@ -119,7 +119,7 @@
       </pre>
       <p data-cite="notifications">
         On some operating systems [=badge/setting=] a badge can require
-        permission from the user. In this case, a developer need to query the
+        permission from the user. In this case, a developer needs to query the
         "[=notifications=]" permissions status before [=badge/setting=] a
         badge. If the permission is not granted, the developer will need to
         prompt for permission via the
@@ -288,6 +288,34 @@
         Setting the application badge
       </h2>
       <p>
+        To <dfn>set badge value</dfn> given a [=badge=] |badge| and an optional
+        {{unsigned long long}} |contents| value:
+      </p>
+      <ol class="algorithm">
+        <li>Switching on |contents|, if it happens to be the case that:
+          <dl class="switch">
+            <dt>
+              |contents| was not passed:
+            </dt>
+            <dd>
+              [=badge/Set=] |badge| to [=badge/"flag"=].
+            </dd>
+            <dt>
+              |contents| is 0:
+            </dt>
+            <dd>
+              [=badge/Set=] |badge| to [=badge/"nothing"=].
+            </dd>
+            <dt>
+              |contents|:
+            </dt>
+            <dd>
+              [=badge/Set=] |badge| to |contents|.
+            </dd>
+          </dl>
+        </li>
+      </ol>
+      <p>
         To <dfn>set the application badge</dfn> of platform object
         |context:platform object| to an optional {{unsigned long long}}
         |contents:unsigned long long| value:
@@ -326,27 +354,10 @@
                 </li>
               </ol>
             </li>
-            <li>Switching on |contents|, if it happens to be the case that:
-              <dl class="switch">
-                <dt>
-                  |contents| was not passed:
-                </dt>
-                <dd>
-                  [=badge/Set=] |badge| to [=badge/"flag"=].
-                </dd>
-                <dt>
-                  |contents| is 0:
-                </dt>
-                <dd>
-                  [=badge/Set=] |badge| to [=badge/"nothing"=].
-                </dd>
-                <dt>
-                  |contents|:
-                </dt>
-                <dd>
-                  [=badge/Set=] |badge| to |contents|.
-                </dd>
-              </dl>
+            <li>Let |badge| be the [=installed web application=]'s associated
+            [=badge=].
+            </li>
+            <li>[=Set badge value=] given |badge| and |contents|.
             </li>
             <li>[=Queue a global task=] on the [=DOM manipulation task source=]
             given |global| to [=resolve=] |promise| with `undefined`.
@@ -354,6 +365,45 @@
           </ol>
         </li>
         <li>Return |promise|.
+        </li>
+      </ol>
+      <p>
+        To <dfn class="export">set the application badge for an installed web
+        application</dfn> given a URL |appId| and either a {{boolean}} or
+        {{unsigned long long}} |contents| value. It returns a boolean
+        indicating whether the operation was successful:
+      </p>
+      <ol class="algorithm">
+        <li>Let |app| be the [=installed web application=] identified by
+        |appId|.
+        </li>
+        <li>If no such [=installed web application=] exists, return false.
+        </li>
+        <li>Let |badge| be |app|'s associated [=badge=].
+        </li>
+        <li>[=In parallel=]:
+          <dl class="switch">
+            <dt>
+              |contents| is `true`:
+            </dt>
+            <dd>
+              [=badge/Set=] |badge| to [=badge/"flag"=].
+            </dd>
+            <dt>
+              |contents| is `false` or 0:
+            </dt>
+            <dd>
+              [=badge/Set=] |badge| to [=badge/"nothing"=].
+            </dd>
+            <dt>
+              Otherwise:
+            </dt>
+            <dd>
+              [=badge/Set=] |badge| to |contents|.
+            </dd>
+          </dl>
+        </li>
+        <li>Return true.
         </li>
       </ol>
     </section>
