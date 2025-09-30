@@ -495,7 +495,7 @@ Different operating systems have varying support for badge types. Since the OS u
 
 * **Flag support**: Some platforms do not natively support "flag" badges (badges without numbers). In such cases, user agents communicate to the OS using the closest available representation that conveys badge presence (such as a generic symbol or the number "1") rather than requesting badge clearing.
 * **Number support**: Some platforms may not support numbered badges. In such cases, user agents may communicate the badge to the OS as a flag representation.
-* **Semantic preservation**: User agents must preserve the semantic distinction between "flag" (show something) and "nothing" (show nothing) when communicating with the operating system, even when platform capabilities are limited.
+* **Semantic preservation**: User agents preserve the semantic distinction between "flag" (show something) and "nothing" (show nothing) when communicating with the operating system, even when platform capabilities are limited.
 * **OS control**: The ultimate display behavior is controlled by the operating system and may be further modified by user settings or system conventions.
 
 This approach ensures consistent semantic behavior across platforms and prevents the issues identified in implementations where `setAppBadge()` (flag) incorrectly clears badges instead of displaying them.
