@@ -443,7 +443,7 @@ At any time, the badge for a specific document or app, if it is set, may be eith
 
 The model does not allow a badge to be a negative integer, or the integer value 0 (setting the badge to 0 is equivalent to clearing the badge).
 
-**Important distinction**: A "flag" badge should display a visual indicator to the user (such as a dot or circle), whereas a cleared badge (value 0 or calling `clearAppBadge()`) should display nothing. These are semantically different states, and platforms must not treat a request to set a "flag" as equivalent to clearing the badge.
+**Important distinction**: A "flag" badge generally displays a visual indicator to the user (such as a dot or circle), whereas a cleared badge (value 0 or calling `clearAppBadge()`) clears it. These are semantically different states, and platforms generally won't treat a request to set a "flag" as equivalent to clearing the badge.
 
 The user agent is allowed to clear all badges on an origin whenever there are no foreground pages open on the origin (the intention of this is so that when the user agent quits, it does not need to serialize all the badge data and restore it on start-up; sites should re-apply the badge when they open).
 
