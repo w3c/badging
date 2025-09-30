@@ -155,9 +155,12 @@ state changes that would be convenient for the user to be able to see at a
 glance, but not important enough to disrupt the user, use of the Badge API
 without a notification is warranted.
 
-There may be no need to request permission to use the badging API, since it is
-much less invasive than a notification, but this is at the discretion of the
-user agent.
+There is no need to request permission to use the badging API. The badge can
+always be set successfully by the application, though the operating system
+ultimately controls whether it is displayed to the user. On some platforms,
+calling `Notification.requestPermission()` may be necessary for the badge to
+become visible to the user, even though the badge itself has been successfully
+set by the application.
 
 ## Usage examples
 
