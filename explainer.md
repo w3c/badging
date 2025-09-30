@@ -10,7 +10,6 @@ Date: 2019-10-10
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 
-
 - [Overview](#overview)
 - [Goals and use cases](#goals-and-use-cases)
   - [Comparison to Notifications](#comparison-to-notifications)
@@ -32,9 +31,9 @@ Date: 2019-10-10
 - [Design Questions](#design-questions)
   - [What data types are supported in different operating systems?](#what-data-types-are-supported-in-different-operating-systems)
   - [Why limit support to just an integer? What about other characters?](#why-limit-support-to-just-an-integer-what-about-other-characters)
-  - [Couldn’t this be a declarative API (i.e., a DOM element), so it would work without JavaScript?](#couldnt-this-be-a-declarative-api-ie-a-dom-element-so-it-would-work-without-javascript)
+  - [Couldn't this be a declarative API (i.e., a DOM element), so it would work without JavaScript?](#couldnt-this-be-a-declarative-api-ie-a-dom-element-so-it-would-work-without-javascript)
   - [Is this API useful for mobile OS’s?](#is-this-api-useful-for-mobile-oss)
-  - [Why is this API attached to `window` instead of `navigator` or `notifications`?](#why-is-this-api-attached-to-window-instead-of-navigator-or-notifications)
+  - [Why is this API attached to `navigator` instead of `window` or `notifications`?](#why-is-this-api-attached-to-navigator-instead-of-window-or-notifications)
   - [Is there an upper limit on the size of the integer? And if so, what's the behavior if that limit is reached?](#is-there-an-upper-limit-on-the-size-of-the-integer-and-if-so-whats-the-behavior-if-that-limit-is-reached)
   - [Are you concerned about apps perpetually showing a large unread count?](#are-you-concerned-about-apps-perpetually-showing-a-large-unread-count)
   - [Internationalization](#internationalization)
@@ -44,34 +43,10 @@ Date: 2019-10-10
 
 ## Overview
 
-The **Badging API** is a proposed Web Platform API allowing websites to apply
-badges (small status indicators) to pages or [installed web
+The **Badging API** is a Web Platform API allowing websites to apply
+badges (small status indicators) to [installed web
 apps](https://www.w3.org/tr/appmanifest/#installable-web-applications) on their
-origin. The API is divided into two parts, each of which can be supported, or
-not, by a user agent:
-
-* Document badges, associated with an open document, such as when a badge is
-  shown on or near the page's icon in a browser tab.
-* App badges, associated with an [installed web
-  app](https://www.w3.org/tr/appmanifest/#installable-web-applications) icon,
-  typically in the operating system UI.
-
-Here is a mock of a badge being applied to the page tab:
-
-![Mock of a badge being applied to the page tab](images/tab-badge.png)
-
-This use case is already satisfied today with sites dynamically setting either
-their favicon or title to include some status indicator. The use of an explicit
-badge API has a number of advantages over the "hack" ways:
-
-* The badge can appear outside (completely, or partially overlapping) of the
-  favicon, leaving more room for the site's brand image.
-* The badge is meaningful to the user agent, which can present it to the user in
-  various ways, such as announcing it verbally to a user using a screen reader.
-* Badges can be displayed with a consistent style across websites, chosen by the
-  user agent.
-* User agents can provide a way for users to disable badges on a per-site or
-  global basis.
+origin.
 
 For [installed web
 applications](https://www.w3.org/TR/appmanifest/#installable-web-applications),
@@ -89,23 +64,7 @@ Here are some examples of app badging applied at the OS level:
 ![Android home screen badge](images/android-badge.png)
 <br>Android home screen badge
 
-Unlike document badges, badges applied to apps can be shown and updated even
-when there are no tabs or windows open for the app.
-
-The reason we have separate APIs is that they have very different concerns:
-
-* The app API has additional complexity when used with [push messages](https://www.w3.org/TR/push-api/).
-* The scope and lifetime of the app API is considerably different to the document API.
-* The presence of the document API itself indicates whether the tab will be
-  badged in the UI (obviating the need for a dedicated feature detection method
-  specifically for tab badging).
-
-Other reasons to separate:
-
-* Sites that only want to badge their app icon or only want to badge their tab
-  can just concern themselves with the relevant API.
-* The document API could, in the future, support badges that aren't supported by
-  host operating systems, such as arbitrary Unicode characters.
+Badges applied to apps can be shown and updated even when there are no tabs or windows open for the app.
 
 ## Goals and use cases
 
@@ -161,51 +120,31 @@ user agent.
 
 ## Usage examples
 
-The API is divided into two parts: one for setting/clearing a badge on the
-current document, and one for setting/clearing a badge on the current
-application.
-
-To simply set a numeric badge on the current document:
-
-```js
-navigator.setClientBadge(getUnreadCount());
-```
-
-If `getUnreadCount()` (the argument to `navigator.setClientBadge`) is 0, it will
-automatically clear the badge.
-
-If you just want to show a status indicator flag without a number, use the
-Boolean mode of the API by calling `navigator.setClientBadge` without an
-argument, and `navigator.clearClientBadge()` (which might be done to indicate
-that it is the player's turn to move in a multiplayer game):
-
-```js
-if (myTurn())
-  navigator.setClientBadge();
-else
-  navigator.clearClientBadge();
-```
-
-All of the above set the badge *only* on the current document (e.g., in the page
-tab), and won't affect any other documents, even those at the same URL. To set a
-badge that applies to the current app:
+To set a numeric badge on the current app:
 
 ```js
 navigator.setAppBadge(getUnreadCount());
 ```
 
-As above, a value of 0 clears the badge and `navigator.clearAppBadge()` can also
-explicitly clear the badge for this installed web application. The effects of
-the app API are global and may outlast the document (it is intended to persist
-at least until the user agent closes). It can also be used from a service
-worker, although the meaning of that will be somewhat different.
+If `getUnreadCount()` (the argument to `navigator.setAppBadge`) is 0, it will
+automatically clear the badge.
 
-User agents may expose either or both of the two APIs, so sites should
-feature-detect them individually. In particular, this allows you to fall back to
-showing your own badge in the page favicon or title if the
-`navigator.setClientBadge()` method is not available (regardless of the
-availability of the app API). This is a complete example for a site that wants
-to set the badge on both the current document and the current installed web app:
+If you just want to show a status indicator flag without a number, use the
+Boolean mode of the API by calling `navigator.setAppBadge` without an
+argument, and `navigator.clearAppBadge()` to clear it:
+
+```js
+if (myTurn())
+  navigator.setAppBadge();
+else
+  navigator.clearAppBadge();
+```
+
+The effects of the app API are global and may outlast the document (it is intended to persist
+at least until the user agent closes). It can also be used from a service
+worker.
+
+Here's a complete example for a site that wants to set the badge on the current installed web app:
 
 ```js
 // Should be called whenever the unread count changes (new mail arrives, or mail
@@ -215,15 +154,6 @@ function unreadCountChanged(newUnreadCount) {
   // semi-permanent effect, outliving the current document.
   if (navigator.setAppBadge) {
     navigator.setAppBadge(newUnreadCount);
-  }
-
-  // Set the document badge, for the current tab / window icon.
-  if (navigator.setClientBadge) {
-    navigator.setClientBadge(newUnreadCount);
-  } else {
-    // Fall back to setting favicon (or page title).
-    // (This is a user-supplied function, not part of the Badge API.)
-    showBadgeOnFavicon(newUnreadCount);
   }
 }
 ```
@@ -236,11 +166,8 @@ More advanced examples are given in a [separate document](docs/examples.md).
 
 Calling the API from a service worker has some differences:
 
-* `navigator.setClientBadge()` either shouldn't be callable from service
-  workers, or it would need a `Client` argument to specify which document to
-  badge.
-* When `navigator.setAppBadge()` is called from a service worker, it badges all
-  apps whose scope is inside the service worker scope.
+When `navigator.setAppBadge()` is called from a service worker, it badges all
+apps whose scope is inside the service worker scope.
 
 ## Background updates
 
@@ -399,44 +326,21 @@ complexity, we are not considering changes to the Push API at this time.
 
 ## Feature detection
 
-Ideally we would not provide any feedback to the site as to how the badge is
-going to be displayed to the user, since it's a user interface concern that
-should be at the discretion of the user agent. For example, the site shouldn't
-need to know whether the badge is displayed on a tab icon or on an app icon.
-
-However, a practical concern overrides this: because the favicon can be (and
-often is) used to display a page badge, sites upgrading to the Badge API need
-to know whether they need to fall back to setting the favicon (since,
-presumably, they don't want the badge being displayed twice). So we need to
-provide a way to feature detect — not just "whether the Badge API is supported",
-but "whether a Badge-API badge will show up on or near the favicon".
-
-Therefore, we will explicitly specify that if the `navigator.setClientBadge()`
-method exists, the user agent MUST show a badge set through this method on or
-near the favicon. Therefore, sites can reliably use the presence of this method
-to fall back to a conventional favicon or title badge:
+Sites can feature-detect the Badge API by checking for the presence of the `navigator.setAppBadge` method:
 
 ```js
-if (navigator.setClientBadge) {
-  navigator.setClientBadge(getUnreadCount());
-} else {
-  // Fall back to setting favicon (or page title).
-  // (This is a user-supplied function, not part of the Badge API.)
-  showBadgeOnFavicon(getUnreadCount());
+if (navigator.setAppBadge) {
+  navigator.setAppBadge(getUnreadCount());
 }
 ```
-
-A user agent could provide the `setAppBadge()` methods without
-`setClientBadge()`, which means the above check will apply the fallback, while
-app icons can still be badged.
 
 ## Detailed API proposal
 
 ### The model
 
-A badge is associated with either a document, or an [installed app](https://www.w3.org/TR/appmanifest/#installable-web-applications).
+A badge is associated with an [installed app](https://www.w3.org/TR/appmanifest/#installable-web-applications).
 
-At any time, the badge for a specific document or app, if it is set, may be either:
+At any time, the badge for a specific app, if it is set, may be either:
 
 * A "flag" indicating the presence of a badge with no contents, or
 * A positive integer.
@@ -453,11 +357,6 @@ and
 [`WorkerNavigator`](https://html.spec.whatwg.org/multipage/workers.html#workernavigator).
 They are as follows:
 
-* `navigator.setClientBadge([contents])`: Sets the badge for the current
-  document to *contents*, or to "flag" if *contents* is omitted. If *contents*
-  is 0, clears the badge for the given document.
-* `navigator.clearClientBadge()`: Clears the badge for the current
-  document.
 * `navigator.setAppBadge([contents])`: Sets the badge for the matching app(s) to
   *contents* (an integer), or to "flag" if *contents* is omitted. If *contents*
   is 0, clears the badge for the matching app(s).
@@ -478,13 +377,6 @@ The **matching app(s)** has a different meaning depending on the context:
 **Note**: Should we have a separate overload for boolean flags now, as discussed in [Issue 19](https://github.com/w3c/badging/issues/19) and [Issue 42](https://github.com/w3c/badging/issues/42)?
 
 ### UX treatment
-Badges may appear in any place that the user agent deems appropriate. In general, these places should be obviously related to the pages being badged, so users understand what the status is for.
-
-Appropriate places for a document badge could include:
-
-- Tab favicons.
-- OS-specific contexts for app window icons if the document is open in a [standalone window](https://www.w3.org/TR/appmanifest/#display-modes).
-
 App badges are shown in OS-specific contexts. User agents should attempt reuse existing [operating system APIs and conventions](docs/implementation.md), to achieve a native look-and-feel for the badge.
 
 ## Security and Privacy Considerations
@@ -492,7 +384,7 @@ The API is write-only, so data badged can't be used to track a user. Whether the
 
 These methods are only usable from secure contexts, so forged pages can't set badges on behalf of an origin they don't control.
 
-If the badge methods are called from inside an iframe, the client API should have no effect, and the app API should apply to the app enclosing the iframed contents' URL, not the containing page's URL.
+If the badge methods are called from inside an iframe, the app API should apply to the app enclosing the iframed contents' URL, not the containing page's URL.
 
 There are additional privacy considerations relating to the proposed extensions to the Push API, noted above. However, this does not apply to the base Badge API.
 
@@ -511,17 +403,13 @@ and Ubuntu don't support them at all).
 Limiting support to integers makes behavior more predictable, though we are considering
 whether it might be worth adding support for other characters or symbols in future.
 
-### Couldn’t this be a declarative API (i.e., a DOM element), so it would work without JavaScript?
-This would make sense for the client API, but not the app API (which is
-shared between different pages and has a lifetime beyond the page).
-
-For now, we're specifying both as a JavaScript API to keep them consistent, but
-we could certainly change the document API to be a DOM element (e.g. `<link rel="shortcut icon badge" href="/favicon.ico" badge="99">`).
+### Couldn't this be a declarative API (i.e., a DOM element), so it would work without JavaScript?
+The app API is shared between different pages and has a lifetime beyond the page, so a JavaScript API is more appropriate for this use case.
 
 ### Is this API useful for mobile OS’s?
 iOS has support for badging APIs (see [iOS](docs/implementation.md#ios)).
 
-On Android, badging is blocked at an OS level, as there is [no API for setting a badge without also displaying a notification](#android). However, a badge will already be displayed if a PWA has pending notifications (it just doesn’t allow the fine grained control proposed by this API).
+On Android, badging is blocked at an OS level, as there is [no API for setting a badge without also displaying a notification](#android). However, a badge will already be displayed if a PWA has pending notifications (it just doesn't allow the fine grained control provided by this API).
 
 To summarize: This API cannot be used in PWAs on either mobile operating system. Support on iOS is blocked until Safari implements the API and Android does not have an API for controlling badges. Should either situation change, the badging API will become trivially available.
 
@@ -552,9 +440,8 @@ full power of showing a native badge.
 The API allows `set()`ing an `unsigned long long`. When presenting this value, it should be formatted according to the user's locale settings.
 
 ### Index of Considered Alternatives
-- The "app" API being a more general API that [sets a badge on a URL scope](https://github.com/w3c/badging/issues/55), applying to all apps within that scope.
+- The API being a more general API that [sets a badge on a URL scope](https://github.com/w3c/badging/issues/55), applying to all apps within that scope.
 - Setting an app badge badges [app associated with the current document's linked manifest](https://github.com/w3c/badging/issues/55), as opposed to any app that scopes this document.
-- A single URL-scoped API that sets both the document and app badges at the same time (applying to all documents within the URL scope).
 - A [declarative API](#Couldnt-this-be-a-declarative-API-so-it-would-work-without-JavaScript).
 - Exposing the badging API [elsewhere](#Why-is-this-API-attached-to-window-instead-of-navigator-or-notifications).
 - Supporting [non-integers](#Why-limit-support-to-just-an-integer-What-about-other-characters).
