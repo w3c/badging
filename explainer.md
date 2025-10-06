@@ -443,6 +443,8 @@ At any time, the badge for a specific document or app, if it is set, may be eith
 
 The model does not allow a badge to be a negative integer, or the integer value 0 (setting the badge to 0 is equivalent to clearing the badge).
 
+**Important distinction**: A "flag" badge generally displays a visual indicator to the user (such as a dot or circle), whereas a cleared badge (value 0 or calling `clearAppBadge()`) clears it. These are semantically different states, and platforms generally won't treat a request to set a "flag" as equivalent to clearing the badge.
+
 The user agent is allowed to clear all badges on an origin whenever there are no foreground pages open on the origin (the intention of this is so that when the user agent quits, it does not need to serialize all the badge data and restore it on start-up; sites should re-apply the badge when they open).
 
 ### The API
@@ -486,6 +488,17 @@ Appropriate places for a document badge could include:
 - OS-specific contexts for app window icons if the document is open in a [standalone window](https://www.w3.org/TR/appmanifest/#display-modes).
 
 App badges are shown in OS-specific contexts. User agents should attempt reuse existing [operating system APIs and conventions](docs/implementation.md), to achieve a native look-and-feel for the badge.
+
+### Implementation Considerations for Platform Limitations
+
+Different operating systems have varying support for badge types. Since the OS ultimately controls badge rendering, it is the user agent that communicates the correct semantic intent:
+
+* **Flag support**: Some platforms do not natively support "flag" badges (badges without numbers). In such cases, user agents communicate to the OS using the closest available representation that conveys badge presence (such as a generic symbol or the number "1") rather than requesting badge clearing.
+* **Number support**: Some platforms might not support numbered badges. In such cases, user agents can communicate the badge to the OS as a flag representation.
+* **Semantic preservation**: User agents preserve the semantic distinction between "flag" (show something) and "nothing" (show nothing) when communicating with the operating system, even when platform capabilities are limited.
+* **OS control**: The ultimate display behavior is controlled by the operating system and can be further controlled by user settings or system conventions.
+
+This approach ensures consistent semantic behavior across platforms and prevents the issues identified in implementations where `setAppBadge()` (flag) incorrectly clears badges instead of displaying them.
 
 ## Security and Privacy Considerations
 The API is write-only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
