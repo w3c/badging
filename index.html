@@ -191,7 +191,10 @@
         An [=installed web application=] has an associated [=badge=], which is
         initialized to [=badge/"nothing"=]. The operating system stores and
         manages the badge value, with the [=user agent=] acting as an
-        intermediary to communicate badge changes to the OS.
+        intermediary to communicate badge changes to the OS. The [=badge=] is
+        keyed by the application's [=installed web application/identity=],
+        which is why a [=badge=] survives the application being closed and
+        launched again.
       </p>
       <p>
         The user agent MAY (re)[=set=] an application's badge to
@@ -356,6 +359,67 @@
         </li>
       </ol>
       <p>
+        To <dfn data-lt=
+        "find the application identity|finding the application identity">find
+        the application identity</dfn> for a global object |global|:
+      </p>
+      <ol class="algorithm">
+        <li>If |global| is a {{Window}} object, then:
+          <ol>
+            <li>Let |traversable| be |global|'s [=navigable/top-level
+            traversable=].
+            </li>
+            <li>If |traversable| is not an [=application context=], return
+            null.
+            </li>
+            <li>Let |manifest| be |traversable|'s [=navigable/active
+            document=]'s [=Document/processed manifest=].
+            </li>
+            <li>If |manifest| is null, return null.
+            </li>
+            <li>Return |manifest|'s [=manifest/id=].
+            </li>
+          </ol>
+        </li>
+        <li data-cite="service-workers">If |global| is a
+        {{ServiceWorkerGlobalScope}}, then:
+          <ol>
+            <li>Let |registration| be |global|'s [=service worker=]'s [=service
+            worker/containing service worker registration=].
+            </li>
+            <li>Let |candidates| be the [=ordered set=] of [=installed web
+            applications=] whose [=manifest/navigation scope=] contains
+            |registration|'s [=service worker registration/scope url=].
+            </li>
+            <li>If |candidates|'s [=set/size=] is not 1, return null.
+            </li>
+            <li>Return |candidates|[0]'s [=installed web
+            application/identity=].
+            </li>
+          </ol>
+        </li>
+        <li>If |global| is a {{DedicatedWorkerGlobalScope}} or a
+        {{SharedWorkerGlobalScope}}, then:
+          <ol>
+            <li>Let |identities| be a new [=ordered set=].
+            </li>
+            <li>[=list/For each=] |owner| of |global|'s
+            [=WorkerGlobalScope/owner set=], [=set/append=] the result of
+            [=finding the application identity=] for |owner|'s [=relevant
+            global object=] to |identities|.
+            </li>
+            <li>[=set/Remove=] null from |identities|.
+            </li>
+            <li>If |identities|'s [=set/size=] is 1, return |identities|[0].
+            </li>
+            <li>Return null.
+            </li>
+          </ol>
+        </li>
+        <li>Return null.
+        </li>
+      </ol>
+      <p>
         To <dfn>set the application badge</dfn> of platform object
         |context:platform object| to an optional {{unsigned long long}}
         |contents:unsigned long long| value:
@@ -394,13 +458,14 @@
                 </li>
               </ol>
             </li>
-            <li>Let |badge| be the [=installed web application=]'s associated
-            [=badge=].
-            </li>
-            <li>[=Set badge value=] given |badge| and |contents|.
-            </li>
             <li>[=Queue a global task=] on the [=DOM manipulation task source=]
             given |global| to [=resolve=] |promise| with `undefined`.
+            </li>
+            <li>Let |identity| be the result of [=finding the application
+            identity=] for |global|.
+            </li>
+            <li>If |identity| is not null, [=set badge value=] given the
+            [=badge=] associated with |identity| and |contents|.
             </li>
           </ol>
         </li>
@@ -456,6 +521,19 @@
         back the value of a badge that was previously set, to ensure that the
         application badge cannot be used as a storage or fingerprinting
         mechanism.
+      </p>
+      <p>
+        Whether an [=installed web application=] exists is also not observable
+        through {{NavigatorBadge/setAppBadge()}} or
+        {{NavigatorBadge/clearAppBadge()}}. Holding everything else about the
+        calling context equal, a call behaves identically whether or not an
+        [=installed web application=] exists: a call that would otherwise
+        [=resolve=] still [=resolve=]s with `undefined`, and simply sets
+        nothing. A [=user agent=] MUST NOT vary the result, the timing, or any
+        exception thrown according to whether an application is installed,
+        because doing so would let any page detect what the user has installed.
+        The [=set the application badge for an installed web application=]
+        algorithm returns a boolean, and so MUST NOT be exposed to script.
       </p>
     </section>
     <section>
