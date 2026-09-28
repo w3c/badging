@@ -142,6 +142,20 @@ The effects of the app API are global and may outlast the document (it is intend
 at least until the user agent closes). It can also be used from a service
 worker.
 
+Here's a complete example for a site that wants to set the badge on the current installed web app:
+
+```js
+// Should be called whenever the unread count changes (new mail arrives, or mail
+// is marked read/unread).
+function unreadCountChanged(newUnreadCount) {
+  // Set the app badge, for app icons and links. This has a global and
+  // semi-permanent effect, outliving the current document.
+  if ('setAppBadge' in navigator) {
+    navigator.setAppBadge(newUnreadCount);
+  }
+}
+```
+
 More advanced examples are given in a [separate document](docs/examples.md).
 
 ## Usage from service workers
@@ -329,6 +343,8 @@ At any time, the badge for a specific app, if it is set, may be either:
 * A positive integer.
 
 The model does not allow a badge to be a negative integer, or the integer value 0 (setting the badge to 0 is equivalent to clearing the badge).
+
+**Important distinction**: A "flag" badge generally displays a visual indicator to the user (such as a dot or circle), whereas a cleared badge (value 0 or calling `clearAppBadge()`) clears it. These are semantically different states, and platforms generally won't treat a request to set a "flag" as equivalent to clearing the badge.
 
 The user agent is allowed to clear all badges on an origin whenever there are no foreground pages open on the origin (the intention of this is so that when the user agent quits, it does not need to serialize all the badge data and restore it on start-up; sites should re-apply the badge when they open).
 
