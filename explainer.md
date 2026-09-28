@@ -146,7 +146,7 @@ More advanced examples are given in a [separate document](docs/examples.md).
 
 ## Usage from service workers
 
-Calling the API from a service worker behaves similarly, with the exception that when `navigator.setAppBadge()` is called from a service worker, it badges all apps whose scope is inside the service worker scope.
+The API is exposed on `WorkerNavigator`, so it can also be called from a service worker.
 
 ## Background updates
 
