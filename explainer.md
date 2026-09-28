@@ -31,7 +31,7 @@ Date: 2019-10-10
 - [Design Questions](#design-questions)
   - [What data types are supported in different operating systems?](#what-data-types-are-supported-in-different-operating-systems)
   - [Why limit support to just an integer? What about other characters?](#why-limit-support-to-just-an-integer-what-about-other-characters)
-  - [Couldn’t this be a declarative API (i.e., a DOM element), so it would work without JavaScript?](#couldnt-this-be-a-declarative-api-ie-a-dom-element-so-it-would-work-without-javascript)
+  - [Couldn't this be a declarative API (i.e., a DOM element), so it would work without JavaScript?](#couldnt-this-be-a-declarative-api-ie-a-dom-element-so-it-would-work-without-javascript)
   - [Is this API useful for mobile OS’s?](#is-this-api-useful-for-mobile-oss)
   - [Why is this API attached to `navigator` instead of `window` or `notifications`?](#why-is-this-api-attached-to-navigator-instead-of-window-or-notifications)
   - [Is there an upper limit on the size of the integer? And if so, what's the behavior if that limit is reached?](#is-there-an-upper-limit-on-the-size-of-the-integer-and-if-so-whats-the-behavior-if-that-limit-is-reached)
