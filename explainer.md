@@ -58,7 +58,7 @@ Here are some examples of app badging applied at the OS level:
 
 The badge can be shown and updated even when there are no tabs or windows open for the app. The use of an explicit badge API has a number of advantages over the "hack" ways (like dynamically setting favicons or titles to include a status indicator):
 
-* The badge is meaningful to the user agent and OS, which can present it to the user in various ways, such as announcing it verbally to a user using a screen reader.
+* The badge is meaningful to the user agent and OS, which can expose its value through platform accessibility APIs so assistive technologies can present it on demand.
 * Badges can be displayed with a consistent style chosen by the host operating system.
 * User agents can provide a way for users to disable badges on a per-site or global basis.
 
