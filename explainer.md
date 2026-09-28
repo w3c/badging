@@ -58,6 +58,7 @@ Here are some examples of app badging applied at the OS level:
 
 The badge can be shown and updated even when there are no tabs or windows open for the app. The use of an explicit badge API has a number of advantages over the "hack" ways (like dynamically setting favicons or titles to include a status indicator):
 
+* The badge can appear outside (completely, or partially overlapping) of the iconic representation of the app, leaving more room for the site's brand image.
 * The badge is meaningful to the user agent and OS, which can expose its value through platform accessibility APIs so assistive technologies can present it on demand.
 * Badges can be displayed with a consistent style chosen by the host operating system.
 * User agents can provide a way for users to disable badges on a per-site or global basis.
@@ -388,7 +389,7 @@ Different operating systems have varying support for badge types. Since the OS u
 This approach ensures consistent semantic behavior across platforms and prevents the issues identified in implementations where `setAppBadge()` (flag) incorrectly clears badges instead of displaying them.
 
 ## Security and Privacy Considerations
-The API is write-only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
+The API is write-only, so data badged can't be used to track a user. (The API is set only, so the badge data cannot be used to identify users.) Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
 
 These methods are only usable from secure contexts, so forged pages can't set badges on behalf of an origin they don't control.
 
@@ -449,9 +450,10 @@ full power of showing a native badge.
 The API allows `set()`ing an `unsigned long long`. When presenting this value, it should be formatted according to the user's locale settings.
 
 ### Index of Considered Alternatives
+- An API to set the badge on a browser tab.
 - The "app" API being a more general API that [sets a badge on a URL scope](https://github.com/w3c/badging/issues/55), applying to all apps within that scope.
 - Setting an app badge badges [app associated with the current document's linked manifest](https://github.com/w3c/badging/issues/55), as opposed to any app that scopes this document.
-- A single URL-scoped API that sets both the document and app badges at the same time (applying to all documents within the URL scope).
+- A single URL-scoped API that sets both a document badge and an app badge at the same time.
 - A [declarative API](#couldnt-this-be-a-declarative-api-ie-a-dom-element-so-it-would-work-without-javascript).
 - Exposing the badging API [elsewhere](#why-is-this-api-attached-to-navigator-instead-of-window-or-notifications).
 - Supporting [non-integers](#why-limit-support-to-just-an-integer-what-about-other-characters).
