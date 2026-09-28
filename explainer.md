@@ -125,10 +125,10 @@ navigator.setAppBadge(getUnreadCount());
 If `getUnreadCount()` (the argument to `navigator.setAppBadge`) is 0, it will
 automatically clear the badge.
 
-If you just want to show a status indicator flag without a number, use the
-Boolean mode of the API by calling `navigator.setAppBadge` without an
-argument, and `navigator.clearAppBadge()` (which might be done to indicate
-that it is the player's turn to move in a multiplayer game):
+If you just want to show a status indicator flag without a number, call
+`navigator.setAppBadge` without an argument. To clear the badge, call
+`navigator.clearAppBadge()` (which might be done to indicate that it is the
+player's turn to move in a multiplayer game):
 
 ```js
 if (myTurn()) {
@@ -429,7 +429,7 @@ The API allows `set()`ing an `unsigned long long`. When presenting this value, i
 - Exposing the badging API [elsewhere](#why-is-this-api-attached-to-navigator-instead-of-window-or-notifications).
 - Supporting [non-integers](#why-limit-support-to-just-an-integer-what-about-other-characters).
 - Use in the [background](#why-cant-this-be-used-in-the-background-from-the-serviceworker-see-28-and-5).
-- [Separate methods](https://github.com/w3c/badging/issues/19) for setting/clearing boolean flags and numbers.
+- [Separate methods](https://github.com/w3c/badging/issues/19) for setting/clearing flags and numbers.
 - Exposing a [getter](https://github.com/w3c/badging/issues/18) for badge contents.
 - Only [badging](https://github.com/w3c/badging/issues/1) [PWAs](https://github.com/w3c/badging/issues/12).
 - Supporting [query-string scopes](https://github.com/w3c/badging/issues/1#issuecomment-511634128).
