@@ -362,17 +362,9 @@ They are as follows:
   is 0, clears the badge for the matching app(s).
 * `navigator.clearAppBadge()`: Clears the badge for the matching app(s).
 
-The **matching app(s)** has a different meaning depending on the context:
-
-* If called from a document, this refers to an installed app that this document
-  is [within
-  scope](https://www.w3.org/TR/appmanifest/#dfn-within-scope-manifest) of. If
-  multiple apps match, it is the one with the most specific scope. If none
-  match, the method has no effect. (Zero or one apps.)
-* If called from a service worker, this refers to all apps whose scope URL
-  [matches the service worker
-  registration](https://www.w3.org/TR/service-workers-1/#scope-match-algorithm)
-  of this service worker. (Zero or more apps.)
+The **matching app(s)** refers to the installed web application(s) that the
+current context (document or worker) is associated with, as determined by the
+user agent (typically based on the application's scope).
 
 ### UX treatment
 Badges may appear in any place that the user agent deems appropriate. App badges are shown in OS-specific contexts. User agents should attempt to reuse existing [operating system APIs and conventions](docs/implementation.md), to achieve a native look-and-feel for the badge.
@@ -393,7 +385,7 @@ The API is write-only, so data badged can't be used to track a user. (The API is
 
 These methods are only usable from secure contexts, so forged pages can't set badges on behalf of an origin they don't control.
 
-If the badge methods are called from inside an iframe, the app API should apply to the app enclosing the iframed contents' URL, not the containing page's URL.
+Additionally, to prevent misuse, a `SecurityError` is thrown if these methods are called from a cross-origin iframe.
 
 There are additional privacy considerations relating to the proposed extensions to the Push API, noted above. However, this does not apply to the base Badge API.
 
