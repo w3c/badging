@@ -376,6 +376,17 @@ The **matching app(s)** has a different meaning depending on the context:
 ### UX treatment
 Badges may appear in any place that the user agent deems appropriate. App badges are shown in OS-specific contexts. User agents should attempt to reuse existing [operating system APIs and conventions](docs/implementation.md), to achieve a native look-and-feel for the badge.
 
+### Implementation Considerations for Platform Limitations
+
+Different operating systems have varying support for badge types. Since the OS ultimately controls badge rendering, it is the user agent that communicates the correct semantic intent:
+
+* **Flag support**: Some platforms do not natively support "flag" badges (badges without numbers). In such cases, user agents communicate to the OS using the closest available representation that conveys badge presence (such as a generic symbol or the number "1") rather than requesting badge clearing.
+* **Number support**: Some platforms might not support numbered badges. In such cases, user agents can communicate the badge to the OS as a flag representation.
+* **Semantic preservation**: User agents preserve the semantic distinction between "flag" (show something) and "nothing" (show nothing) when communicating with the operating system, even when platform capabilities are limited.
+* **OS control**: The ultimate display behavior is controlled by the operating system and can be further controlled by user settings or system conventions.
+
+This approach ensures consistent semantic behavior across platforms and prevents the issues identified in implementations where `setAppBadge()` (flag) incorrectly clears badges instead of displaying them.
+
 ## Security and Privacy Considerations
 The API is write-only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
 
