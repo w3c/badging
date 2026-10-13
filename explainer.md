@@ -117,7 +117,7 @@ user agent.
 
 ## Usage examples
 
-To simply set a numeric badge on the current application:
+To set a numeric badge on the current application:
 
 ```js
 navigator.setAppBadge(getUnreadCount());
