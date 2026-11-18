@@ -131,11 +131,10 @@ If you just want to show a status indicator flag without a number, call
 `navigator.clearAppBadge()`
 
 ```js
-if (myTurn()) {
+if (myTurn())
   navigator.setAppBadge();
-} else {
+else
   navigator.clearAppBadge();
-}
 ```
 
 The effects of the app API are global and may outlast the document (it is intended to persist
