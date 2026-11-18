@@ -128,8 +128,7 @@ automatically clear the badge.
 
 If you just want to show a status indicator flag without a number, call
 `navigator.setAppBadge` without an argument. To clear the badge, call
-`navigator.clearAppBadge()` (which might be done to indicate that it is the
-player's turn to move in a multiplayer game):
+`navigator.clearAppBadge()`
 
 ```js
 if (myTurn()) {
