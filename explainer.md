@@ -380,7 +380,7 @@ Different operating systems have varying support for badge types. Since the OS u
 This approach ensures consistent semantic behavior across platforms and prevents the issues identified in implementations where `setAppBadge()` (flag) incorrectly clears badges instead of displaying them.
 
 ## Security and Privacy Considerations
-The API is write-only, so data badged can't be used to track a user. (The API is set only, so the badge data cannot be used to identify users.) Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
+The API is write-only, so data badged can't be used to track a user. Whether the API is present could possibly be used as a bit of entropy to fingerprint users, but this is the case for all new APIs.
 
 These methods are only usable from secure contexts, so forged pages can't set badges on behalf of an origin they don't control.
 
